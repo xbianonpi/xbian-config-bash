@@ -261,7 +261,7 @@ function showInterfaceSSIDDlg() {
 	showInputDlg "$(_ network.label.custom)" $1
 }
 
-function showRestartWLANDlg() {
+function showRestartAdapterDlg() {
 	wrapTxtFn "$(printf "$(_  network.connection.restart)" "$1")" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"

@@ -498,6 +498,18 @@ function restartWLANAdapterFn() {
 	return $PROCESSID;
 }
 
+# Restart a lan adapter
+# Arguments
+#  $1 Interface name
+# Return
+#  @: Process id of the ifup process
+#  0: Process ifup not running
+function restartLANAdapterFn() {
+	ifdown eth0 &>/dev/null
+	ifup eth0 &>/dev/null
+	return $PROCESSID;
+}
+
 # Gets the status of the wlan restart
 # Return
 #  0: The wlan status file does not exist

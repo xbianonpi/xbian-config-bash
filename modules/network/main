@@ -106,6 +106,7 @@ function showInterfaceStaticGUIFn() {
 	GATEWAY=$(echo "$2" | grep gateway | cut -f 2 -d" ")
 	NAMESERVER1=$(echo "$2" | grep nameserver1 | cut -f 2 -d" ")
 	NAMESERVER2=$(echo "$2" | grep nameserver2 | cut -f 2 -d" ")
+	
 	showInterfaceStaticDlg "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2"
 	if [ $? -eq 0 ]; then
 		STATICCONF=($(echo -e "$RETURN"))
@@ -125,7 +126,13 @@ function showInterfaceStaticGUIFn() {
 			RESULT=$(setInterfaceStaticFn "$1" "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2"; echo $?)
 			if [ $RESULT -eq 1 ]; then
 				showInterfaceStaticSuccessDlg
-				showGUIFn;
+				if [[ $1 =~ "wlan" ]]; then
+					showWlanScanGUIFn "$1" "$2"
+				else
+					showRestartAdapterDlg $1
+					restartLANAdapterFn;
+					showGUIFn;
+				fi
 			else
 				showInterfaceStaticErrorDlg
 				showInterfaceStaticGUIFn "$1" "$2"
@@ -261,7 +268,7 @@ function showWlanProtectionGUIFn() {
 }
 
 function showWlanRestartGUIFn() {
-	showRestartWLANDlg $1
+	showRestartAdapterDlg $1
 	restartWLANAdapterFn "$1"
 	LASTSTATUS=-1;
 	while [ $(kill -0 $PROCESSID 2>/dev/null >/dev/null; echo $?) -eq 0 ]; do
