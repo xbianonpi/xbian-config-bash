@@ -122,9 +122,10 @@ function showInterfaceStaticGUIFn() {
 				NAMESERVER2="${STATICCONF[4]}"
 			fi
 			# Validation of arguments is done inside this function
-			RESULT=$(setInterfaceStaticFn "$1" "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2")
+			RESULT=$(setInterfaceStaticFn "$1" "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2"; echo $?)
 			if [ $RESULT -eq 1 ]; then
 				showInterfaceStaticSuccessDlg
+				showGUIFn;
 			else
 				showInterfaceStaticErrorDlg
 				showInterfaceStaticGUIFn "$1" "$2"
