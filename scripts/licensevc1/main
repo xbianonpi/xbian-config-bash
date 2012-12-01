@@ -22,14 +22,14 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(select update);
+ARGUMENTS=(select insert delete update);
 
 #|------------------------------------|
 #|          Include files             |
 #|------------------------------------|
 
-source $BASEPATH/scripts/hostname/functions
-source $BASEPATH/scripts/hostname/dialogs
+source $BASEPATH/scripts/licensevc1/functions
+source $BASEPATH/scripts/licensevc1/dialogs
 
 #|------------------------------------|
 #|           Main program             |
@@ -37,13 +37,31 @@ source $BASEPATH/scripts/hostname/dialogs
 
 # Executes the GUI version of this module
 function showGUIFn() {
-	getCurrentHostnameFn HOSTNAME
-	CURRENTHOSTNAME=$HOSTNAME;
-	showHostnameInputDlg $CURRENTHOSTNAME;
-	if [ ! -z $RETURN ]; then
-		setHostnameFn $RETURN $CURRENTHOSTNAME
+	getCurrentLicenseVC1Fn LICENSE
+	CURRENTLICENSE=$LICENSE;
+	showLicenseVC1InputDlg $CURRENTLICENSE;
+	if [ ! -z $RETURN ] && [ ! -z $CURRENTLICENSE ]; then
+		updateLicenseVC1Fn $RETURN $CURRENTLICENSE
 		if [ $? -eq 1 ]; then
-			showHostnameSuccessDlg;
+			showLicenseVC1UpdatedDlg;
+			ASKFORREBOOT=1;
+		else
+			showErrorDlg;
+		fi
+	elif [ ! -z $RETURN ] && [ -z $CURRENTLICENSE ]; then
+		insertLicenseVC1Fn $RETURN;
+		if [ $? -eq 1 ]; then
+			showLicenseVC1InsertedDlg;
+			ASKFORREBOOT=1;
+		else
+			showErrorDlg;
+		fi
+	elif [ -z $RETURN ] && [ -z $CURRENTLICENSE ]; then
+		return 1;
+	else
+		deleteLicenseVC1Fn $CURRENTLICENSE;
+		if [ $? -eq 1 ]; then
+			showLicenseVC1DeletedDlg;
 			ASKFORREBOOT=1;
 		else
 			showErrorDlg;
@@ -63,18 +81,32 @@ function showGUIFn() {
 function showCMDFn() {
 	case $1 in
 		"select")
-			getCurrentHostnameFn HOSTNAME;
-			echo $HOSTNAME;
+			getCurrentLicenseVC1Fn LICENSE;
+			echo $LICENSE;
 		;;
 		"update")
 			shift;
 			if [ $# -eq 1 ]; then
-				getCurrentHostnameFn HOSTNAME
-				setHostnameFn $1 $HOSTNAME;
+				getCurrentLicenseVC1Fn LICENSE
+				updateLicenseVC1Fn $1 $LICENSE;
 				echo $?;
 			else
 				echo 0;
 			fi
+		;;
+		"insert")
+			shift;
+			if [ $# -eq 1 ]; then
+				insertLicenseVC1Fn $1;
+				echo $?;
+			else
+				echo 0;
+			fi
+		;;		
+		"delete")
+			getCurrentLicenseVC1Fn LICENSE
+			deleteLicenseVC1Fn $LICENSE;
+			echo $?;
 		;;
 	esac
 }

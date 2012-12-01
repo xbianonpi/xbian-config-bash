@@ -46,7 +46,7 @@ ORIGINALIFS=$IFS;
 #APTBASE="http://apt.xbian.org/dists/wheezy/main/binary-armhf/"
 
 # Location of the xbian-config script files
-BASEPATH="/usr/local/include/xbian-config1"
+BASEPATH="/usr/local/include/xbian-config"
 
 # Current dialog title
 TITLE="Config"
@@ -79,10 +79,11 @@ function showMainCloseDlg() {
 	DOREBOOT=0;
 
 	# Is a reboot needed for the changes to get effect
-	if [ $ASKFORREBOOT -eq 1 ]; then
-		wrapTxtFn "A reboot is required. Do you want to reboot now?"
-		centerTxtFn "$WRAPPEDTXT"
-		showConfirmDlg "Reboot?" "$CENTEREDTXT";
+	if [ $ASKFORREBOOT -eq 0 ]; then
+		wrapTxtFn "A reboot is required. Do you want to reboot now?" 60
+		centerTxtFn "$WRAPPEDTXT" 60
+		echo -e "$CENTEREDTXT";
+		showConfirmDlg "$CENTEREDTXT" $HEIGHT 60;
 	
 		# 0: Do reboot
 		# 1: Don't reboot
@@ -97,9 +98,9 @@ function showMainCloseDlg() {
 		clrFSCacheFn;
 	fi
 	clrMemCacheFn;
-	if [ $DOREBOOT -eq 1 ]; then
-		reboot
-	fi;
+	#if [ $DOREBOOT -eq 1 ]; then
+	#	reboot
+	#fi;
 	exit 0
 }
 
@@ -139,6 +140,7 @@ function showMainMenuDlg() {
 	# If a certain menu items has no subitems, than we've reach of final function we want to execute
 	if [ -z "$ITEMS" ]; then
 		# Grab the line of the module we want to execute
+		
 		LINE=$(cat $BASEPATH/struct | grep ^$(echo $LEVEL | awk '{print substr($0,0,length)}'):);
 		
 		# Grab the system name of the module we want to execute
@@ -146,7 +148,7 @@ function showMainMenuDlg() {
 		
 		# Grab the verbose name of the current module
 		CLEVEL=$(echo $LINE | rev | cut -f3 -d: | rev | sed 's/\ *$//g');
-
+		
 		# Include the module we want to execute
 		source $BASEPATH/scripts/$MODULE/main
 		
@@ -201,8 +203,7 @@ if [[ $# -gt 0 ]]; then
 				echo "Available arguments for module '$MODULE' are:";
 				echo ${ARGUMENTS[@]};
 			else
-				showCMDFn "$@";
-				echo $?;
+				echo $(showCMDFn "$@");
 			fi
 		else
 			echo "Available arguments for module '$MODULE' are:";

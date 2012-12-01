@@ -17,19 +17,35 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-# Shows the dialog in which users can enter the new hostname
-#  $1 [string] Current Hostname
+# Shows the dialog in which users can enter the mpg2 license
+#  $1 [string] Current License
 # Returns
 #  $? [Integer]
 #  - 1: Change
 #  - 0: Cancel
-function showHostnameInputDlg() {
-	showInputDlg "Hostname:" $1
+function showLicenseMPG2InputDlg() {
+	showInputDlg "License MPG2:" $1
 }
 
-#Shows hostname succesfully change dialog
-function showHostnameSuccessDlg() {
-	wrapTxtFn "Hostname successfully changed"
+#Shows the license successfulle inserted dialog
+function showLicenseMPG2InsertedDlg() {
+	wrapTxtFn "MPG2 license successfully inserted"
+	centerTxtFn "$WRAPPEDTXT"
+	showMsgDlg "Close" "$CENTEREDTXT"
+	return $?;
+}
+
+#Shows the license successfulle updated dialog
+function showLicenseMPG2UpdatedDlg() {
+	wrapTxtFn "MPG2 license successfully updated"
+	centerTxtFn "$WRAPPEDTXT"
+	showMsgDlg "Close" "$CENTEREDTXT"
+	return $?;
+}
+
+#Shows the license successfulle removed dialog
+function showLicenseMPG2DeletedDlg() {
+	wrapTxtFn "MPG2 license successfully removed"
 	centerTxtFn "$WRAPPEDTXT"
 	showMsgDlg "Close" "$CENTEREDTXT"
 	return $?;
