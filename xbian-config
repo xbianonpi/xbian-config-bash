@@ -201,7 +201,7 @@ if [[ $# -gt 0 ]]; then
 				echo "Available arguments for module '$MODULE' are:";
 				echo ${ARGUMENTS[@]};
 			else
-				cmdline "$@";
+				showCMDFn "$@";
 				echo $?;
 			fi
 		else
