@@ -76,12 +76,11 @@ showInfoDlg() {
 }
 
 # Show a yes/no dialog
-#  $1 Title
-#  $2 Text
-#  $3 (optional) Height
-#  $4 (optional) Width
-#  $5 (optional) Yes label
-#  $6 (optional) No Label
+#  $1 Text
+#  $2 (optional) Height
+#  $3 (optional) Width
+#  $4 (optional) Yes label
+#  $5 (optional) No Label
 showConfirmDlg() {
 	YESLABEL="Yes"
 	NOLABEL="No"
@@ -159,43 +158,60 @@ function showMenuDlg() {
 }
 
 # Show radio list
-#  $1 Title
-#  $2 Descriptive text
-#  $3 Items
-#  $4 Rows
-#  $5 (optional) Height
-#  $6 (optional) Width
+#  $1 Items
+#  $2 Rows
+#  $3 (optional) Height
+#  $4 (optional) Width
 function showRadioDlg() {
-	if [ $# -gt 2 ]; then
-		ROWS=$3;
+	if [ $# -gt 1 ]; then
+		ROWS=$2;
 	else
 		ROWS=5;
 	fi
 	WIDTH=$(($DEFAULTWIDTH+15));
-
+	HEIGHT=7;
+	if [ $# -gt 2 ]; then
+		HEIGHT=$3
+	fi
 	if [ $# -gt 3 ]; then
-		HEIGHT=$4
-	fi
-	if [ $# -gt 4 ]; then
-		WIDTH=$5
-	fi
-	if [ $# -gt 5 ]; then
-		YESLABEL=$6
-	fi
-	if [ $# -gt 6 ]; then
-		NOLABEL=$7
+		WIDTH=$4
 	fi
 
 	RETURN=$( \
 		dialog \
 			--title "$TITLE" \
 			--backtitle "$BACKTITLE" \
-			--radiolist "$2" $HEIGHT $WIDTH $ROWS $3 3>&1 1>&2 2>&3);
+			--radiolist "$1" $HEIGHT $WIDTH $ROWS $3 3>&1 1>&2 2>&3);
 
+}
+
+# Show input dialog
+#  $1 Descriptive text
+#  $2 Value
+#  $3 (optional) Height
+#  $4 (optional) Width
+function showInputDlg() {
+	VALUE=$2;
+	WIDTH=$DEFAULTWIDTH;
+	HEIGHT=8;
+	if [ $# -gt 2 ]; then
+		HEIGHT=$3
+	fi
+	if [ $# -gt 3 ]; then
+		WIDTH=$4
+	fi
+
+	RETURN=$( \
+		dialog \
+			--backtitle "$BACKTITLE" \
+			--title "$TITLE" \
+			--ok-label Change \
+			--inputbox "$1" $HEIGHT $WIDTH $VALUE \
+			3>&1 1>&2 2>&3);
 }
 
 # Standard error dialog
 function showErrorDlg() {
-	centerTextFn "An unexpected error occurred"
-	showdialog "Close" "$CENTEREDTEXT" $HEIGHT;
+	centerTxtFn "An unexpected error occurred"
+	showMsgDlg "Close" "$CENTEREDTXT" 7;
 }
