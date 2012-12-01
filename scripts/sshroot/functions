@@ -17,6 +17,11 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
+# Checks if user root has a password set
+# Returns
+#  *[Integer]
+#  - 1: No root password is set
+#  - 0: Root password is set
 function rootPasswordSetFn() {
 	if [ -z $(cat /etc/shadow | grep root | cut -f 2 -d:) ]; then
 		return 0;
@@ -25,6 +30,11 @@ function rootPasswordSetFn() {
 	fi
 }
 
+# Enables root ssh login
+# Returns
+#  $?[Integer]
+#  - 1: Success
+#  - 0: Failed
 function enableSSHRootLoginFn() {
 	sed -i 's/PermitRootLogin no/PermitRootLogin yes/g' /etc/ssh/sshd_config
 	/etc/init.d/ssh restart >/dev/null
@@ -32,6 +42,11 @@ function enableSSHRootLoginFn() {
 	return $?;
 }
 
+# Disables root ssh login
+# Returns
+#  $?[Integer]
+#  - 1: Success
+#  - 0: Failed
 function disableSSHRootLoginFn() {
 	sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
 	/etc/init.d/ssh restart >/dev/null
@@ -39,6 +54,11 @@ function disableSSHRootLoginFn() {
 	return $?;
 }
 
+# Checks if root ssh login is enabled
+# Returns
+#  $?[Integer]
+#  - 1: Enabled
+#  - 0: Disabled
 function isSSHRootLoginEnabledFn() {
 	if [ $(cat /etc/ssh/sshd_config | grep "PermitRootLogin yes" | wc -l) -eq 0 ]; then
 		return 0;

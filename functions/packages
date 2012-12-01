@@ -20,6 +20,10 @@
 
 # Check if a package is installed on the system
 #  $1 package name
+# Returns
+#  * [Integer]
+#  - 0: Not installed
+#  - 1: Installed
 function isPKGInstalledFn() {
 	RES=$(dpkg-query -W -f='${Status}\n' "$1" 2>/dev/null)
 	DEINST=$(echo $RES | grep 'deinstall ok' | wc -l)

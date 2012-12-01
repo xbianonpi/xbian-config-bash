@@ -20,10 +20,10 @@
 DEFAULTWIDTH=55;
 
 # Show a normal dialog (messagebox)
-# $1 Ok label
-# $2 Text
-# $3 (optional) Height
-# $4 (optional) Width
+#  $1 Ok label
+#  $2 Text
+#  $3 (optional) Height
+#  $4 (optional) Width
 showMsgDlg() {
 	# Default width and height
 	HEIGHT=7
@@ -49,9 +49,9 @@ showMsgDlg() {
 }
 
 # Show a information box
-# $1 Text
-# $2 (optional) Height
-# $3 (optional) Width
+#  $1 Text
+#  $2 (optional) Height
+#  $3 (optional) Width
 showInfoDlg() {
 	# Default width and height
 	HEIGHT=7
@@ -76,12 +76,12 @@ showInfoDlg() {
 }
 
 # Show a yes/no dialog
-# $1 Title
-# $2 Text
-# $3 (optional) Height
-# $4 (optional) Width
-# $5 (optional) Yes label
-# $6 (optional) No Label
+#  $1 Title
+#  $2 Text
+#  $3 (optional) Height
+#  $4 (optional) Width
+#  $5 (optional) Yes label
+#  $6 (optional) No Label
 showConfirmDlg() {
 	YESLABEL="Yes"
 	NOLABEL="No"
@@ -113,13 +113,13 @@ showConfirmDlg() {
 }
 
 #Show menu
-# $1 Descriptive text
-# $2 Menu items
-# $3 (optional) Rows
-# $4 (optional) Height
-# $5 (optional) Width
-# $6 (optional) Yes label
-# $7 (optional) No Label
+#  $1 Descriptive text
+#  $2 Menu items
+#  $3 (optional) Rows
+#  $4 (optional) Height
+#  $5 (optional) Width
+#  $6 (optional) Yes label
+#  $7 (optional) No Label
 function showMenuDlg() {
 	YESLABEL="Select"
 	NOLABEL="Return"	
@@ -158,13 +158,13 @@ function showMenuDlg() {
 			$2 3>&1 1>&2 2>&3)
 }
 
-#Show radio list
-# $1 Title
-# $2 Descriptive text
-# $3 Items
-# $4 Rows
-# $5 (optional) Height
-# $6 (optional) Width
+# Show radio list
+#  $1 Title
+#  $2 Descriptive text
+#  $3 Items
+#  $4 Rows
+#  $5 (optional) Height
+#  $6 (optional) Width
 function showRadioDlg() {
 	if [ $# -gt 2 ]; then
 		ROWS=$3;
@@ -194,7 +194,7 @@ function showRadioDlg() {
 
 }
 
-#Standard error dialog
+# Standard error dialog
 function showErrorDlg() {
 	centerTextFn "An unexpected error occurred"
 	showdialog "Close" "$CENTEREDTEXT" $HEIGHT;

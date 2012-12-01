@@ -17,12 +17,12 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-#Clear the systems memory
+# Clear the systems memory
 function clrMemCacheFn() {
 	echo 1 | sudo tee /proc/sys/vm/drop_caches >/dev/null
 }
 
-#Clear the FS cache
+# Clear the FS cache
 function clrFSCacheFn() {
 	rm -rf /tmp/xbianpackages
 	rm -rf /tmp/xbiancache

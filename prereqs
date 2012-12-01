@@ -17,7 +17,7 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-#Enable CTRL-C, doesn't clear caches, doesn't install/executes anything
+# Enable CTRL-C, doesn't clear caches, doesn't install/executes anything
 if [ $DEBUG -eq 0 ]; then
 	trap '' 2;
 fi

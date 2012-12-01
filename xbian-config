@@ -27,64 +27,65 @@ fi
 #|          Global variables          |
 #|------------------------------------|
 
-#Title at the top of the dialog windows
+# Title at the top of the dialog windows
 BACKTITLE="XBian $(cat /etc/xbian_version)";
 
-#Debugging mode, when enable no actual changes are made to the system
+# Debugging mode, when enable no actual changes are made to the system
 DEBUG=0;
 
-#Check if a reboot is needed
+# Check if a reboot is needed
 ASKFORREBOOT=0;
 
-#Check if the package database needs to be updates
+# Check if the package database needs to be updates
 #PACKAGEDBUPDATED=0;
 
-#Standard delimiter
+# Standard delimiter
 ORIGINALIFS=$IFS;
 
-#Url for the main APT repository Package location
+# Url for the main APT repository Package location
 #APTBASE="http://apt.xbian.org/dists/wheezy/main/binary-armhf/"
 
-#Location of the xbian-config script files
+# Location of the xbian-config script files
 BASEPATH="/usr/local/include/xbian-config1"
 
-#Current dialog title
+# Current dialog title
 TITLE="Config"
 
 #|------------------------------------|
 #|          Include files             |
 #|------------------------------------|
 
-#Common xbian-config functions
+# Common xbian-config functions
 source $BASEPATH/functions/packages
 
-#Pre-requirements
+# Pre-requirements
 source $BASEPATH/prereqs
 
-#Standard dialogs
+# Standard dialogs
 source $BASEPATH/functions/dialogs
 
-#Text markup
+# Text markup
 source $BASEPATH/functions/markup
 
-#System functions
+# System functions
 source $BASEPATH/functions/system
 
 #|------------------------------------|
 #|           Main program             |
 #|------------------------------------|
+
 function showMainCloseDlg() {
 
 	DOREBOOT=0;
 
-	#Is a reboot needed for the changes to get effect
+	# Is a reboot needed for the changes to get effect
 	if [ $ASKFORREBOOT -eq 1 ]; then
 		wrapTxtFn "A reboot is required. Do you want to reboot now?"
 		centerTxtFn "$WRAPPEDTXT"
 		showConfirmDlg "Reboot?" "$CENTEREDTXT";
 	
-		# 0 = Do reboot
-		# 1 = Don't reboot
+		# 0: Do reboot
+		# 1: Don't reboot
 		case "$?" in
 			0)
 				DOREBOOT=1;
@@ -120,59 +121,59 @@ function showMainMenuDlg() {
 		CPATH=$3;
 	fi
 	
-	#Trim CPATH
+	# Trim CPATH
 	trimLnFn $CPATH
 	CPATH=$TRIMMEDLN;
 
-	#Draw showMainMenuDlg
+	# Draw showMainMenuDlg
 	IFS=$'\n';
 	
-	#Get all sub-items that corresponding to the level we are currently
+	# Get all sub-items that corresponding to the level we are currently
 	ITEMS=$(cat $BASEPATH/struct | grep ^$(echo $LEVEL$ADD[0-9])*: | sed 's/\(.*\)\.\(\.*[0-9].\)\{1,\}/\2/' | sed 's/\([0-9]\)\(:\)\([a-zA-Z0-9\ \ %,-\"\*]\{1,\}\)\(:\)\([a-zA-Z0-9\ %,-\"\*]\{1,\}\)\(:\)/\1%\3!-!"\5"%:/' | cut -f1 -d: | sed ':a;N;$!ba;s/\n//g' | awk '{print substr($0,0,length)}');
 
-	#Clear caches need by previous function
+	# Clear caches need by previous function
 	clrMemCacheFn;
 	
-	#Create main menu
+	# Create main menu
 	
-	#If a certain menu items has no subitems, than we've reach of final function we want to execute
+	# If a certain menu items has no subitems, than we've reach of final function we want to execute
 	if [ -z "$ITEMS" ]; then
-		#Grab the line of the module we want to execute
+		# Grab the line of the module we want to execute
 		LINE=$(cat $BASEPATH/struct | grep ^$(echo $LEVEL | awk '{print substr($0,0,length)}'):);
 		
-		#Grab the system name of the module we want to execute
+		# Grab the system name of the module we want to execute
 		MODULE=$(echo $LINE | rev | cut -f1 -d: | rev);
 		
-		#Grab the verbose name of the current module
+		# Grab the verbose name of the current module
 		CLEVEL=$(echo $LINE | rev | cut -f3 -d: | rev | sed 's/\ *$//g');
 
-		#Include the module we want to execute
+		# Include the module we want to execute
 		source $BASEPATH/scripts/$MODULE/main
 		
-		#Change the dialog title to reflect the right module
+		# Change the dialog title to reflect the right module
 		TITLE="${CPATH% > *} > $CLEVEL"
 		
-		#Open the modules gui function
+		# Open the modules gui function
 		showGUIFn;
 		
-		#When we're done, show the main menu again
+		# When we're done, show the main menu again
 		IFS=$'\n';
 		showMainMenuDlg $(($1-1)) $(echo $LEVEL | awk '{print substr($0,0,length-1)}') ${CPATH% > *};
 	else
 		IFS="%";
-		#Set the title to the appropriate menu level we're in
+		# Set the title to the appropriate menu level we're in
 		TITLE=$CPATH
 
-		#Show the main menu
+		# Show the main menu
 		showMenuDlg "" "$ITEMS" 6;
 		
-		#What there a button pressed?
-		# 1 = Button
-		# 0 = Item
+		# What there a button pressed?
+		#  1: Button
+		#  0: Item
 		if [ $? -eq 1 ]; then
-			#Which button was pressed?
-			# 0 = Close
-			# 1 = Select
+			# Which button was pressed?
+			#  0: Close
+			#  1: Select
 			if [ $1 -eq 0 ]; then
 				showMainCloseDlg;
 			else
@@ -187,15 +188,15 @@ function showMainMenuDlg() {
 
 }
 
-#Check xbian-config was opened using arguments
+# Check xbian-config was opened using arguments
 if [[ $# -gt 0 ]]; then
 	MODULE=$1;
 	if [ -f $BASEPATH/scripts/$MODULE/main ]; then
 		source $BASEPATH/scripts/$MODULE/main
 		shift;
-		#If the module was called with arguments
+		# If the module was called with arguments
 		if [ $# -gt 0 ]; then
-			#Check if it's a valid argument
+			# Check if it's a valid argument
 			if [ $(echo ${ARGUMENTS[@]} | grep $1 | wc -l) -eq 0 ]; then
 				echo "Available arguments for module '$MODULE' are:";
 				echo ${ARGUMENTS[@]};
