@@ -1,0 +1,201 @@
+#!/bin/bash
+#
+#Copyright 2012 CurlyMo & Hexagon <development@xbian.org>
+#
+#This file is part of XBian - XBMC on the Raspberry Pi.
+#
+#XBian is free software: you can redistribute it and/or modify it under the
+#terms of the GNU General Public License as published by the Free Software
+#Foundation, either version 3 of the License, or (at your option) any later
+#version.
+#
+#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#details.
+#
+#You should have received a copy of the GNU General Public License along
+#with XBian. If not, see <http://www.gnu.org/licenses/>
+
+DEFAULTWIDTH=55;
+
+# Show a normal dialog (messagebox)
+# $1 Ok label
+# $2 Text
+# $3 (optional) Height
+# $4 (optional) Width
+showMsgDlg() {
+	# Default width and height
+	HEIGHT=7
+	IMSGHGHT=$(echo -e "$3" | wc -l);
+	if [ $HEIGHT -eq $IMSGHGHT ]; then
+		HEIGHT=$(($IMSGHGHT+4));
+	fi
+
+	WIDTH=$DEFAULTWIDTH
+	# Overridden width and height
+	if [ $# -gt 2 ]; then
+		HEIGHT=$3
+	fi
+	if [ $# -gt 3 ]; then
+		WIDTH=$4
+	fi
+	# Show messagebox
+	dialog \
+		--backtitle "$BACKTITLE" \
+		--title "$TITLE" \
+		--ok-label "$1" \
+		--msgbox "$2" $HEIGHT $WIDTH
+}
+
+# Show a information box
+# $1 Text
+# $2 (optional) Height
+# $3 (optional) Width
+showInfoDlg() {
+	# Default width and height
+	HEIGHT=7
+	IMSGHGHT=$(echo -e "$3" | wc -l);
+	if [ $HEIGHT -eq $IMSGHGHT ]; then
+		HEIGHT=$(($IMSGHGHT+4));
+	fi
+
+	WIDTH=$DEFAULTWIDTH
+	# Overridden width and height
+	if [ $# -gt 1 ]; then
+		HEIGHT=$2
+	fi
+	if [ $# -gt 2 ]; then
+		WIDTH=$3
+	fi
+	# Show messagebox
+	dialog \
+		--backtitle "$BACKTITLE" \
+		--title "$TITLE" \
+		--infobox "$1" $HEIGHT $WIDTH
+}
+
+# Show a yes/no dialog
+# $1 Title
+# $2 Text
+# $3 (optional) Height
+# $4 (optional) Width
+# $5 (optional) Yes label
+# $6 (optional) No Label
+showConfirmDlg() {
+	YESLABEL="Yes"
+	NOLABEL="No"
+
+	# Default width and height
+	HEIGHT=7
+
+	WIDTH=$DEFAULTWIDTH
+	# Overridden width and height
+	if [ $# -gt 1 ]; then
+		HEIGHT=$2
+	fi
+	if [ $# -gt 2 ]; then
+		WIDTH=$3
+	fi
+	if [ $# -gt 3 ]; then
+		YESLABEL=$4
+	fi
+	if [ $# -gt 4 ]; then
+		NOLABEL=$5
+	fi
+	# Show yes/no dialog
+	dialog \
+		--backtitle "$BACKTITLE" \
+		--title "$TITLE" \
+		--yes-label $YESLABEL \
+		--no-label $NOLABEL \
+		--yesno "$1" $HEIGHT $WIDTH
+}
+
+#Show menu
+# $1 Descriptive text
+# $2 Menu items
+# $3 (optional) Rows
+# $4 (optional) Height
+# $5 (optional) Width
+# $6 (optional) Yes label
+# $7 (optional) No Label
+function showMenuDlg() {
+	YESLABEL="Select"
+	NOLABEL="Return"	
+	
+	if [ $# -gt 2 ]; then
+		ROWS=$3;
+	else
+		ROWS=5;
+	fi
+	HEIGHT=$(($ROWS+5))
+	WIDTH=$(($DEFAULTWIDTH+15));
+
+	if [ $# -gt 3 ]; then
+		HEIGHT=$4
+	fi
+	if [ $# -gt 4 ]; then
+		WIDTH=$5
+	fi
+	if [ $# -gt 5 ]; then
+		YESLABEL=$6
+	fi
+	if [ $# -gt 6 ]; then
+		NOLABEL=$7
+	fi
+
+	RETURN=$( \
+		dialog \
+			--no-kill \
+			--backtitle "$BACKTITLE" \
+			--title "$TITLE" \
+			--ok-label $YESLABEL \
+			--colors \
+			--cancel-label $NOLABEL \
+			--column-separator "!" \
+			--menu "$1" $HEIGHT $WIDTH $ROWS \
+			$2 3>&1 1>&2 2>&3)
+}
+
+#Show radio list
+# $1 Title
+# $2 Descriptive text
+# $3 Items
+# $4 Rows
+# $5 (optional) Height
+# $6 (optional) Width
+function showRadioDlg() {
+	if [ $# -gt 2 ]; then
+		ROWS=$3;
+	else
+		ROWS=5;
+	fi
+	WIDTH=$(($DEFAULTWIDTH+15));
+
+	if [ $# -gt 3 ]; then
+		HEIGHT=$4
+	fi
+	if [ $# -gt 4 ]; then
+		WIDTH=$5
+	fi
+	if [ $# -gt 5 ]; then
+		YESLABEL=$6
+	fi
+	if [ $# -gt 6 ]; then
+		NOLABEL=$7
+	fi
+
+	RETURN=$( \
+		dialog \
+			--title "$TITLE" \
+			--backtitle "$BACKTITLE" \
+			--radiolist "$2" $HEIGHT $WIDTH $ROWS $3 3>&1 1>&2 2>&3);
+
+}
+
+#Standard error dialog
+function showErrorDlg() {
+	centerTextFn "An unexpected error occurred"
+	showdialog "Close" "$CENTEREDTEXT" $HEIGHT;
+}
