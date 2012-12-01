@@ -1,0 +1,91 @@
+#!/bin/bash
+#
+#Copyright 2012 CurlyMo <development@xbian.org>
+#
+#This file is part of XBian - XBMC on the Raspberry Pi.
+#
+#XBian is free software: you can redistribute it and/or modify it under the
+#terms of the GNU General Public License as published by the Free Software
+#Foundation, either version 3 of the License, or (at your option) any later
+#version.
+#
+#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#details.
+#
+#You should have received a copy of the GNU General Public License along
+#with XBian. If not, see <http://www.gnu.org/licenses/>
+
+#Wrap text fit in dialog width
+# $1 [String]	Text
+# $2 [Integer] 	Width (optional) 
+#Returns
+# $HEIGHT [Integer]		Needed height for the dialog
+# $WRAPPEDTEXT [String]	String wrapped in newlines to fit width
+function wrapTxtFn() {
+	TEXT=$1;
+	
+	if [ $# -gt 1 ]; then
+		WIDTH=$2;
+	else
+		WIDTH=$DEFAULTWIDTH;
+	fi
+	IFS=" ";
+	WORDS=($(echo $TEXT));
+	RAWLINES=();
+	LINES=();
+	IFS=$'\n';
+	for WORD in ${WORDS[@]}; do
+		if [ $((${#RAWLINES}+${#WORD})) -lt $(($WIDTH-13)) ]; then
+			RAWLINES+=$WORD" ";
+		else
+			RAWLINES+=$WORD" ";
+			LINES+=($(echo $RAWLINES | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'));
+			RAWLINES="";
+		fi
+	done;
+	LINES+=($RAWLINES);
+	RAWLINES="";
+	WRAPPEDTXT="\n";
+	HEIGHT=6;
+	for LINE in ${LINES[@]}; do
+		HEIGHT=$(($HEIGHT+1));
+		WRAPPEDTXT+=$LINE"\n";
+	done
+	IFS=$ORIGINALIFS;
+	return $HEIGHT;
+}
+
+#Centers text in predefined width
+# $1 [String]	Text
+# $2 [Integer] 	Width (optional)
+#Returns
+# $CENTEREDTXT [String]
+function centerTxtFn() {
+	TEXT=$1;
+	IFS=$'\n';
+	if [ $# -gt 1 ]; then
+		WIDTH=$2;
+	else
+		WIDTH=$DEFAULTWIDTH;
+	fi
+	
+	LINES=($(echo -e "$TEXT"));
+	CENTEREDTXT="\n";
+	for LINE in ${LINES[@]}; do
+		NRSPACES=$(($(($WIDTH-6))-$((${#LINE}))));
+		for (( c=0; c<=$(($NRSPACES/2)); c++ )); do
+			CENTEREDTXT+=" ";
+		done;
+		CENTEREDTXT+=$LINE"\n";
+	done;
+}
+
+#Trim trailing and leading spaces from line
+# $1 [String]	Line
+#Returns
+# $TRIMMEDLN [String]
+function trimLnFn() {
+	TRIMMEDLN=$(echo -e "$1" | sed 's/^\ //;s/\ $//');
+}
