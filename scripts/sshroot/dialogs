@@ -17,6 +17,11 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
+# Shows the dialog in which users can choose to disable or enable root login through ssh
+# Returns
+#  $? [Integer]
+#  - 1: Enable ssh root login
+#  - 0: Disable ssh root login
 function enableDisableSSHRootLoginDlg() {
 	wrapTxtFn "Do you want to enable or disable root ssh login?";
 	centerTxtFn "$WRAPPEDTXT";
@@ -24,19 +29,21 @@ function enableDisableSSHRootLoginDlg() {
 	return $?;
 }
 
+# Warns the user that no root password was given, a requirement for ssh root login
 function showEmptyRootPasswordDlg() {
 	wrapTxtFn "User root has an empty password, without a password user root cannot login through ssh so please set this first.";
 	centerTxtFn "$WRAPPEDTXT";
 	showMsgDlg "Close" "$CENTEREDTXT" $HEIGHT;
-	return $RETURN;
 }
 
+# Shows a message that the SSH root login was disabled
 function showSSHRootDisabledDlg() {
 	wrapTxtFn "SSH root login succesfully disabled"
 	centerTxtFn "$WRAPPEDTXT";	
 	showMsgDlg "Close" "$CENTEREDTXT"
 }
 
+# Shows a message that the SSH root login was enabled
 function showSSHRootEnabledDlg() {
 	wrapTxtFn "SSH root login succesfully enabled"
 	centerTxtFn "$WRAPPEDTXT";	

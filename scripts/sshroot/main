@@ -17,15 +17,29 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
+#|------------------------------------|
+#|          Global variables          |
+#|------------------------------------|
+
+# The arguments this module accepts
 ARGUMENTS=(status rootpass enable disable);
+
+#|------------------------------------|
+#|          Include files             |
+#|------------------------------------|
+
 source $BASEPATH/scripts/sshroot/functions
 source $BASEPATH/scripts/sshroot/dialogs
 
+#|------------------------------------|
+#|           Main program             |
+#|------------------------------------|
+
+# Executes the GUI version of this module
 function showGUIFn() {
 	rootPasswordSetFn
 	if [ $? -eq 0 ]; then
-		showEmptyRootPasswordDlg 
-		return 1;
+		showEmptyRootPasswordDlg
 	fi
 	
 	enableDisableSSHRootLoginDlg
@@ -46,6 +60,21 @@ function showGUIFn() {
 	fi
 }
 
+# Executes the command line version of this module
+#  $1 Argument [Integer]
+# Returns
+#  *Status [Integer]
+#  - 1: Enabled
+#  - 0: Disabled
+#  *Rootpass [Integer]
+#  - 1: Set
+#  - 0: Empty
+#  *Enable [Integer]
+#  - 1: Succes
+#  - 0: Failed
+#  *Disable [Integer]
+#  - 1: Succes
+#  - 0: Failed
 function showCMDFn() {
 	case $1 in
 		"status")

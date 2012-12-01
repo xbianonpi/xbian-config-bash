@@ -17,12 +17,12 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-#Wrap text fit in dialog width
-# $1 [String]	Text
-# $2 [Integer] 	Width (optional) 
-#Returns
-# $HEIGHT [Integer]		Needed height for the dialog
-# $WRAPPEDTEXT [String]	String wrapped in newlines to fit width
+# Wrap text fit in dialog width
+#  $1 [String]	Text
+#  $2 [Integer] 	Width (optional) 
+# Returns
+#  $HEIGHT [Integer]		Needed height for the dialog
+#  $WRAPPEDTEXT [String]	String wrapped in newlines to fit width
 function wrapTxtFn() {
 	TEXT=$1;
 	
@@ -57,11 +57,11 @@ function wrapTxtFn() {
 	return $HEIGHT;
 }
 
-#Centers text in predefined width
-# $1 [String]	Text
-# $2 [Integer] 	Width (optional)
-#Returns
-# $CENTEREDTXT [String]
+# Centers text in predefined width
+#  $1 [String]	Text
+#  $2 [Integer] Width (optional)
+# Returns
+#  $CENTEREDTXT [String]
 function centerTxtFn() {
 	TEXT=$1;
 	IFS=$'\n';
@@ -82,10 +82,10 @@ function centerTxtFn() {
 	done;
 }
 
-#Trim trailing and leading spaces from line
-# $1 [String]	Line
-#Returns
-# $TRIMMEDLN [String]
+# Trim trailing and leading spaces from line
+#  $1 [String]	Line
+# Returns
+#  $TRIMMEDLN [String]
 function trimLnFn() {
 	TRIMMEDLN=$(echo -e "$1" | sed 's/^\ //;s/\ $//');
 }
