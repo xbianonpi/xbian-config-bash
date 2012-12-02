@@ -1,4 +1,4 @@
-1:SSH root login:Enable/Disable SSH root login:sshrootlogin
-2:Hostname:Change the default hostname:hostname
-3:MPG2:Enter/remove your MPG2 license:licensempg2
-4:VC1:Enter/remove your VC1 license:licensevc1
+1:sshrootlogin
+2:hostname
+3:licensempg2
+4:licensevc1
