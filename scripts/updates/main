@@ -101,25 +101,35 @@ function showGUIFn() {
 
 # Executes the command line version of this module
 #  $1 Argument [Integer]
-#  $2 Hostname [String]
 # Returns
-#  *Get [String]
-#  - Hostname
-#  *Set [Integer]
+#  *Check [String]
+#  - Latest version
+#  *Update [Integer]
 #  - 1: Success
 #  - 0: Failed
 function showCMDFn() {
 	case $1 in
-		"select")
-			getCurrentHostnameFn HOSTNAME;
-			echo $HOSTNAME;
+		"check")
+			downloadPackageListFn
+			if [ $? -eq 0 ]; then
+				echo 0;
+			else
+				TO_INSTALL=$(checkForUpdatesFn)
+				if [ ! -z "$TO_INSTALL" ]; then
+					if [ "$TO_INSTALL" = "0" ]; then
+						echo "0"
+					elif [ "$TO_INSTALL" = "-1" ]; then
+						echo "-1"
+					else
+						echo "$TO_INSTALL"
+					fi
+				fi
+			fi
 		;;
 		"update")
-			shift;
-			if [ $# -eq 1 ]; then
-				getCurrentHostnameFn HOSTNAME
-				setHostnameFn $1 $HOSTNAME;
-				echo $?;
+			installUpdateFn "$2"
+			if [ $? -eq 1 ]; then
+				echo 1;
 			else
 				echo 0;
 			fi
