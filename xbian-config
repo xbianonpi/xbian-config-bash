@@ -216,8 +216,8 @@ function showMainMenuDlg() {
 # Check xbian-config was opened using arguments
 if [[ $# -gt 0 ]]; then
 	MODULE=$1;
-	if [ -f $BASEPATH/scripts/$MODULE/main ]; then
-		source $BASEPATH/scripts/$MODULE/main
+	if [ -f $BASEPATH/modules/$MODULE/main ]; then
+		source $BASEPATH/modules/$MODULE/main
 		shift;
 		# If the module was called with arguments
 		if [ $# -gt 0 ]; then

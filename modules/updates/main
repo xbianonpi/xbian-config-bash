@@ -123,6 +123,8 @@ function showCMDFn() {
 					else
 						echo "$TO_INSTALL"
 					fi
+				else
+					echo "0"
 				fi
 			fi
 		;;
