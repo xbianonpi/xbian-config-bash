@@ -17,20 +17,56 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-# Shows the dialog in which users can enter the new hostname
-#  $1 [string] Current Hostname
-# Returns
-#  $? [Integer]
-#  - 1: Change
-#  - 0: Cancel
-function showHostnameInputDlg() {
-	showInputDlg "Hostname:" $1
+function showPackageListDownloadDlg() {
+        wrapTxtFn "$_DOWNLOAD_PL"
+        centerTxtFn "$WRAPPEDTXT"
+        showInfoDlg "$CENTEREDTXT"
 }
 
-#Shows hostname succesfully change dialog
-function showHostnameSuccessDlg() {
-	wrapTxtFn "Hostname successfully changed"
+function showPackageListErrorDlg() {
+	wrapTxtFn "$_PL_ERROR"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "Close" "$CENTEREDTXT"
-	return $?;
+	showMsgDlg "$CENTEREDTXT"
+}
+
+function showCheckingForUpdatesDlg() {
+        wrapTxtFn "$_CHECKING_FOR_UD"
+        centerTxtFn "$WRAPPEDTXT"
+        showInfoDlg "$CENTEREDTXT"
+}
+
+function showUpToDateDlg() {
+	wrapTxtFn "$_UP_TO_DATE"
+	centerTxtFn "$WRAPPEDTXT"
+	showMsgDlg "$CENTEREDTXT"
+}
+
+function showUpdateErrorDlg() {
+	wrapTxtFn "$_ERROR_CHECK_UPDATE"
+	centerTxtFn "$WRAPPEDTXT"
+	showMsgDlg "$CENTEREDTXT"
+}
+
+function showUpdateAvailableDlg() {
+	wrapTxtFn "$_AN_UPDATE ($TO_INSTALL) $_IS_AVAILABLE"
+	centerTxtFn "$WRAPPEDTXT"
+	showConfirmDlg "$CENTEREDTXT"
+}
+
+function showInstallingUpdateDlg() {
+        wrapTxtFn "$_INSTALLING_UPDATE"
+        centerTxtFn "$WRAPPEDTXT"
+        showInfoDlg "$CENTEREDTXT"
+}
+
+function showSystemUpdatedDlg() {
+	wrapTxtFn "$_UPDATED_TO $TO_INSTALL"
+	centerTxtFn "$WRAPPEDTXT"
+	showMsgDlg "$CENTEREDTXT"
+}
+
+function showErrorOccurredDlg() {
+	wrapTxtFn "An error occurred while installing the update"
+	centerTxtFn "$WRAPPEDTXT"
+	showMsgDlg "$CENTEREDTXT"
 }
