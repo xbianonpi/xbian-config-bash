@@ -43,26 +43,26 @@ function showGUIFn() {
 		showPackageListErrorDlg
 	else
 		showCheckingForUpdatesDlg
-		TO_INSTALL=$(checkForUpdatesFn)
-		if [ ! -z "$TO_INSTALL" ]; then
-			if [ "$TO_INSTALL" = "0" ]; then
+		TOINSTALL=$(checkForUpdatesFn)
+		if [ ! -z "$TOINSTALL" ]; then
+			if [ "$TOINSTALL" = "0" ]; then
 				# No new updates
-				showUpToDateDlg
-			elif [ "$TO_INSTALL" = "-1" ]; then
+				showUpdatesUpToDateDlg
+			elif [ "$TOINSTALL" = "-1" ]; then
 				# An error occurred
 				showUpdateErrorDlg
 			else
 				# Update is available
-				showUpdateAvailableDlg
+				showUpdateAvailableDlg "$TOINSTALL"
 				if [ $? -eq 0 ]; then
 					showInstallingUpdateDlg
-					installUpdateFn "$TO_INSTALL"
+					installUpdateFn "$TOINSTALL"
 					if [ $? -eq 1 ]; then
 						# System updated
-						showSystemUpdatedDlg
+						showSystemUpdatedDlg "$TOINSTALL"
 					else
 						# An error occurred
-						showErrorOccurredDlg
+						showUpdateErrorOccurredDlg
 					fi
 				fi
 			fi

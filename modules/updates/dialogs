@@ -18,55 +18,55 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 function showPackageListDownloadDlg() {
-        wrapTxtFn "$_DOWNLOAD_PL"
+        wrapTxtFn "$_DOWNLOADPL"
         centerTxtFn "$WRAPPEDTXT"
         showInfoDlg "$CENTEREDTXT"
 }
 
 function showPackageListErrorDlg() {
-	wrapTxtFn "$_PL_ERROR"
+	wrapTxtFn "$_PLERROR"
 	centerTxtFn "$WRAPPEDTXT"
 	showMsgDlg "$CENTEREDTXT"
 }
 
 function showCheckingForUpdatesDlg() {
-        wrapTxtFn "$_CHECKING_FOR_UD"
+        wrapTxtFn "$_CHECKINGFORUD"
         centerTxtFn "$WRAPPEDTXT"
         showInfoDlg "$CENTEREDTXT"
 }
 
-function showUpToDateDlg() {
-	wrapTxtFn "$_UP_TO_DATE"
+function showUpdatesUpToDateDlg() {
+	wrapTxtFn "$_UPTODATE"
 	centerTxtFn "$WRAPPEDTXT"
 	showMsgDlg "$CENTEREDTXT"
 }
 
 function showUpdateErrorDlg() {
-	wrapTxtFn "$_ERROR_CHECK_UPDATE"
+	wrapTxtFn "$_ERRORCHECKUPDATE"
 	centerTxtFn "$WRAPPEDTXT"
 	showMsgDlg "$CENTEREDTXT"
 }
 
 function showUpdateAvailableDlg() {
-	wrapTxtFn "$_AN_UPDATE ($TO_INSTALL) $_IS_AVAILABLE"
+	wrapTxtFn "$_ANUPDATE ($1) $_ISAVAILABLE"
 	centerTxtFn "$WRAPPEDTXT"
 	showConfirmDlg "$CENTEREDTXT"
 }
 
 function showInstallingUpdateDlg() {
-        wrapTxtFn "$_INSTALLING_UPDATE"
+        wrapTxtFn "$_INSTALLINGUPDATE"
         centerTxtFn "$WRAPPEDTXT"
         showInfoDlg "$CENTEREDTXT"
 }
 
 function showSystemUpdatedDlg() {
-	wrapTxtFn "$_UPDATED_TO $TO_INSTALL"
+	wrapTxtFn "$_UPDATEDTO $1"
 	centerTxtFn "$WRAPPEDTXT"
 	showMsgDlg "$CENTEREDTXT"
 }
 
-function showErrorOccurredDlg() {
-	wrapTxtFn "An error occurred while installing the update"
+function showUpdateErrorOccurredDlg() {
+	wrapTxtFn "$_ERRORUPDATE"
 	centerTxtFn "$WRAPPEDTXT"
 	showMsgDlg "$CENTEREDTXT"
 }
