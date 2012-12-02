@@ -48,11 +48,6 @@ showMsgDlg() {
 #  $3 (optional) Width
 showInfoDlg() {
 	# Default width and height
-	HEIGHT=7
-	IMSGHGHT=$(echo -e "$3" | wc -l);
-	if [ $HEIGHT -eq $IMSGHGHT ]; then
-		HEIGHT=$(($IMSGHGHT+4));
-	fi
 
 	WIDTH=$DEFAULTWIDTH
 	# Overridden width and height
@@ -66,7 +61,7 @@ showInfoDlg() {
 	dialog \
 		--backtitle "$BACKTITLE" \
 		--title "$TITLE" \
-		--infobox "$1" $HEIGHT $WIDTH
+		--infobox "\n$1" $HEIGHT $WIDTH
 }
 
 # Show a yes/no dialog
