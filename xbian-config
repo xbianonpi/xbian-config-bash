@@ -43,10 +43,11 @@ ASKFORREBOOT=0;
 ORIGINALIFS=$IFS;
 
 # Url for the main APT repository Package location
-#APTBASE="http://apt.xbian.org/dists/wheezy/main/binary-armhf/"
+APTBASE="http://apt.xbian.org/dists/wheezy/main/binary-armhf/"
 
 # Location of the xbian-config script files
-BASEPATH="/usr/local/include/xbian-config"
+# BASEPATH="/usr/local/include/xbian-config"
+BASEPATH="./"
 
 # Current dialog title
 TITLE="Config"
