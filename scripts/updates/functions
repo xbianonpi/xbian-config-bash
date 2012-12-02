@@ -23,10 +23,10 @@
 #  @return      0 for not available, 1 for available
 function getPkgVersionCacheFn() {
         RES_APT_CACHE=$(apt-cache showpkg $1 | grep "$2 (")
-        if [ -z $RES_APT_CACHE ]; then
+        if [ -z "$RES_APT_CACHE" ]; then
                 apt-get update > /dev/null
                 RES_APT_CACHE=$(apt-cache showpkg $1 | grep "$2 (")
-                if [ -z $RES_APT_CACHE ]; then
+                if [ -z "$RES_APT_CACHE" ]; then
                         # Still not available, this package doesnt exist
                         return 0;
                 else
