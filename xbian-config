@@ -46,7 +46,7 @@ ORIGINALIFS=$IFS;
 APTBASE="http://apt.xbian.org/dists/wheezy/main/binary-armhf/"
 
 # Location of the xbian-config script files
-BASEPATH="/usr/local/include/xbian-config"
+BASEPATH="/usr/local/include/xbian-config1"
 
 # Prefered language of xbian-config
 LANGUAGE="en"
