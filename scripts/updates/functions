@@ -1,0 +1,187 @@
+#!/bin/bash
+#
+#Copyright 2012 CurlyMo <development@xbian.org>
+#
+#This file is part of XBian - XBMC on the Raspberry Pi.
+#
+#XBian is free software: you can redistribute it and/or modify it under the
+#terms of the GNU General Public License as published by the Free Software
+#Foundation, either version 3 of the License, or (at your option) any later
+#version.
+#
+#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#details.
+#
+#You should have received a copy of the GNU General Public License along
+#with XBian. If not, see <http://www.gnu.org/licenses/>
+
+# Check if a package of a specific version is available in apt cache
+#  $1           Package name
+#  $2           Package version
+#  @return      0 for not available, 1 for available
+function getPkgVersionCacheFn() {
+        RES_APT_CACHE=$(apt-cache showpkg $1 | grep "$2 (")
+        if [ -z $RES_APT_CACHE ]; then
+                apt-get update > /dev/null
+                RES_APT_CACHE=$(apt-cache showpkg $1 | grep "$2 (")
+                if [ -z $RES_APT_CACHE ]; then
+                        # Still not available, this package doesnt exist
+                        return 0;
+                else
+                        # Now it's available, apt-get update did the trick!
+                        return 1;
+                fi
+        else
+                # Was available without updateing apt repos, great!
+                return 1;
+        fi
+}
+
+# Check if a package is installed on the system
+#  $1 package name
+function getPkgInstalledFn() {
+        RES=$(dpkg-query -W -f='${Status}\n' "$1" 2>/dev/null)
+        DEINST=$(echo $RES | grep 'deinstall ok' | wc -l)
+        if [ -z "$RES" ]; then
+                return 0;
+        fi
+        if [ $DEINST -eq 1 ]; then
+                return 0;
+        fi
+        return 1;
+}
+
+# Check which version of a package that is installed
+#  $1 package name
+function getPkgVersionInstalledFn() {
+        getPkgInstalledFn "$1"
+        if [ $? -eq 1 ]; then
+                dpkg-query -W -f='${Version}\n' "$1" 2>/dev/null
+        fi
+}
+
+# Make sure the apt database it up to date
+# Returns
+#  - 1: Success
+function updateAptDatabaseFn() {
+
+        apt-get clean 2>/dev/null >/dev/null
+        apt-get update 2>/dev/null >/dev/null
+
+	return 1;
+
+}
+
+# Updrade system to a specific version
+#  $1 Version
+# Returns
+#  - 1: Success
+#  - 0: Failure
+function installUpdateFn() {
+
+        # Double chack that version is valid
+        getPkgVersionCacheFn xbian-update "$1"
+        if [ $? -eq 1 ]; then
+                apt-get install -y xbian-update=$1 2>/dev/null >/dev/null
+                # Double check that the correct version is installed
+                CURRENT_VERSION=$(getPkgVersionInstalledFn xbian-update)
+                if [ "$CURRENT_VERSION" = "$2" ]; then
+			return 1;
+                else
+			return 0;
+                fi
+        else
+		return 0;
+        fi
+
+}
+
+# Download updated package-lists if needed
+# Return
+#  - 0: Failed
+#  - 1: Success
+function downloadPackageListFn() {
+        if [ ! -f /tmp/xbiancache/Packages ]; then
+                if [ ! -d /tmp/xbiancache ]; then
+                        mkdir /tmp/xbiancache;
+                fi
+                wget -P /tmp/xbiancache/ ${APTBASE}Packages.gz 2>/dev/null >/dev/null;
+		if [ -f /tmp/xbiancache/Packages.gz ]; then
+	                gunzip -c /tmp/xbiancache/Packages.gz > /tmp/xbiancache/Packages;
+		else
+			return 0;
+		fi
+        fi
+	return 1;
+}
+
+# Checks for latest available system version
+#  $1 Version
+# Returns [string]
+#  - *: Latest available version
+#  - 0: No updates available
+function checkForUpdatesFn() {
+        IFS=$'\n';
+        if [ -f /tmp/xbiancache/Packages ]; then
+
+                # Check if any updates at all are installed
+                INSTALLED_VERSION=$(getPkgVersionInstalledFn xbian-update)
+
+                # Prepare package array
+                APTPACKAGES=$(cat /tmp/xbiancache/Packages | sed -n 's/\(Package: \)\(.*$\)\|\(Version: \)\(.*$\)\|\(Filename: \)\(.*$\)\|\(Description: \)\(.*$\)/\2\4\6\8/p')
+                PACKAGES_UNSORTED=()
+                L=0
+                LINE=""
+                for PACKAGE_DATA in ${APTPACKAGES[@]}; do
+                        L=$(($L+1))
+                        LINE=$LINE$PACKAGE_DATA":"
+                        if [[ $L == 4 ]]; then
+                                L=0
+                                if [[ $(echo $LINE | cut -f 1 -d:) =~ "xbian-update" ]]; then
+                                        PACKAGES_UNSORTED+=($LINE)
+                                fi
+                                LINE="";
+                        fi
+                done
+
+                # Sort the packages by name and order, ascending
+                PACKAGES=($(echo  "${PACKAGES_UNSORTED[*]}" | sort -t: -u +0 -2 -))
+                NUMPACKAGES=${#PACKAGES[@]}
+                TO_INSTALL="";
+                I=0
+                for LINE in ${PACKAGES[@]}; do
+                        if [ -z $TO_INSTALL ]; then
+                                PACKAGE=$(echo $LINE | cut -f 1 -d:)
+                                # Check for a newer version of this package
+                                if [ $I -lt $NUMPACKAGES ]; then
+                                        NEXTVERSION="";
+                                        if [ $I -ne $(($NUMPACKAGES-1)) ]; then
+                                                N=$(($I+1))
+                                                NEXTVERSION=$( echo ${PACKAGES[$N]} | cut -f 2 -d: )
+                                        fi
+                                        VERSION=$(echo $LINE | cut -f 2 -d:)
+                                        if [ "$VERSION" = "$INSTALLED_VERSION" ]; then
+                                                TO_INSTALL=$NEXTVERSION
+                                        else
+                                                if [ -z "$INSTALLED_VERSION" ]; then
+                                                        TO_INSTALL=$VERSION
+                                                fi
+                                        fi
+                                fi
+                        fi
+                        I=$(($I+1))
+                done
+
+                # Check if there is a new version available
+                if [ ! -z "$TO_INSTALL" ]; then
+			echo $TO_INSTALL
+                else
+			echo 0
+                fi
+        else
+		echo -1
+        fi
+
+}
