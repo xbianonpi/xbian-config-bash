@@ -1,0 +1,116 @@
+#!/bin/bash
+#
+#Copyright 2012 CurlyMo <development@xbian.org>
+#
+#This file is part of XBian - XBMC on the Raspberry Pi.
+#
+#XBian is free software: you can redistribute it and/or modify it under the
+#terms of the GNU General Public License as published by the Free Software
+#Foundation, either version 3 of the License, or (at your option) any later
+#version.
+#
+#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#details.
+#
+#You should have received a copy of the GNU General Public License along
+#with XBian. If not, see <http://www.gnu.org/licenses/>
+
+#|------------------------------------|
+#|          Global variables          |
+#|------------------------------------|
+
+# The arguments this module accepts
+ARGUMENTS=(select insert delete update);
+
+#|------------------------------------|
+#|          Include files             |
+#|------------------------------------|
+
+source $BASEPATH/modules/licensevc1/functions
+source $BASEPATH/modules/licensevc1/dialogs
+
+#|------------------------------------|
+#|           Main program             |
+#|------------------------------------|
+
+# Executes the GUI version of this module
+function showGUIFn() {
+	getCurrentLicenseVC1Fn LICENSE
+	CURRENTLICENSE=$LICENSE;
+	showLicenseVC1InputDlg $CURRENTLICENSE;
+	
+	CODE=$?
+	if [ $CODE -eq 1 ] || [ $CODE -eq 0 ]; then
+		if [ ! -z $RETURN ] && [ ! -z $CURRENTLICENSE ]; then
+			updateLicenseVC1Fn $RETURN $CURRENTLICENSE
+			if [ $? -eq 1 ]; then
+				showLicenseVC1UpdatedDlg;
+				ASKFORREBOOT=1;
+			else
+				showErrorDlg;
+			fi
+		elif [ ! -z $RETURN ] && [ -z $CURRENTLICENSE ]; then
+			insertLicenseVC1Fn $RETURN;
+			if [ $? -eq 1 ]; then
+				showLicenseVC1InsertedDlg;
+				ASKFORREBOOT=1;
+			else
+				showErrorDlg;
+			fi
+		elif [ -z $RETURN ] && [ -z $CURRENTLICENSE ]; then
+			return 1;
+		else
+			deleteLicenseVC1Fn $CURRENTLICENSE;
+			if [ $? -eq 1 ]; then
+				showLicenseVC1DeletedDlg;
+				ASKFORREBOOT=1;
+			else
+				showErrorDlg;
+			fi
+		fi
+	fi
+}
+
+# Executes the command line version of this module
+#  $1 Argument [Integer]
+#  $2 Hostname [String]
+# Returns
+#  *Get [String]
+#  - Hostname
+#  *Set [Integer]
+#  - 1: Success
+#  - 0: Failed
+function showCMDFn() {
+	case $1 in
+		"select")
+			getCurrentLicenseVC1Fn LICENSE;
+			echo $LICENSE;
+		;;
+		"update")
+			shift;
+			if [ $# -eq 1 ]; then
+				getCurrentLicenseVC1Fn LICENSE
+				updateLicenseVC1Fn $1 $LICENSE;
+				echo $?;
+			else
+				echo 0;
+			fi
+		;;
+		"insert")
+			shift;
+			if [ $# -eq 1 ]; then
+				insertLicenseVC1Fn $1;
+				echo $?;
+			else
+				echo 0;
+			fi
+		;;		
+		"delete")
+			getCurrentLicenseVC1Fn LICENSE
+			deleteLicenseVC1Fn $LICENSE;
+			echo $?;
+		;;
+	esac
+}
