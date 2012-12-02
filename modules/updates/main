@@ -28,8 +28,8 @@ ARGUMENTS=(check update);
 #|          Include files             |
 #|------------------------------------|
 
-source $BASEPATH/scripts/updates/functions
-source $BASEPATH/scripts/updates/dialogs
+source $BASEPATH/modules/updates/functions
+source $BASEPATH/modules/updates/dialogs
 
 #|------------------------------------|
 #|           Main program             |
