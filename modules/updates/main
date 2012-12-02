@@ -37,60 +37,32 @@ source $BASEPATH/modules/updates/dialogs
 
 # Executes the GUI version of this module
 function showGUIFn() {
-
-	wrapTxtFn "Downloading package list ..."
-	centerTxtFn "$WRAPPEDTXT"
-	showInfoDlg "$CENTEREDTXT"
-
+	showPackageListDownloadDlg
 	downloadPackageListFn
 	if [ $? -eq 0 ]; then
-
-		wrapTxtFn "Package list could not be downloaded, try again later ..."
-		centerTxtFn "$WRAPPEDTXT"
-		showMsgDlg "Close" "$CENTEREDTXT"
-
+		showPackageListErrorDlg
 	else
-
-		wrapTxtFn "Checking for updates ..."
-		centerTxtFn "$WRAPPEDTXT"
-		showInfoDlg "$CENTEREDTXT"
-
+		showCheckingForUpdatesDlg
 		TO_INSTALL=$(checkForUpdatesFn)
 		if [ ! -z "$TO_INSTALL" ]; then
 			if [ "$TO_INSTALL" = "0" ]; then
 				# No new updates
-				wrapTxtFn "Your system is up to date!"
-				centerTxtFn "$WRAPPEDTXT"
-				showMsgDlg "Ok" "$CENTEREDTXT"
-
+				showUpToDateDlg
 			elif [ "$TO_INSTALL" = "-1" ]; then
 				# An error occurred
-				wrapTxtFn "An error occurred while checking for updates"
-				centerTxtFn "$WRAPPEDTXT"
-				showMsgDlg "Ok" "$CENTEREDTXT"
-
+				showUpdateErrorDlg
 			else
 				# Update is available
-				wrapTxtFn "An update ($TO_INSTALL) is available, do you want to install this?"
-				centerTxtFn "$WRAPPEDTXT"
-				showConfirmDlg "$CENTEREDTXT"
-
+				showUpdateAvailableDlg
 				if [ $? -eq 0 ]; then
-					wrapTxtFn "Installing update, please wait"
-					centerTxtFn "$WRAPPEDTXT"
-					showInfoDlg "$CENTEREDTXT"
+					showInstallingUpdateDlg
 					installUpdateFn "$TO_INSTALL"
-
 					if [ $? -eq 1 ]; then
 						# System updated
-						wrapTxtFn "System updated to version $TO_INSTALL"
-						centerTxtFn "$WRAPPEDTXT"
-						showMsgDlg "Ok" "$CENTEREDTXT"
+						showSystemUpdatedDlg
 					else
 						# An error occurred
-						wrapTxtFn "An error occurred while instaling the update"
-						centerTxtFn "$WRAPPEDTXT"
-						showMsgDlg "Ok" "$CENTEREDTXT"
+						showErrorOccurredDlg
 					fi
 				fi
 			fi
