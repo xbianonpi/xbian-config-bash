@@ -72,7 +72,7 @@ function showGUIFn() {
 }
 
 # Executes the command line version of this module
-#  $1 Argument [Integer]
+#  $1 Argument [String]
 # Returns
 #  *Check [String]
 #  - Latest version

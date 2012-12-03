@@ -48,8 +48,17 @@ APTBASE="http://apt.xbian.org/dists/wheezy/main/binary-armhf/"
 # Location of the xbian-config script files
 BASEPATH="/usr/local/include/xbian-config"
 
+# XBMC language array
+# declare -A LANGARRAY
+# LANGARRAY[Dutch]=nl
+# LANGARRAY[English]=en
+
+# Get XBMC language setting
+# XBMCLANG=$(cat /home/xbian/.xbmc/userdata/guisettings.xml | sed '/<language>/!d;s//\n/;s/[^\n]*\n//;:a;$!{/<\/language/!N;//!ba};y/\n/ /;s/<\/language>/\n/;P;D')
+
 # Prefered language of xbian-config
-LANGUAGE="en"
+# LANGUAGE=${LANGARRAY[$XBMCLANG]};
+LANGUAGE="en";
 
 #|------------------------------------|
 #|          Include files             |
@@ -173,7 +182,11 @@ function showMainMenuDlg() {
 		MENU="";
 		I=1;
 		for ITEM in ${ITEMS[@]}; do
-			source $BASEPATH/modules/$ITEM/lang/$LANGUAGE
+			if [ -f $BASEPATH/modules/$ITEM/lang/$LANGUAGE ]; then
+				source $BASEPATH/modules/$ITEM/lang/$LANGUAGE
+			else
+				source $BASEPATH/modules/$ITEM/lang/en
+			fi
 			MENU+="$I%$_NAME!-!\"$_DESC\"%";
 			I=$(($I+1));
 		done;
@@ -206,7 +219,12 @@ function showMainMenuDlg() {
 		elif [ $CODE -eq 0 ]; then 
 			IFS=$'\n';
 			MODULE=$(cat $BASEPATH/struct | grep ^$(echo $LEVEL$RETURN)*: | cut -f 2 -d:)
-			source $BASEPATH/modules/$MODULE/lang/$LANGUAGE
+			
+			if [ -f $BASEPATH/modules/$MODULE/lang/$LANGUAGE ]; then
+				source $BASEPATH/modules/$MODULE/lang/$LANGUAGE
+			else
+				source $BASEPATH/modules/$MODULE/lang/en
+			fi
 			showMainMenuDlg $(($1+1)) $LEVEL$RETURN$ADD  "$CPATH > $_NAME";
 		fi;
 	fi;

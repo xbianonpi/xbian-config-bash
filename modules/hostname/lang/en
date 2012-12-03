@@ -19,5 +19,5 @@
 
 _NAME="Hostname"
 _DESC="Change the default hostname"
-_HOSTNAME="Hostname";
+_HOSTNAME="Hostname"
 _HOSTNAMECHANGED="Hostname successfully changed"

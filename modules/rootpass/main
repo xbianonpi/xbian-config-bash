@@ -22,14 +22,14 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(select insert delete update);
+ARGUMENTS=(update);
 
 #|------------------------------------|
 #|          Include files             |
 #|------------------------------------|
 
-source $BASEPATH/modules/licensempg2/functions
-source $BASEPATH/modules/licensempg2/dialogs
+source $BASEPATH/modules/rootpass/functions
+source $BASEPATH/modules/rootpass/dialogs
 
 #|------------------------------------|
 #|           Main program             |
@@ -37,79 +37,46 @@ source $BASEPATH/modules/licensempg2/dialogs
 
 # Executes the GUI version of this module
 function showGUIFn() {
-	getCurrentLicenseMPG2Fn LICENSE
-	CURRENTLICENSE=$LICENSE;
-	showLicenseMPG2InputDlg $CURRENTLICENSE;
+	showRootPassInputDlg;
 	CODE=$?
-	if [ $CODE -eq 1 ] || [ $CODE -eq 0 ]; then
-		if [ ! -z $RETURN ] && [ ! -z $CURRENTLICENSE ]; then
-			updateLicenseMPG2Fn $RETURN $CURRENTLICENSE
-			if [ $? -eq 1 ]; then
-				showLicenseMPG2UpdatedDlg;
-				ASKFORREBOOT=1;
+	if [ $CODE -eq 0 ]; then
+		VALUES=($VALUES);
+		if [ ${#VALUES[@]} -eq 2 ]; then 
+			if [ ! -z ${VALUES[0]} ] && [ ! -z ${VALUES[1]} ] && [ "${VALUES[0]}" == "${VALUES[1]}" ]; then 
+				setRootPassFn ${VALUES[0]}
+				if [ $? -eq 1 ]; then
+					showRootPassSuccessDlg;
+				else
+					showErrorDlg;
+				fi
 			else
-				showErrorDlg;
+				showRootPassNoMatchDlg
+				showGUIFn;
 			fi
-		elif [ ! -z $RETURN ] && [ -z $CURRENTLICENSE ]; then
-			insertLicenseMPG2Fn $RETURN;
-			if [ $? -eq 1 ]; then
-				showLicenseMPG2InsertedDlg;
-				ASKFORREBOOT=1;
-			else
-				showErrorDlg;
-			fi
-		elif [ -z $RETURN ] && [ -z $CURRENTLICENSE ]; then
-			return 1;
 		else
-			deleteLicenseMPG2Fn $CURRENTLICENSE;
-			if [ $? -eq 1 ]; then
-				showLicenseMPG2DeletedDlg;
-				ASKFORREBOOT=1;
-			else
-				showErrorDlg;
-			fi
+			showRootPassEmptyFieldsDlg;
+			showGUIFn;
 		fi
-	fi
+	fi 
 }
 
 # Executes the command line version of this module
 #  $1 Argument [String]
-#  $2 License [String]
+#  $2 Password [String]
 # Returns
-#  *Select [String]
-#  - License
 #  *Update [Integer]
 #  - 1: Success
 #  - 0: Failed
 function showCMDFn() {
 	case $1 in
-		"select")
-			getCurrentLicenseMPG2Fn LICENSE;
-			echo $LICENSE;
-		;;
 		"update")
 			shift;
 			if [ $# -eq 1 ]; then
-				getCurrentLicenseMPG2Fn LICENSE
-				updateLicenseMPG2Fn $1 $LICENSE;
+				setRootPassFn $1;
 				echo $?;
 			else
 				echo 0;
 			fi
-		;;
-		"insert")
-			shift;
-			if [ $# -eq 1 ]; then
-				insertLicenseMPG2Fn $1;
-				echo $?;
-			else
-				echo 0;
-			fi
-		;;		
-		"delete")
-			getCurrentLicenseMPG2Fn LICENSE
-			deleteLicenseMPG2Fn $LICENSE;
-			echo $?;
 		;;
 	esac
 }

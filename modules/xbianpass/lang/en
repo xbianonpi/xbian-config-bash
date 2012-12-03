@@ -17,29 +17,9 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-#|------------------------------------|
-#|             Main Menu			  |
-#|------------------------------------|
-_TITLE="Config"
-_REBOOTREQUIRED="Een herstart is vereist. Wil je nu herstarten?"
-
-#|------------------------------------|
-#|              Dialogs	  	   		  |
-#|------------------------------------|
-_YES="Ja"
-_NO="Nee"
-_INSERT="Invoegen"
-_REMOVE="Verwijderen"
-_UPDATE="Bijwerken"
-_CANCEL="Annuleren"
-_SELECT="Selecteren"
-_RETURN="Terugkeren"
-_ERROR="Er is een onverwachte fout opgetreden"
-_CLOSE="Sluiten"
-_CHANGE="Veranderen"
-_EXIT="Afsluiten"
-_ENABLE="Aanzetten"
-_DISABLE="Uitzetten"
-_PASSWORD="Wachtwoord:"
-_CONFIRM="Herhaal:"
-_RETRY="Opnieuw"
+_NAME="XBian password"
+_DESC="Change password for xbian user"
+_XBIANPASSCHANGED="root password succesfully changed"
+_XBIANPASS="Password:";
+_XBIANPASSEMPTYFIELDS="You have to enter both a new password and a confirmation"
+_XBIANPASSNOMATCH="Passwords didn't match"

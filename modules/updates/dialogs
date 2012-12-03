@@ -18,9 +18,10 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 function showPackageListDownloadDlg() {
-        wrapTxtFn "$_DOWNLOADPL"
-        centerTxtFn "$WRAPPEDTXT"
-        showInfoDlg "$CENTEREDTXT"
+	wrapTxtFn "$_DOWNLOADPL"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showInfoDlg "$ALIGNEDTXT"
 }
 
 function showPackageListErrorDlg() {
@@ -30,9 +31,10 @@ function showPackageListErrorDlg() {
 }
 
 function showCheckingForUpdatesDlg() {
-        wrapTxtFn "$_CHECKINGFORUD"
-        centerTxtFn "$WRAPPEDTXT"
-        showInfoDlg "$CENTEREDTXT"
+	wrapTxtFn "$_CHECKINGFORUD"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showInfoDlg "$ALIGNEDTXT"
 }
 
 function showUpdatesUpToDateDlg() {
@@ -54,9 +56,10 @@ function showUpdateAvailableDlg() {
 }
 
 function showInstallingUpdateDlg() {
-        wrapTxtFn "$_INSTALLINGUPDATE"
-        centerTxtFn "$WRAPPEDTXT"
-        showInfoDlg "$CENTEREDTXT"
+	wrapTxtFn "$_INSTALLINGUPDATE"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showInfoDlg "$ALIGNEDTXT"
 }
 
 function showSystemUpdatedDlg() {
