@@ -56,12 +56,12 @@ function showGUIFn() {
 }
 
 # Executes the command line version of this module
-#  $1 Argument [Integer]
+#  $1 Argument [String]
 #  $2 Hostname [String]
 # Returns
-#  *Get [String]
+#  *Select [String]
 #  - Hostname
-#  *Set [Integer]
+#  *Update [Integer]
 #  - 1: Success
 #  - 0: Failed
 function showCMDFn() {

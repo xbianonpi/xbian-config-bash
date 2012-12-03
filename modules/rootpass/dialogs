@@ -17,20 +17,35 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-# Shows the dialog in which users can enter the new hostname
-#  $1 [string] Current Hostname
+# Shows the dialog in which users can enter the new password
 # Returns
 #  $? [Integer]
 #  - 1: Change
 #  - 0: Cancel
-function showHostnameInputDlg() {
-	showInputDlg "$_HOSTNAME:" $1
+function showRootPassInputDlg() {
+	showPassDlg "$_ROOTPASS"
 }
 
-#Shows hostname succesfully changed dialog
-function showHostnameSuccessDlg() {
-	wrapTxtFn "$_HOSTNAMECHANGED"
+#Shows rootpass succesfully changed dialog
+function showRootPassSuccessDlg() {
+	wrapTxtFn "$_ROOTPASSCHANGED"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	showMsgDlg "$CENTEREDTXT" $HEIGHT
+	return $?;
+}
+
+#Shows rootpass password didn't match dialog
+function showRootPassNoMatchDlg() {
+	wrapTxtFn "$_ROOTPASSNOMATCH"
+	centerTxtFn "$WRAPPEDTXT"
+	showMsgDlg "$CENTEREDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
+	return $?;
+}
+
+#Shows rootpass there where empty fields dialog
+function showRootPassEmptyFieldsDlg() {
+	wrapTxtFn "$_ROOTPASSEMPTYFIELDS"
+	centerTxtFn "$WRAPPEDTXT"
+	showMsgDlg "$CENTEREDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
 	return $?;
 }

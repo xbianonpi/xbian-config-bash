@@ -17,29 +17,17 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-#|------------------------------------|
-#|             Main Menu			  |
-#|------------------------------------|
-_TITLE="Config"
-_REBOOTREQUIRED="Een herstart is vereist. Wil je nu herstarten?"
-
-#|------------------------------------|
-#|              Dialogs	  	   		  |
-#|------------------------------------|
-_YES="Ja"
-_NO="Nee"
-_INSERT="Invoegen"
-_REMOVE="Verwijderen"
-_UPDATE="Bijwerken"
-_CANCEL="Annuleren"
-_SELECT="Selecteren"
-_RETURN="Terugkeren"
-_ERROR="Er is een onverwachte fout opgetreden"
-_CLOSE="Sluiten"
-_CHANGE="Veranderen"
-_EXIT="Afsluiten"
-_ENABLE="Aanzetten"
-_DISABLE="Uitzetten"
-_PASSWORD="Wachtwoord:"
-_CONFIRM="Herhaal:"
-_RETRY="Opnieuw"
+# Get the current password
+#  $1 [String] New password
+# Returns
+#  * [Integer]
+#  - 1: Success
+#  - 0: Failed
+function setXbianPassFn() {
+	echo "xbian:$1" | chpasswd 
+	if [ $? == 1 ]; then
+		return 0;
+	else
+		return 1;
+	fi
+}

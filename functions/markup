@@ -82,6 +82,23 @@ function centerTxtFn() {
 	done;
 }
 
+function valignTxtFn() {
+	TEXT=$1;
+	IFS=$'\n';
+	if [ $# -gt 1 ]; then
+		HEIGHT=$2;
+	else
+		HEIGHT=$DEFAULTHEIGHT;
+	fi	
+	
+	LINES=($(echo -e "$TEXT"));
+	ALIGNEDTXT="\n";
+	for (( c=0; c<=$(($(($HEIGHT/2))-4-${#LINES[@]})); c++ )); do
+		ALIGNEDTXT+="\n";
+	done;
+	ALIGNEDTXT+=$TEXT;
+}
+
 # Trim trailing and leading spaces from line
 #  $1 [String]	Line
 # Returns
