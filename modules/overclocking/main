@@ -22,14 +22,14 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(status rootpass enable disable);
+ARGUMENTS=(select update);
 
 #|------------------------------------|
 #|          Include files             |
 #|------------------------------------|
 
-source $BASEPATH/modules/sshrootlogin/functions
-source $BASEPATH/modules/sshrootlogin/dialogs
+source $BASEPATH/modules/overclocking/functions
+source $BASEPATH/modules/overclocking/dialogs
 
 #|------------------------------------|
 #|           Main program             |
@@ -37,62 +37,19 @@ source $BASEPATH/modules/sshrootlogin/dialogs
 
 # Executes the GUI version of this module
 function showGUIFn() {
-	rootPasswordSetFn
-	if [ $? -eq 0 ]; then
-		showEmptyRootPasswordDlg
-	fi
-	
-	enableDisableSSHRootLoginDlg
-	CODE=$?
-	if [ $CODE -eq 0 ]; then
-		enableSSHRootLoginFn
-		if [ $? -eq 0 ]; then
-			showErrorDlg;
-		else
-			showSSHRootEnabledDlg
-		fi
-	elif [ $CODE -eq 1 ]; then
-		disableSSHRootLoginFn
-		if [ $? -eq 0 ]; then
-			showErrorDlg;
-		else
-			showSSHRootDisabledDlg
-		fi
-	fi
+	#showOCWarningDlg;
+	showOCSettingsDlg;
 }
 
 # Executes the command line version of this module
 #  $1 Argument [String]
+#  $2 Hostname [String]
 # Returns
-#  *Status [Integer]
-#  - 1: Enabled
-#  - 0: Disabled
-#  *Rootpass [Integer]
-#  - 1: Set
-#  - 0: Empty
-#  *Enable [Integer]
-#  - 1: Succes
-#  - 0: Failed
-#  *Disable [Integer]
-#  - 1: Succes
+#  *Select [String]
+#  - Hostname
+#  *Update [Integer]
+#  - 1: Success
 #  - 0: Failed
 function showCMDFn() {
-	case $1 in
-		"status")
-			isSSHRootLoginEnabledFn;
-			echo $?;
-		;;
-		"rootpass")
-			rootPasswordSetFn;
-			echo $?;
-		;;
-		"enable")
-			enableSSHRootLoginFn;
-			echo $?;
-		;;
-		"disable")
-			disableSSHRootLoginFn;
-			echo $?;
-		;;
-	esac
+	echo;
 }
