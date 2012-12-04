@@ -23,6 +23,8 @@ if [ ! $(id -u) -eq 0 ]; then
 	exit 0;
 fi
 
+dialog --title "[Config]" --infobox "\n       Loading. Please wait..." 5 40
+
 #|------------------------------------|
 #|          Global variables          |
 #|------------------------------------|
@@ -87,7 +89,7 @@ source $BASEPATH/functions/system
 #|------------------------------------|
 
 # Current dialog title
-TITLE="$_TITLE"
+TITLE="[$_TITLE]"
 
 #|------------------------------------|
 #|           Main program             |
@@ -170,7 +172,7 @@ function showMainMenuDlg() {
 		source $BASEPATH/modules/$MODULE/lang/$LANGUAGE
 		
 		# Change the dialog title to reflect the right module
-		TITLE="${CPATH% > *} > $_NAME"
+		TITLE="[${CPATH% > *} > $_NAME]"
 		
 		# Open the modules gui function
 		showGUIFn;
@@ -193,7 +195,7 @@ function showMainMenuDlg() {
 		
 		IFS="%";
 		# Set the title to the appropriate menu level we're in
-		TITLE=$CPATH
+		TITLE="["$CPATH"]"
 
 		# Show the main menu
 		if [ $1 -eq 0 ]; then

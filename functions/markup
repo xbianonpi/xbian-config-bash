@@ -33,11 +33,11 @@ function wrapTxtFn() {
 	fi
 	IFS=" ";
 	WORDS=($(echo $TEXT));
-	RAWLINES=();
+	RAWLINES=();	
 	LINES=();
 	IFS=$'\n';
 	for WORD in ${WORDS[@]}; do
-		if [ $((${#RAWLINES}+${#WORD})) -lt $(($WIDTH-13)) ]; then
+		if [ $((${#RAWLINES}+${#WORD})) -lt $(($WIDTH-10)) ]; then
 			RAWLINES+=$WORD" ";
 		else
 			RAWLINES+=$WORD" ";
@@ -70,15 +70,15 @@ function centerTxtFn() {
 	else
 		WIDTH=$DEFAULTWIDTH;
 	fi
-	
 	LINES=($(echo -e "$TEXT"));
-	CENTEREDTXT="\n";
+
+	CENTEREDTXT="";
 	for LINE in ${LINES[@]}; do
 		NRSPACES=$(($(($WIDTH-6))-$((${#LINE}))));
 		for (( c=0; c<=$(($NRSPACES/2)); c++ )); do
 			CENTEREDTXT+=" ";
 		done;
-		CENTEREDTXT+=$LINE"\n";
+		CENTEREDTXT+=$LINE;
 	done;
 }
 
@@ -105,4 +105,107 @@ function valignTxtFn() {
 #  $TRIMMEDLN [String]
 function trimLnFn() {
 	TRIMMEDLN=$(echo -e "$1" | sed 's/^\ //;s/\ $//');
+}
+
+function createTableRowFn() {
+	TYPE=$1;
+	shift;
+	NRCOLUMNS=$#;
+	NEWROW=""
+	for (( c=1; c<=$NRCOLUMNS; c++ )); do
+		NEWROW+="$1"
+		if [ $c -eq 1 ]; then
+			NEWROW+="%";
+		elif [ $NRCOLUMNS -gt $c ]; then
+			if [ $TYPE == "radio" ] && [ $NRCOLUMNS -gt $(($c+1)) ]; then
+				NEWROW+="!"
+			else
+				NEWROW+="%"
+			fi
+		else
+			NEWROW+="%"
+		fi
+		shift;
+	done;
+}
+
+function createTableHeaderFn() {
+	#Check for similar number of columns between rows
+	TYPE=$1;
+	shift;
+	HEADER=""
+	IFS="%";
+	TBLROWS=($1)
+	
+	NEWTBLROWS=();
+	NEWTBLROW="";
+	I=0;
+	for TBLROW in ${TBLROWS[@]}; do
+		I=$(($I+1));
+		if [ $I -eq 2 ]; then
+			NEWTBLROW+=$TBLROW;
+			NEWTBLROWS+=($NEWTBLROW);
+		elif [ $I -eq 3 ]; then
+			NEWTBLROW="";
+			I=0;
+		else
+			NEWTBLROW+="$TBLROW!";
+		fi
+	done;
+
+	NRCOLUMNS=0;
+	WORDLENGTH=();
+	for (( c=0; c<${#NEWTBLROWS[@]}; c++ )); do
+		IFS="!";
+		TBLROW=(${NEWTBLROWS[$c]});
+		
+		NRCOLUMNS=${#TBLROW[@]};
+		for (( d=0; d<${#TBLROW[@]}; d++ )); do
+			if [ $c -eq 0 ]; then
+				WORDLENGTH+=(${#TBLROW[$d]});
+			elif [ ${WORDLENGTH[$d]} -lt ${#TBLROW[$d]} ]; then
+				WORDLENGTH[$d]=${#TBLROW[$d]}
+			fi
+		done
+	done
+	IFS=$ORIGINALIFS;
+	HEADER=" "
+	
+	if [ $TYPE == "radio" ]; then
+		NRCOLUMNS=$(($NRCOLUMNS-1));
+	fi
+	
+	HEADER+=$2;
+	HEADER+="  ";
+	shift
+	
+	for (( c=1; c<=$NRCOLUMNS; c++ )); do
+		HEADER+=$2;
+		for (( d=0; d<=$((${WORDLENGTH[$c]}-${#2})); d++ )); do
+			HEADER+=" ";
+		done
+		shift;
+	done
+}
+
+
+function createTableFn() {
+	TYPE=$1
+	shift
+	OLDHEADER=$1;
+	shift;
+	OLDROWS=($@);
+	ROWS="";
+	for OLDROW in ${OLDROWS[@]}; do
+		IFS=","
+		ROW1=($OLDROW)
+		createTableRowFn $TYPE ${ROW1[@]};
+		ROWS+=$NEWROW;
+		
+	done
+	ROWS=$(echo $ROWS | awk '{print substr($0,0,length)'});
+	
+	IFS=","
+	NEWHEADER=($OLDHEADER);
+	createTableHeaderFn $TYPE $ROWS ${NEWHEADER[@]};
 }

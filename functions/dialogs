@@ -46,7 +46,7 @@ showMsgDlg() {
 		--backtitle "$BACKTITLE" \
 		--title "$TITLE" \
 		--ok-label "$OKLABEL" \
-		--msgbox "$1" $HEIGHT $WIDTH
+		--msgbox "\n$1" $HEIGHT $WIDTH
 }
 
 # Show a information box
@@ -69,7 +69,7 @@ showInfoDlg() {
 	dialog \
 		--backtitle "$BACKTITLE" \
 		--title "$TITLE" \
-		--infobox "$1" $HEIGHT $WIDTH
+		--infobox "\n$1" $HEIGHT $WIDTH
 }
 
 # Show a yes/no dialog
@@ -105,7 +105,7 @@ showConfirmDlg() {
 		--title "$TITLE" \
 		--yes-label $YESLABEL \
 		--no-label $NOLABEL \
-		--yesno "$1" $HEIGHT $WIDTH
+		--yesno "\n$1" $HEIGHT $WIDTH
 }
 
 #Show menu
@@ -155,31 +155,37 @@ function showMenuDlg() {
 }
 
 # Show radio list
-#  $1 Items
-#  $2 Rows
-#  $3 (optional) Height
-#  $4 (optional) Width
+#  $1 Descriptive text
+#  $2 Items
+#  $3 Rows
+#  $4 (optional) Height
+#  $5 (optional) Width
 function showRadioDlg() {
-	if [ $# -gt 1 ]; then
-		ROWS=$2;
+
+	if [ $# -gt 2 ]; then
+		ROWS=$3;
 	else
 		ROWS=5;
 	fi
-	WIDTH=$(($DEFAULTWIDTH+15));
-	HEIGHT=$DEFAULTHEIGHT
-	if [ $# -gt 2 ]; then
-		HEIGHT=$3
-	fi
+	WIDTH=$(($DEFAULTWIDTH+15))
+	HEIGHT=$((DEFAULTHEIGHT+5));
 	if [ $# -gt 3 ]; then
-		WIDTH=$4
+		HEIGHT=$4
 	fi
-
+	if [ $# -gt 4 ]; then
+		WIDTH=$5
+	fi
+	
 	RETURN=$( \
 		dialog \
+			--no-kill \
+			--colors \
 			--title "$TITLE" \
 			--backtitle "$BACKTITLE" \
-			--radiolist "$1" $HEIGHT $WIDTH $ROWS $3 3>&1 1>&2 2>&3);
-
+			--column-separator "!" \
+			--no-collapse \
+			--radiolist "\n     \Zb$1" $HEIGHT $WIDTH $ROWS \
+			$2 3>&1 1>&2 2>&3);
 }
 
 # Show input dialog
@@ -219,7 +225,7 @@ function showInputDlg() {
 			3>&1 1>&2 2>&3);
 }
 
-# Show input dialog
+# Show password dialog
 #  $1 Descriptive text
 #  $3 (optional) Height
 #  $4 (optional) Width
