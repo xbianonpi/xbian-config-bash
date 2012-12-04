@@ -1,0 +1,210 @@
+#!/bin/bash
+#
+#Copyright 2012 Hexagon <development@xbian.org>
+#
+#This file is part of XBian - XBMC on the Raspberry Pi.
+#
+#XBian is free software: you can redistribute it and/or modify it under the
+#terms of the GNU General Public License as published by the Free Software
+#Foundation, either version 3 of the License, or (at your option) any later
+#version.
+#
+#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#details.
+#
+#You should have received a copy of the GNU General Public License along
+#with XBian. If not, see <http://www.gnu.org/licenses/>
+
+#|------------------------------------|
+#|          Global variables          |
+#|------------------------------------|
+
+# The arguments this module accepts
+ARGUMENTS=(status mode dhcp static credentials);
+
+#|------------------------------------|
+#|          Include files             |
+#|------------------------------------|
+
+source $BASEPATH/modules/network/functions
+source $BASEPATH/modules/network/dialogs
+
+#|------------------------------------|
+#|           Main program             |
+#|------------------------------------|
+
+# Executes the GUI version of this module
+function showGUIFn() {
+	# Not implemented
+	return 0;
+}
+
+# Executes the command line version of this module
+# Arguments:
+#  *
+#    $1 Action [String]
+#  status|dhcp|static|credentials
+#    $2 Interface [String]
+#  static
+#    $3 IP [String]
+#    $4 Gateway [String]
+#    $5 Netmask [String]
+#    $6 Nameserver 1 [String] (optional)
+#    $7 Nameserver 2 [String] (optional)
+#  credentials (No arguments return current settings)
+#    $3 Encryption mode (WEP|WPA|Open) [string]
+#    $4 ESSID
+#    $5 KEY (Only used for WEP|WPA)
+# Returns:
+#   0: Failure
+#   1: Success
+# Echoes:
+#   @0: Error code, see below
+#   @1: What the user asked for
+# Error codes:
+#  -1: Wrong number of arguments
+#  -2: Invalid argument
+#  -3: No interfaces available
+#  -4: Invalid interface
+#  -5: Interface not configured
+function showCMDFn() {
+	case $1 in
+		"list")
+			IFACES=$(listNetworkInterfacesFn)
+			if [ $? -eq 1 ] && [ ! -z "$IFACES" ]; then
+				echo "$IFACES"
+				return 1;
+			else
+				# No interfaces available
+				echo "-3"
+				return 0;
+			fi
+		;;
+		"status")
+			# Check that we have 2 arguments ($1=action, $2=interface)
+			if [ $# -eq 2 ]; then
+				# No need to check for valid interface here as readNetworkConfigurationFn does it
+				NETCONF=$(readNetworkConfigurationFn "$2")
+				if [ $? -eq 1 ]; then
+					if [ ! -z "$NETCONF" ]; then
+						echo -e "$NETCONF"
+						return 1;
+					else
+						echo "-5"
+						return 0;
+					fi
+				else
+					echo "-2"
+					return 0;
+				fi
+			else
+				# Wrong number of arguments
+				echo "-1"
+				return 0;
+			fi
+		;;
+		"dhcp")
+			# Check that we have 3 arguments ($1=action, $2=interface, $3=dhcp|static
+			if [ $# -eq 3 ]; then
+				isValidInterfaceFn "$2"
+				if [ $? -eq 1 ]; then
+					setInterfaceDhcpFn "$2"
+					return 1;
+				else
+					# Invalid interface
+					echo "-2"
+					return 0;
+				fi
+			else
+				# Wrong number of arguments
+				echo "-1"
+				return 0;
+			fi
+		;;
+		"static")
+			if [ $# -gt 3 ]; then
+				isValidInterfaceFn "$2"
+				if [ $? -eq 1]; then
+
+					# $3 = IP
+					# $4 = Gateway
+					# $5 = Netmask
+					# $6 = Nameserver1
+					# $7 = Nameserver2
+
+					# Handle optional name servers
+					NAMESERVER1=""
+					NAMESERVER2=""
+
+					if [ $# -gt 5 ]; then
+						NAMESERVER1="$6"
+					fi
+					if [ $# -gt 6 ]; then
+						NAMESERVER2="$7"
+					fi
+
+					# Validation of arguments is done inside this function
+					setInterfaceStaticFn "$2" "$3" "$4" "$5" "$NAMESERVER1" "$NAMESERVER2"
+
+					# Return status of setInterfaceModeFn
+					echo "$?"
+					return 1;
+				else
+					# Invalid interface
+					echo "-2"
+					return 0;
+				fi
+			else
+				# Wrong number of arguments
+				echo "-1"
+				return 0;
+			fi
+		;;
+		"credentials")
+			# Two parameters should be get
+			if [ $# -eq 2 ]; then
+				isValidInterfaceFn "$2"
+				if [ $? -eq 1]; then
+					getInterfaceWlanCredentials "$2"
+					echo "$?"
+					return 1;
+				else
+					# Invalid interface
+					echo "-2"
+					return 0;
+				fi
+			# More than two parameters means set
+			elif [ $# -gt 3 ]; then
+				isValidInterfaceFn "$2"
+				if [ $? -eq 1]; then
+					# Validation of the data is done inside this function
+
+					# $2 = Interface
+					# $3 = WPA|WEP|Open
+					# $4 = ESSID
+					# $5 = KEY (semi-optional, only needed with WPA or WEP)
+
+					KEY=""
+					if [ $# -gt 4 ]; then
+						KEY="$5"
+					fi
+
+					setInterfaceWlanCredentials "$2" "$3" "$4" "$KEY"
+					echo "$?"
+					return 1;
+				else
+					# Invalid interface
+					echo "-2"
+					return 0;
+				fi
+			else
+				# Wrong number of arguments
+				echo "-1"
+				return 0;
+			fi
+
+		;;
+	esac
+}
