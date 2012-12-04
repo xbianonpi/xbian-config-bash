@@ -146,11 +146,9 @@ function showMainMenuDlg() {
 	# Trim CPATH
 	trimLnFn $CPATH
 	CPATH=$TRIMMEDLN;
-
-	# Draw showMainMenuDlg
-	IFS=$'\n';
 	
 	# Get all sub-items that corresponding to the level we are currently
+	IFS=$'\n';
 	ITEMS=$(cat $BASEPATH/struct | grep ^$(echo $LEVEL$ADD[0-9])*: | cut -f 2 -d:);
 
 	# Clear caches need by previous function
@@ -193,7 +191,6 @@ function showMainMenuDlg() {
 			I=$(($I+1));
 		done;
 		
-		IFS="%";
 		# Set the title to the appropriate menu level we're in
 		TITLE="["$CPATH"]"
 

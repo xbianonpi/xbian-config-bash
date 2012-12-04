@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 #Copyright 2012 CurlyMo <development@xbian.org>
 #
@@ -6,16 +6,16 @@
 #
 #XBian is free software: you can redistribute it and/or modify it under the
 #terms of the GNU General Public License as published by the Free Software
-#Foundation, either version 3 of the License, or (at your option) any later
+#Foundation,either version 3 of the License,or (at your option) any later
 #version.
 #
-#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#XBian is distributed in the hope that it will be useful,but WITHOUT ANY
 #WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 #FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 #details.
 #
 #You should have received a copy of the GNU General Public License along
-#with XBian. If not, see <http://www.gnu.org/licenses/>
+#with XBian. If not,see <http://www.gnu.org/licenses/>
 
 # Shows the overclocking warning
 function showOCWarningDlg() {
@@ -26,8 +26,15 @@ function showOCWarningDlg() {
 }
 
 function showOCSettingsDlg() {
-	createTableFn "radio" "#,Name, ARM, CORE, SDRAM, Overvolt" "1,None, 700Mhz, 250Mhz, 400Mhz, 0,off" "2,Modest, 800Mhz, 300Mhz, 400Mhz, 0,off" "3,XBian, 840Mhz, 375Mhz, 400Mhz, 0,off" "4,Medium, 900Mhz, 333Mhz, 450Mhz, 2,off" "5,High, 950Mhz, 450Mhz, 450Mhz, 6,off" "6,Turbo, 1000MHz, 500MHz, 500MHz, 6,off"
+	createTableFn "radio"\
+	"#,Name,ARM,CORE,SDRAM,Overvolt"\
+	"1,None,700Mhz,250Mhz,400Mhz,0,${STATUS[0]}"\
+	"2,Modest,800Mhz,300Mhz,400Mhz,0,${STATUS[1]}"\
+	"3,XBian,840Mhz,375Mhz,400Mhz,0,${STATUS[2]}"\
+	"4,Medium,900Mhz,333Mhz,450Mhz,2,${STATUS[3]}"\
+	"5,High,950Mhz,450Mhz,450Mhz,6,${STATUS[4]}"\
+	"6,Turbo,1000Mhz,500Mhz,500Mhz,6,${STATUS[5]}"\
+	"7,...,...,...,...,...,${STATUS[6]}"
 	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+15))
-	IFS="%";
-	showRadioDlg "$CENTEREDTXT" "$ROWS" 6 14
+	showRadioDlg "$CENTEREDTXT" "$ROWS" 7 15
 }

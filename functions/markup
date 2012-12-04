@@ -107,105 +107,103 @@ function trimLnFn() {
 	TRIMMEDLN=$(echo -e "$1" | sed 's/^\ //;s/\ $//');
 }
 
-function createTableRowFn() {
+# Create table header used inside table
+#  $1 [String] Radio/Menu: Are we creating a row for a menu or radio dialog?
+#  $2 [String] Rows: Strings with the values likes used in dialogs
+#  $3 [String] Header: A string with names of the header words seperated by commas
+# Returns
+#  $HEADER [String] String containing the outlined header
+#  $ROWS   [String] String with all outlined rows
+function createTableFn() {
 	TYPE=$1;
 	shift;
-	NRCOLUMNS=$#;
-	NEWROW=""
-	for (( c=1; c<=$NRCOLUMNS; c++ )); do
-		NEWROW+="$1"
-		if [ $c -eq 1 ]; then
-			NEWROW+="%";
-		elif [ $NRCOLUMNS -gt $c ]; then
-			if [ $TYPE == "radio" ] && [ $NRCOLUMNS -gt $(($c+1)) ]; then
-				NEWROW+="!"
-			else
-				NEWROW+="%"
-			fi
-		else
-			NEWROW+="%"
-		fi
-		shift;
-	done;
-}
-
-function createTableHeaderFn() {
-	#Check for similar number of columns between rows
-	TYPE=$1;
-	shift;
-	HEADER=""
-	IFS="%";
-	TBLROWS=($1)
+	IFS=",";
+	OLDHEADER=($1)
+	IFS=$ORIGINALIFS;
+	shift
+	OLDROWS=($@)
 	
-	NEWTBLROWS=();
-	NEWTBLROW="";
-	I=0;
-	for TBLROW in ${TBLROWS[@]}; do
-		I=$(($I+1));
-		if [ $I -eq 2 ]; then
-			NEWTBLROW+=$TBLROW;
-			NEWTBLROWS+=($NEWTBLROW);
-		elif [ $I -eq 3 ]; then
-			NEWTBLROW="";
-			I=0;
-		else
-			NEWTBLROW+="$TBLROW!";
-		fi
-	done;
-
 	NRCOLUMNS=0;
 	WORDLENGTH=();
-	for (( c=0; c<${#NEWTBLROWS[@]}; c++ )); do
-		IFS="!";
-		TBLROW=(${NEWTBLROWS[$c]});
-		
-		NRCOLUMNS=${#TBLROW[@]};
-		for (( d=0; d<${#TBLROW[@]}; d++ )); do
+	for (( c=0; c<${#OLDROWS[@]}; c++ )); do
+		IFS=",";
+		OLDROW=(${OLDROWS[$c]});
+		NRCOLUMNS=${#OLDROW[@]};
+		for (( d=0; d<${#OLDROW[@]}; d++ )); do
 			if [ $c -eq 0 ]; then
-				WORDLENGTH+=(${#TBLROW[$d]});
-			elif [ ${WORDLENGTH[$d]} -lt ${#TBLROW[$d]} ]; then
-				WORDLENGTH[$d]=${#TBLROW[$d]}
+				WORDLENGTH+=(${#OLDROW[$d]});
+			elif [ ${WORDLENGTH[$d]} -lt ${#OLDROW[$d]} ]; then
+				WORDLENGTH[$d]=${#OLDROW[$d]}
 			fi
 		done
 	done
 	IFS=$ORIGINALIFS;
-	HEADER=" "
 	
 	if [ $TYPE == "radio" ]; then
 		NRCOLUMNS=$(($NRCOLUMNS-1));
 	fi
 	
-	HEADER+=$2;
-	HEADER+="  ";
+	HEADER=${OLDHEADER[0]};
+	HEADER+=" ";
 	shift
+	CENTERED=();
 	
-	for (( c=1; c<=$NRCOLUMNS; c++ )); do
-		HEADER+=$2;
-		for (( d=0; d<=$((${WORDLENGTH[$c]}-${#2})); d++ )); do
+	for (( c=1; c<$NRCOLUMNS; c++ )); do
+		if [ ${WORDLENGTH[$c]} -lt ${#OLDHEADER[$c]} ]; then
+			WORDLENGTH[$c]=${#OLDHEADER[$c]};
+			CENTERED[$c]=1;
+		else
+			CENTERED[$c]=0;
+		fi
+		LENGTH=$((${WORDLENGTH[$c]}-${#OLDHEADER[$c]}));
+
+		HEADER+=" [ ";
+		HEADER+=${OLDHEADER[$c]};
+		
+		for (( d=0; d<$(($LENGTH)); d++ )); do
 			HEADER+=" ";
 		done
+		HEADER+=" ]";
 		shift;
 	done
-}
-
-
-function createTableFn() {
-	TYPE=$1
-	shift
-	OLDHEADER=$1;
-	shift;
-	OLDROWS=($@);
-	ROWS="";
-	for OLDROW in ${OLDROWS[@]}; do
-		IFS=","
-		ROW1=($OLDROW)
-		createTableRowFn $TYPE ${ROW1[@]};
-		ROWS+=$NEWROW;
-		
-	done
-	ROWS=$(echo $ROWS | awk '{print substr($0,0,length)'});
 	
-	IFS=","
-	NEWHEADER=($OLDHEADER);
-	createTableHeaderFn $TYPE $ROWS ${NEWHEADER[@]};
+	ROWS="";
+	for (( c=0; c<${#OLDROWS[@]}; c++ )); do
+		IFS=",";
+		OLDROW=(${OLDROWS[$c]});
+		NRCOLUMNS=${#OLDROW[@]};
+		for (( d=0; d<${#OLDROW[@]}; d++ )); do
+			LENGTH=$((${WORDLENGTH[$d]}-${#OLDROW[$d]}));
+			if [ $d -gt 0 ] && [ $d -lt $((${#OLDROW[@]}-1)) ]; then
+				if [ $d -gt 1 ]; then
+					ROWS+="$DEFAULTCOLSEP"
+				fi
+				ROWS+="[ ";
+				if [ ${CENTERED[$d]} -eq 1 ]; then					
+					for (( e=0; e<$(($LENGTH/2)); e++ )); do
+						ROWS+=" ";
+					done
+					ROWS+=${OLDROW[$d]};
+					for (( e=0; e<$(($LENGTH/2)); e++ )); do
+						ROWS+=" ";
+					done
+					
+					if ! [ $(($e+$e)) -eq $LENGTH ]; then
+						ROWS+=" ";
+					fi;
+				else
+					ROWS+=${OLDROW[$d]};
+					for (( e=0; e<$LENGTH; e++ )); do
+						ROWS+=" ";
+					done
+				fi
+					
+				ROWS+=" ]";
+			elif [ $d -gt 0 ]; then
+				ROWS+="$DEFAULTDELIMITER"${OLDROW[$d]}"$DEFAULTDELIMITER";
+			else
+				ROWS+=${OLDROW[$d]}"$DEFAULTDELIMITER";
+			fi
+		done
+	done
 }

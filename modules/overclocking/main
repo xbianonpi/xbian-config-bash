@@ -38,7 +38,8 @@ source $BASEPATH/modules/overclocking/dialogs
 # Executes the GUI version of this module
 function showGUIFn() {
 	#showOCWarningDlg;
-	showOCSettingsDlg;
+	STATUS=(off off off off off off on);
+	showOCSettingsDlg $STATUS;
 }
 
 # Executes the command line version of this module
