@@ -1,0 +1,162 @@
+#!/bin/bash
+#
+#Copyright 2012 Hexagon <development@xbian.org>
+#
+#This file is part of XBian - XBMC on the Raspberry Pi.
+#
+#XBian is free software: you can redistribute it and/or modify it under the
+#terms of the GNU General Public License as published by the Free Software
+#Foundation, either version 3 of the License, or (at your option) any later
+#version.
+#
+#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#details.
+#
+#You should have received a copy of the GNU General Public License along
+#with XBian. If not, see <http://www.gnu.org/licenses/>
+
+# ToDo:
+# ----------------------------
+# setInterfaceDhcpFn "eth0"
+# setInterfaceStaticFn "eth0" "192.168.1.1" "255.255.255.0" "192.168.1.1" "192.168.1.1"
+# getInterfaceWlanCredentials "wlan0" # Return MODE ESSID KEY
+# setInterfaceWlanCredentials "wlan0" "WPA" "ssid" "key"
+# ----------------------------
+
+# List all available network interfaces
+# Echoes @return
+#  @1: Available interfaces
+#  @2: Error code
+# Returns
+#  1: Success
+#  0: Error
+function listNetworkInterfacesFn() {
+	# List all interfaces
+	IFACES=$(ip addr | grep state | grep -v lo: | cut -f 2 -d":" | sed 's/ //g')
+	if [ ! -z "$IFACES" ]; then
+		echo "$IFACES"
+		return 1
+	else
+		echo "-3"
+		return 0
+	fi
+}
+
+# Check if a given string is a valid interface name
+# Parameters
+#  $1: Interface name
+# Returns
+#  1: Valid
+#  0: Invalid
+function isValidInterfaceFn() {
+	INTERFACE=$(listNetworkInterfacesFn | grep "$1")
+	if [ ! -z "$INTERFACE" ]; then
+		return 1;
+	else
+		return 0;
+	fi
+}
+
+# Reads various netowrk configuration options from related files
+# Arguments
+#   $1 Interface
+# Return
+#   1: Success
+#   0: Failure
+# Echoes
+#   @1: Textual table
+#       -----------------------
+#       MODE dhcp|static|manual
+#       IP X.X.X.X
+#       NETMASK X.X.X:X
+#       GATEWAY X.X.X.X
+#       NAMESERVER1 X.X.X.X
+#       NAMESERVER2 X.X.X.X
+#   @0: Error code
+# Error codes
+#   -4: Invalid interface
+function readNetworkConfigurationFn() {
+        isValidInterfaceFn "$1"
+	if [ $? -eq 1 ]; then
+		# Read network configuration from /etc/network/interfaces
+		TFILEIFACES=$(cat /etc/network/interfaces)
+
+		# Place everything after matching iface in a variable
+		CONTENT=$(echo -e "$TFILEIFACES" | grep -A20 "^iface $1 inet" | sed '1d');
+
+		# Delete (possible) subsequent ifaces from variable
+		CONTENT=$(echo -e "$CONTENT" | sed '/iface/,$d');
+
+		# Extract DHCP or Static
+		MODE=$(echo -e "$TFILEIFACES" | grep "iface $1" | cut -f 4 -d " ");
+
+		# Extract manual ip configuration
+		CIP=$(echo -e "$CONTENT" | grep address | cut -f 2 -d " ");
+		CSM=$(echo -e "$CONTENT" | grep netmask | cut -f 2 -d " ");
+		CGW=$(echo -e "$CONTENT" | grep gateway | cut -f 2 -d " ");
+
+	        # Read nameservers from /etc/resolv.conf
+	        NS1="";
+	        NS2="";
+	        if [ $(cat /etc/resolv.conf | grep nameserver | wc -l) -gt 0 ]; then
+	           NS=($(cat /etc/resolv.conf | grep nameserver | sed 's/nameserver //g' ))
+	           if [ ${#RNS[@]} -gt 0 ]; then
+	              NS1=$(echo -e "${RNS[0]}");
+	           fi
+	           if [ ${#RNS[@]} -gt 1 ]; then
+	              NS2=$(echo -e "${RNS[1]}");
+	           fi
+	        fi
+		echo "MODE $MODE"
+		echo "IP $CIP"
+		echo "NETMASK $CSM"
+		echo "GATEWAY $CGW"
+		echo "NAMESERVER1 $NS1"
+		echo "NAMESERVER2 $NS2"
+		return 1;
+	else
+		echo "-1"
+		return 0;
+	fi
+}
+
+# Validate a given ip address
+# Arguments
+#  $1 Ip address
+# Return
+#  1: Valid
+#  0: Invalid
+function checkValidIpNumberFn() {
+        if case $1 in
+                *[!.0-9]* | *.*.*.*.* | *..* | [!0-9]* | *[!0-9] ) false ;;
+                *25[6-9]* | *2[6-9][0-9]* | *[3-9][0-9][0-9]* | *[0-9][0-9][0-9][0-9]* ) false ;;
+                [!1-9].*.*.* | *.*.*.[!1-9] ) false ;;
+                *.*.*.* ) true ;;
+                *) false ;;
+        esac; then
+		# Ip were valid
+		return 1;
+	else
+		# Ip were invalid
+		return 0;
+        fi
+}
+
+# Validate a given netmask
+# Arguments
+#  $1 Netmask
+# Return
+#  1: Valid
+#  0: Invalid
+function checkValidIpNetmaskFn() {
+        if case $1 in
+                255.0.0.0 | 255.255.0.0 | 255.255.255.0 | 255.255.255.255 ) true ;;
+                *) false ;;
+        esac; then
+		return 1
+	else
+		return 0
+        fi
+}
