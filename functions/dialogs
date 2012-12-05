@@ -285,5 +285,6 @@ function showPassDlg() {
 # Standard error dialog
 function showErrorDlg() {
 	centerTxtFn "$_ERROR"
-	showMsgDlg "$CENTEREDTXT" 7;
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $DEFAULTHEIGHT;
 }

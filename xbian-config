@@ -103,7 +103,6 @@ function showMainCloseDlg() {
 	if [ $ASKFORREBOOT -eq 1 ]; then
 		wrapTxtFn "$_REBOOTREQUIRED" 60
 		centerTxtFn "$WRAPPEDTXT" 60
-		echo -e "$CENTEREDTXT";
 		showConfirmDlg "$CENTEREDTXT" $HEIGHT 60;
 	
 		# 0: Do reboot
