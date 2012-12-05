@@ -31,6 +31,7 @@ function showHostnameInputDlg() {
 function showHostnameSuccessDlg() {
 	wrapTxtFn "$_HOSTNAMECHANGED"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 	return $?;
 }
