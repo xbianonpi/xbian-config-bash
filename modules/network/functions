@@ -19,11 +19,230 @@
 
 # ToDo:
 # ----------------------------
-# setInterfaceDhcpFn "eth0"
-# setInterfaceStaticFn "eth0" "192.168.1.1" "255.255.255.0" "192.168.1.1" "192.168.1.1"
-# getInterfaceWlanCredentials "wlan0" # Return MODE ESSID KEY
-# setInterfaceWlanCredentials "wlan0" "WPA" "ssid" "key"
+# DEPRECATED , Should be built in in getStatus
+#   - getInterfaceWlanCredentials "wlan0" # Return MODE ESSID KEY
 # ----------------------------
+
+# Set wlan credentials
+# Arguments
+#  $1 Interface name
+#  $2 Protection (WPA|WEP|Open)
+#  $3 ESSID
+#  $4 KEY (Only needed for WPA and WEP)
+# Return
+#  1: Success
+#  0: Failure
+# Error codes
+#  -10: Invalid wireless protection
+setInterfaceWlanCredentials() {
+
+	# Check that supplied interface is valid
+        isValidInterfaceFn "$1"
+	if [ $? -eq 1 ]; then
+
+		# Create buffer for holding configuration
+		WLANBUFFER=""
+		case $2 in
+			"WEP")
+				WLANBUFFER+="\nwireless-essid $3\nwireless-key $4"
+			;;
+			"WPA")
+				WLANBUFFER+="\nwpa-ssid \"$3\"\nwpa-psk \"$4\""
+			;;
+			"Open")
+				WLANBUFFER+="\nwireless-mode managed\nwireless-essid $3"
+			;;
+			*)
+				echo "-10"
+				return 0
+			;;
+		esac
+
+	        if [ $(cat /etc/network/interfaces | grep "^iface $1" | wc -l) -gt 0 ]; then
+
+			# Interface already present, store it + any subsequent ifaces in an buffer
+			IFACEBUFFER=$(cat /etc/network/interfaces | grep -A100 "^iface $1" | sed '1d');
+
+			# Extract DHCP or Static
+			MODE=$(cat /etc/network/interfaces | grep "iface $1" | cut -f 4 -d " ");
+
+			# Remove what's now in the buffer from the file
+			sed -i "/^iface $1/,+100d" /etc/network/interfaces
+
+			# Extract subsequent ifaces to a separate buffer
+			MORE=$(echo -e "$IFACEBUFFER" | sed -n '/\(allow-hotplug.*\|^iface.*\)/,$p')
+
+			# Get a cleaned verson of current clause
+			ME=$(echo -e "$IFACEBUFFER" | sed '/\(allow-hotplug.*\|^iface.*\)/,$d' | sed '/\(^wireless.*\|^wpa.*\)/d')
+
+			# Re-add current interface withouth previous cruft
+	                echo -e "iface $1 inet $MODE" >> /etc/network/interfaces
+			echo -e "$WLANBUFFER" >> /etc/network/interfaces
+			echo -e "$ME\n" >> /etc/network/interfaces
+
+			# Re-add subsequent interfaces
+			echo -e "$MORE" >> /etc/network/interfaces
+
+			return 1;
+		else
+			# Interface not present, add it to the end
+			echo -e "iface $1 inet dhcp" >> /etc/network/interfaces
+			echo -e "$WLANBUFFER\n" >> /etc/network/interfaces
+			return 1;
+		fi
+
+
+	else
+		echo "-3"
+		return 0;
+	fi
+}
+
+# Sets an interface to use dhcp
+# Arguments
+#  $1 Interface name
+setInterfaceDhcpFn() {
+        isValidInterfaceFn "$1"
+	if [ $? -eq 1 ]; then
+	        if [ $(cat /etc/network/interfaces | grep "^iface $1" | wc -l) -gt 0 ]; then
+
+			# Interface already present, store it + any subsequent ifaces in an buffer
+			IFACEBUFFER=$(cat /etc/network/interfaces | grep -A100 "^iface $1" | sed '1d');
+
+			# Remove what's now in the buffer from the file
+			sed -i "/^iface $1/,+100d" /etc/network/interfaces
+
+			# Extract subsequent ifaces to a separate buffer
+			MORE=$(echo -e "$IFACEBUFFER" | sed -n '/\(allow-hotplug.*\|^iface.*\)/,$p')
+
+			# Get a cleaned verson of current clause
+			ME=$(echo -e "$IFACEBUFFER" | sed '/\(allow-hotplug.*\|^iface.*\)/,$d' | sed '/\(^address.*\|^netmask.*\|^gateway.*\)/d')
+
+			# Re-add current interface withouth previous cruft
+	                echo -e "iface $1 inet dhcp" >> /etc/network/interfaces
+			echo -e "$ME\n" >> /etc/network/interfaces
+
+			# Re-add subsequent interfaces
+			echo -e "$MORE" >> /etc/network/interfaces
+
+			return 1;
+		else
+			# Interface not present, add it to the end
+			sudo echo -e "iface $1 inet dhcp\n" >> /etc/network/interfaces
+
+			return 1;
+		fi
+	else
+		echo "-3"
+		return 0;
+	fi
+}
+
+# setInterfaceStaticFn "eth0" "192.168.1.1" "255.255.255.0" "192.168.1.1" "192.168.1.1"
+
+# Sets an interface to use static ip
+# Arguments
+#  $1 Interface name
+#  $2 IP
+#  $3 Netmask
+#  $4 Gateway
+#  $5 DNS1 (optional)
+#  $6 DNS2 (optional)
+# Returns
+#  0: Failed
+#  1: Succeede
+# Error codes
+#  -3: Invalid interface
+#  -6: Invalid IP
+#  -7: Invalid netmask
+#  -8: Invalid Gateway
+#  -9: Invalid DNS
+setInterfaceStaticFn() {
+        isValidInterfaceFn "$1"
+	if [ $? -eq 1 ]; then
+
+		# Configuration buffer
+		BUFFERIFACES=""
+		BUFFERRESOLV=""
+
+		# Validate input & preparation of configuration buffers
+		checkValidIpNumberFn "$2"
+		if [ ! $? -eq 1 ]; then
+			echo "-6"
+			return 0;
+		else
+			BUFFERIFACES+="address $2"
+		fi
+		checkValidIpNetmaskFn "$3"
+		if [ ! $? -eq 1 ]; then
+			echo "-7"
+			return 0;
+		else
+			BUFFERIFACES+="\nnetmask $3"
+		fi
+		checkValidIpNumberFn "$4"
+		if [ ! $? -eq 1 ]; then
+			echo "-8"
+			return 0;
+		else
+			BUFFERIFACES+="\ngateway $4"
+		fi
+		if [ $# -gt 4 ]; then
+			if [ ! $(checkValidIpNumberFn "$5") -eq 1 ]; then
+				echo "-9"
+				return 0;
+			else
+				BUFFERRESOLV+="nameserver $5"
+			fi
+		fi
+		if [ $# -gt 5 ]; then
+			if [ ! $(checkValidIpNumberFn "$6") -eq 1 ]; then
+				echo "-9"
+				return 0;
+			else
+				BUFFERRESOLV+="\nnameserver $6"
+			fi
+		fi
+
+		# Process /etc/network/interfaces
+	        if [ $(cat /etc/network/interfaces | grep "^iface $1" | wc -l) -gt 0 ]; then
+
+			# Interface already present, store it + any subsequent ifaces in an buffer
+			IFACETMP=$(cat /etc/network/interfaces | grep -A100 "^iface $1" | sed '1d');
+
+			# Remove what's now in the buffer from the file
+			sed -i "/^iface $1/,+100d" /etc/network/interfaces
+
+			# Extract subsequent ifaces to a separate buffer
+			MORE=$(echo -e "$IFACETMP" | sed -n '/\(allow-hotplug.*\|^iface.*\)/,$p')
+			ME=$(echo -e "$IFACETMP" | sed '/\(allow-hotplug.*\|^iface.*\)/,$d' | sed '/\(^address.*\|^netmask\.*|^gateway.*\)/d')
+
+			# Re-add current interface withouth previous cruft
+	                echo -e "iface $1 inet static" >> /etc/network/interfaces
+			echo -e "$ME" >> /etc/network/interfaces
+			echo -e "$BUFFERIFACES\n" >> /etc/network/interfaces
+
+			# Re-add subsequent interfaces
+			echo -e "$MORE" >> /etc/network/interfaces
+
+		else
+			# Interface not present, add it to the end
+			sudo echo -e "iface $1 inet static" >> /etc/network/interfaces
+			echo -e "$BUFFERIFACES\n" >> /etc/network/interfaces
+
+		fi
+
+		# Process /etc/resolv.conf
+		sed -i "/nameserver/d" /etc/resolv.conf
+		echo -e "$BUFFERRESOLV" >> /etc/resolv.conf
+
+		echo "1"
+		return 1;
+	else
+		echo "-3"
+		return 0;
+	fi
+}
 
 # List all available network interfaces
 # Echoes @return

@@ -167,7 +167,7 @@ function showCMDFn() {
 			if [ $# -eq 2 ]; then
 				isValidInterfaceFn "$2"
 				if [ $? -eq 1]; then
-					getInterfaceWlanCredentials "$2"
+					#getInterfaceWlanCredentials "$2"
 					echo "$?"
 					return 1;
 				else
