@@ -26,7 +26,7 @@ function rootPasswordSetFn() {
 	if [ -z $(cat /etc/shadow | grep root | cut -f 2 -d:) ]; then
 		return 0;
 	else
-		return 0;
+		return 1;
 	fi
 }
 
