@@ -19,9 +19,6 @@
 
 DEFAULTWIDTH=55;
 DEFAULTHEIGHT=7;
-DEFAULTCOLSEP="!"
-DEFAULTDELIMITER="%"
-
 # Show a normal dialog (messagebox)
 #  $1 Text
 #  $2 (optional) Height
@@ -49,7 +46,7 @@ showMsgDlg() {
 		--backtitle "$BACKTITLE" \
 		--title "$TITLE" \
 		--ok-label "$OKLABEL" \
-		--msgbox "\n$1" $HEIGHT $WIDTH
+		--msgbox "$1" $HEIGHT $WIDTH
 }
 
 # Show a information box
@@ -143,7 +140,7 @@ function showMenuDlg() {
 	if [ $# -gt 6 ]; then
 		NOLABEL=$7
 	fi
-	IFS=$DEFAULTDELIMITER;
+
 	RETURN=$( \
 		dialog \
 			--no-kill \
@@ -152,7 +149,7 @@ function showMenuDlg() {
 			--ok-label $YESLABEL \
 			--colors \
 			--cancel-label $NOLABEL \
-			--column-separator "$DEFAULTCOLSEP" \
+			--column-separator "!" \
 			--menu "$1" $HEIGHT $WIDTH $ROWS \
 			$2 3>&1 1>&2 2>&3)
 }
@@ -163,11 +160,13 @@ function showMenuDlg() {
 #  $3 Rows
 #  $4 (optional) Height
 #  $5 (optional) Width
-#  $6 (optional) Yes label
-#  $7 (optional) No Label
 function showRadioDlg() {
+<<<<<<< HEAD
 	YESLABEL="$_SELECT"
-	NOLABEL="$_RETURN"	
+	NOLABEL="$_RETURN"
+	HEADER=$1;
+=======
+>>>>>>> parent of c57175b... Perfectionized table creator
 
 	if [ $# -gt 2 ]; then
 		ROWS=$3;
@@ -175,31 +174,43 @@ function showRadioDlg() {
 		ROWS=5;
 	fi
 	WIDTH=$(($DEFAULTWIDTH+15))
+	if [ $# -gt 4 ]; then
+		WIDTH=$5
+	fi
+	
+	centerTxtFn "$_SPACEOPTIONSELECT" $WIDTH;
 	HEIGHT=$((DEFAULTHEIGHT+5));
 	if [ $# -gt 3 ]; then
 		HEIGHT=$4
 	fi
-	if [ $# -gt 4 ]; then
-		WIDTH=$5
-	fi
+<<<<<<< HEAD
 	if [ $# -gt 5 ]; then
 		YESLABEL=$6
 	fi
 	if [ $# -gt 6 ]; then
 		NOLABEL=$7
 	fi
+	
 	IFS=$DEFAULTDELIMITER;
+=======
+	if [ $# -gt 4 ]; then
+		WIDTH=$5
+	fi
+	
+>>>>>>> parent of c57175b... Perfectionized table creator
 	RETURN=$( \
 		dialog \
 			--no-kill \
-			--ok-label $YESLABEL \
 			--colors \
-			--cancel-label $NOLABEL \
 			--title "$TITLE" \
 			--backtitle "$BACKTITLE" \
-			--column-separator "$DEFAULTCOLSEP" \
+			--column-separator "!" \
 			--no-collapse \
-			--radiolist "\n  \Zb$1" $HEIGHT $WIDTH $ROWS \
+<<<<<<< HEAD
+			--radiolist "\n$CENTEREDTXT\Zb\n  $HEADER" $HEIGHT $WIDTH $ROWS \
+=======
+			--radiolist "\n     \Zb$1" $HEIGHT $WIDTH $ROWS \
+>>>>>>> parent of c57175b... Perfectionized table creator
 			$2 3>&1 1>&2 2>&3);
 }
 

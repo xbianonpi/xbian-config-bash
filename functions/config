@@ -16,11 +16,25 @@
 #
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
+#
 
-_NAME="Overclocking"
-_DESC="Stel overclocking in"
-_OCWARNING="Extreem overclocken kan de levensduur van de Rasperry Pi verkleinen. XBian heeft verschillende overclock instelling gesteld en een ideale combinatie van waardes vastgesteld. Turbo overclock kan je bestandssysteem corrumperen. Overclock op eigen risk!"
-_OCNOTCHANGED="Deze overclock instellingen staan al ingesteld"
-_OCCHANGED="De overclock instellingen zijn succesvol aangepast"
-_OCNAME="Naam"
-_OCCUSTOM="~"
+# update/insert Raspberry PI config variable
+#  $1 [String] Key
+#  $2 [Mixed] Value
+updateConfigVarFn() {
+	sed -i "/$1/d" /boot/config.txt
+	echo "$1=$2" >> /boot/config.txt
+	sed -i '/^$/d' /boot/config.txt
+}
+
+# select Raspberry PI config variable
+#  $1 [String] Key
+selectConfigVarFn() {
+	RETURN=$(cat /boot/config.txt | grep $1 | cut -f 2 -d=);
+}
+
+# remove Raspberry PI config variable
+#  $1 [String] Key
+deleteConfigVarFn() {
+	sed -i "/$1/d" /boot/config.txt
+}
