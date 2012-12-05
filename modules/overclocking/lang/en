@@ -20,3 +20,7 @@
 _NAME="Overclocking"
 _DESC="Configure overclocking"
 _OCWARNING="Extreme overclocking can reduce the lifetime of your Raspberry Pi. XBian has tested different overclocking settings and created a most preferable combination of settings. Turbo overclock can cause filesystem corruption. Overclock at your own risk!"
+_OCNOTCHANGED="These overclock setings are already set"
+_OCCHANGED="The overclock settings are successfully changed"
+_OCNAME="Name"
+_OCCUSTOM="~"

@@ -6,7 +6,7 @@
 #
 #XBian is free software: you can redistribute it and/or modify it under the
 #terms of the GNU General Public License as published by the Free Software
-#Foundation,either version 3 of the License,or (at your option) any later
+#Foundation, either version 3 of the License,or (at your option) any later
 #version.
 #
 #XBian is distributed in the hope that it will be useful,but WITHOUT ANY
@@ -22,19 +22,32 @@ function showOCWarningDlg() {
 	wrapTxtFn "$_OCWARNING"
 	centerTxtFn "$WRAPPEDTXT"
 	showMsgDlg "$WRAPPEDTXT" $HEIGHT
-	clearMemCache;
 }
 
 function showOCSettingsDlg() {
 	createTableFn "radio"\
-	"#,Name,ARM,CORE,SDRAM,Overvolt"\
-	"1,None,700Mhz,250Mhz,400Mhz,0,${STATUS[0]}"\
-	"2,Modest,800Mhz,300Mhz,400Mhz,0,${STATUS[1]}"\
-	"3,XBian,840Mhz,375Mhz,400Mhz,0,${STATUS[2]}"\
-	"4,Medium,900Mhz,333Mhz,450Mhz,2,${STATUS[3]}"\
-	"5,High,950Mhz,450Mhz,450Mhz,6,${STATUS[4]}"\
-	"6,Turbo,1000Mhz,500Mhz,500Mhz,6,${STATUS[5]}"\
-	"7,...,...,...,...,...,${STATUS[6]}"
+	"   #,\Zb$_OCNAME,\ZbARM,\ZbCORE,\ZbSDRAM,\ZbOvervolt"\
+	"1,\Z2None,\Z2700Mhz,\Z2250Mhz,\Z2400Mhz,\Z20,${STATUS[0]}"\
+	"2,\Z2Modest,\Z2800Mhz,\Z2300Mhz,\Z2400Mhz,\Z20,${STATUS[1]}"\
+	"3,\Z2XBian,\Z2840Mhz,\Z2375Mhz,\Z2400Mhz,\Z20,${STATUS[2]}"\
+	"4,\ZnMedium,\Zn900Mhz,\Zn333Mhz,\Zn450Mhz,\Zn2,${STATUS[3]}"\
+	"5,\ZnHigh,\Zn950Mhz,\Zn450Mhz,\Zn450Mhz,\Zn6,${STATUS[4]}"\
+	"6,\Z1Turbo,\Z11000Mhz,\Z1500Mhz,\Z1500Mhz,\Z16,${STATUS[5]}"\
+	"7,\Z1$_OCCUSTOM,\Z1...,\Z1...,\Z1...,\Z1...,${STATUS[6]}"
 	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+15))
-	showRadioDlg "$CENTEREDTXT" "$ROWS" 7 15
+	showRadioDlg "$CENTEREDTXT" "$ROWS" 7 16	
+}
+
+function showNoOCChangeDlg() {
+	wrapTxtFn "$_OCNOTCHANGED"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+}
+
+function showUpdatedOCDlg() {
+	wrapTxtFn "$_OCCHANGED"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
