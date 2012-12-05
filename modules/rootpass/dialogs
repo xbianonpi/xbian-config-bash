@@ -30,7 +30,8 @@ function showRootPassInputDlg() {
 function showRootPassSuccessDlg() {
 	wrapTxtFn "$_ROOTPASSCHANGED"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT" $HEIGHT
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 	return $?;
 }
 
@@ -38,7 +39,8 @@ function showRootPassSuccessDlg() {
 function showRootPassNoMatchDlg() {
 	wrapTxtFn "$_ROOTPASSNOMATCH"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
 	return $?;
 }
 
@@ -46,6 +48,7 @@ function showRootPassNoMatchDlg() {
 function showRootPassEmptyFieldsDlg() {
 	wrapTxtFn "$_ROOTPASSEMPTYFIELDS"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
 	return $?;
 }

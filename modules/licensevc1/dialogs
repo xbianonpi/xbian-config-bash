@@ -31,7 +31,8 @@ function showLicenseVC1InputDlg() {
 function showLicenseVC1InsertedDlg() {
 	wrapTxtFn "$_VC1INSERTED"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 	return $?;
 }
 
@@ -39,7 +40,8 @@ function showLicenseVC1InsertedDlg() {
 function showLicenseVC1UpdatedDlg() {
 	wrapTxtFn "$_VC1UPDATED"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 	return $?;
 }
 
@@ -47,6 +49,7 @@ function showLicenseVC1UpdatedDlg() {
 function showLicenseVC1DeletedDlg() {
 	wrapTxtFn "$_VC1DELETED"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 	return $?;
 }

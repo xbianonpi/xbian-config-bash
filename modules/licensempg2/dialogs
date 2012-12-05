@@ -31,7 +31,8 @@ function showLicenseMPG2InputDlg() {
 function showLicenseMPG2InsertedDlg() {
 	wrapTxtFn "$_MPG2INSERTED"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 	return $?;
 }
 
@@ -39,7 +40,8 @@ function showLicenseMPG2InsertedDlg() {
 function showLicenseMPG2UpdatedDlg() {
 	wrapTxtFn "$_MPG2UPDATED"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 	return $?;
 }
 
@@ -47,6 +49,7 @@ function showLicenseMPG2UpdatedDlg() {
 function showLicenseMPG2DeletedDlg() {
 	wrapTxtFn "$_MPG2DELETED"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 	return $?;
 }
