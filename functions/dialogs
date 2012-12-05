@@ -19,6 +19,9 @@
 
 DEFAULTWIDTH=55;
 DEFAULTHEIGHT=7;
+DEFAULTCOLSEP="!"
+DEFAULTDELIMITER="%"
+
 # Show a normal dialog (messagebox)
 #  $1 Text
 #  $2 (optional) Height
@@ -140,7 +143,7 @@ function showMenuDlg() {
 	if [ $# -gt 6 ]; then
 		NOLABEL=$7
 	fi
-
+	IFS=$DEFAULTDELIMITER;
 	RETURN=$( \
 		dialog \
 			--no-kill \
@@ -149,7 +152,7 @@ function showMenuDlg() {
 			--ok-label $YESLABEL \
 			--colors \
 			--cancel-label $NOLABEL \
-			--column-separator "!" \
+			--column-separator "$DEFAULTCOLSEP" \
 			--menu "$1" $HEIGHT $WIDTH $ROWS \
 			$2 3>&1 1>&2 2>&3)
 }
@@ -160,13 +163,12 @@ function showMenuDlg() {
 #  $3 Rows
 #  $4 (optional) Height
 #  $5 (optional) Width
+#  $6 (optional) Yes label
+#  $7 (optional) No Label
 function showRadioDlg() {
-<<<<<<< HEAD
 	YESLABEL="$_SELECT"
 	NOLABEL="$_RETURN"
 	HEADER=$1;
-=======
->>>>>>> parent of c57175b... Perfectionized table creator
 
 	if [ $# -gt 2 ]; then
 		ROWS=$3;
@@ -183,7 +185,6 @@ function showRadioDlg() {
 	if [ $# -gt 3 ]; then
 		HEIGHT=$4
 	fi
-<<<<<<< HEAD
 	if [ $# -gt 5 ]; then
 		YESLABEL=$6
 	fi
@@ -192,25 +193,17 @@ function showRadioDlg() {
 	fi
 	
 	IFS=$DEFAULTDELIMITER;
-=======
-	if [ $# -gt 4 ]; then
-		WIDTH=$5
-	fi
-	
->>>>>>> parent of c57175b... Perfectionized table creator
 	RETURN=$( \
 		dialog \
 			--no-kill \
+			--ok-label $YESLABEL \
 			--colors \
+			--cancel-label $NOLABEL \
 			--title "$TITLE" \
 			--backtitle "$BACKTITLE" \
-			--column-separator "!" \
+			--column-separator "$DEFAULTCOLSEP" \
 			--no-collapse \
-<<<<<<< HEAD
 			--radiolist "\n$CENTEREDTXT\Zb\n  $HEADER" $HEIGHT $WIDTH $ROWS \
-=======
-			--radiolist "\n     \Zb$1" $HEIGHT $WIDTH $ROWS \
->>>>>>> parent of c57175b... Perfectionized table creator
 			$2 3>&1 1>&2 2>&3);
 }
 

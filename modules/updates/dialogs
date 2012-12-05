@@ -27,7 +27,8 @@ function showPackageListDownloadDlg() {
 function showPackageListErrorDlg() {
 	wrapTxtFn "$_PLERROR"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 }
 
 function showCheckingForUpdatesDlg() {
@@ -40,19 +41,22 @@ function showCheckingForUpdatesDlg() {
 function showUpdatesUpToDateDlg() {
 	wrapTxtFn "$_UPTODATE"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 }
 
 function showUpdateErrorDlg() {
 	wrapTxtFn "$_ERRORCHECKUPDATE"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 }
 
 function showUpdateAvailableDlg() {
 	wrapTxtFn "$_ANUPDATE ($1) $_ISAVAILABLE"
 	centerTxtFn "$WRAPPEDTXT"
-	showConfirmDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showConfirmDlg "$ALIGNEDTXT"
 }
 
 function showInstallingUpdateDlg() {
@@ -65,11 +69,13 @@ function showInstallingUpdateDlg() {
 function showSystemUpdatedDlg() {
 	wrapTxtFn "$_UPDATEDTO $1"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 }
 
 function showUpdateErrorOccurredDlg() {
 	wrapTxtFn "$_ERRORUPDATE"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 }
