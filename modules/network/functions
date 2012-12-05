@@ -83,11 +83,14 @@ setInterfaceWlanCredentials() {
 			# Re-add subsequent interfaces
 			echo -e "$MORE" >> /etc/network/interfaces
 
+			echo "1";
 			return 1;
 		else
 			# Interface not present, add it to the end
 			echo -e "iface $1 inet dhcp" >> /etc/network/interfaces
 			echo -e "$WLANBUFFER\n" >> /etc/network/interfaces
+
+			echo "1"
 			return 1;
 		fi
 
@@ -138,8 +141,6 @@ setInterfaceDhcpFn() {
 	fi
 }
 
-# setInterfaceStaticFn "eth0" "192.168.1.1" "255.255.255.0" "192.168.1.1" "192.168.1.1"
-
 # Sets an interface to use static ip
 # Arguments
 #  $1 Interface name
@@ -187,16 +188,18 @@ setInterfaceStaticFn() {
 		else
 			BUFFERIFACES+="\ngateway $4"
 		fi
-		if [ $# -gt 4 ]; then
-			if [ ! $(checkValidIpNumberFn "$5") -eq 1 ]; then
+		if [ $# -gt 4 ] && [ ! -z "$5" ]; then
+			checkValidIpNumberFn "$5"
+			if [ ! $? -eq 1 ]; then
 				echo "-9"
 				return 0;
 			else
 				BUFFERRESOLV+="nameserver $5"
 			fi
 		fi
-		if [ $# -gt 5 ]; then
-			if [ ! $(checkValidIpNumberFn "$6") -eq 1 ]; then
+		if [ $# -gt 5 ] && [ ! -z "$6" ]; then
+			checkValidIpNumberFn "$6"
+			if [ ! $? -eq 1 ]; then
 				echo "-9"
 				return 0;
 			else
@@ -215,7 +218,7 @@ setInterfaceStaticFn() {
 
 			# Extract subsequent ifaces to a separate buffer
 			MORE=$(echo -e "$IFACETMP" | sed -n '/\(allow-hotplug.*\|^iface.*\)/,$p')
-			ME=$(echo -e "$IFACETMP" | sed '/\(allow-hotplug.*\|^iface.*\)/,$d' | sed '/\(^address.*\|^netmask\.*|^gateway.*\)/d')
+			ME=$(echo -e "$IFACETMP" | sed '/\(allow-hotplug.*\|^iface.*\)/,$d' | sed '/\(^address.*\|^netmask.*\|^gateway.*\)/d')
 
 			# Re-add current interface withouth previous cruft
 	                echo -e "iface $1 inet static" >> /etc/network/interfaces
@@ -316,16 +319,44 @@ function readNetworkConfigurationFn() {
 		CSM=$(echo -e "$CONTENT" | grep netmask | cut -f 2 -d " ");
 		CGW=$(echo -e "$CONTENT" | grep gateway | cut -f 2 -d " ");
 
+		# Extract wlan configuration
+		PROTECTION=""
+		MODEOPEN=$(echo -e "$CONTENT" | grep ^wireless-mode)
+		MODEWPA=$(echo -e "$CONTENT" | grep ^wpa-)
+		MODEWEP=$(echo -e "$CONTENT" | grep ^wireless-essid)
+		if [ ! -z "$MODEOPEN" ]; then
+			PROTECTION="Open"
+		elif [ ! -z "$MODEWPA" ]; then
+			PROTECTION="WPA"
+		elif [ ! -z "$MODEWEP" ]; then
+			PROTECTION="WEP"
+		fi
+
+		# Extract wlan credentials
+		SSID=""
+		KEY=""
+		if [ ! -z "$PROTECTION" ]; then
+			if [ "$PROTECTION" = "WEP" ]; then
+				SSID=$(echo -e "$CONTENT" | grep wireless-essid | cut -f 2 -d" ")
+				KEY=$(echo -e "$CONTENT" | grep wireless-key | cut -f 2 -d" ")
+			elif [ "$PROTECTION" = "WPA" ]; then
+				SSID=$(echo -e "$CONTENT" | grep wpa-ssid | cut -f 2 -d" " | sed 's/\"//g')
+				KEY=$(echo -e "$CONTENT" | grep wpa-psk | cut -f 2 -d" " | sed "s/\"//g")				
+			elif [ "$PROTECTION" = "Open" ]; then
+				SSID=$(echo -e "$CONTENT" | grep wireless-essid | cut -f 2 -d" ")
+			fi
+		fi
+
 	        # Read nameservers from /etc/resolv.conf
 	        NS1="";
 	        NS2="";
 	        if [ $(cat /etc/resolv.conf | grep nameserver | wc -l) -gt 0 ]; then
 	           NS=($(cat /etc/resolv.conf | grep nameserver | sed 's/nameserver //g' ))
-	           if [ ${#RNS[@]} -gt 0 ]; then
-	              NS1=$(echo -e "${RNS[0]}");
+	           if [ ${#NS[@]} -gt 0 ]; then
+	              NS1=$(echo -e "${NS[0]}");
 	           fi
-	           if [ ${#RNS[@]} -gt 1 ]; then
-	              NS2=$(echo -e "${RNS[1]}");
+	           if [ ${#NS[@]} -gt 1 ]; then
+	              NS2=$(echo -e "${NS[1]}");
 	           fi
 	        fi
 		echo "MODE $MODE"
@@ -334,6 +365,11 @@ function readNetworkConfigurationFn() {
 		echo "GATEWAY $CGW"
 		echo "NAMESERVER1 $NS1"
 		echo "NAMESERVER2 $NS2"
+		if [ ! -z "$PROTECTION" ]; then
+			echo "PROTECTION $PROTECTION"
+			echo "SSID $SSID"
+			echo "KEY $KEY"
+		fi
 		return 1;
 	else
 		echo "-1"

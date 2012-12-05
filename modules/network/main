@@ -74,7 +74,7 @@ function showCMDFn() {
 		"list")
 			IFACES=$(listNetworkInterfacesFn)
 			if [ $? -eq 1 ] && [ ! -z "$IFACES" ]; then
-				echo "$IFACES"
+				echo -e "$IFACES"
 				return 1;
 			else
 				# No interfaces available
@@ -106,8 +106,8 @@ function showCMDFn() {
 			fi
 		;;
 		"dhcp")
-			# Check that we have 3 arguments ($1=action, $2=interface, $3=dhcp|static
-			if [ $# -eq 3 ]; then
+			# Check that we have 3 arguments ($1=action, $2=interface)
+			if [ $# -eq 2 ]; then
 				isValidInterfaceFn "$2"
 				if [ $? -eq 1 ]; then
 					setInterfaceDhcpFn "$2"
@@ -126,7 +126,7 @@ function showCMDFn() {
 		"static")
 			if [ $# -gt 3 ]; then
 				isValidInterfaceFn "$2"
-				if [ $? -eq 1]; then
+				if [ $? -eq 1 ]; then
 
 					# $3 = IP
 					# $4 = Gateway
@@ -146,11 +146,11 @@ function showCMDFn() {
 					fi
 
 					# Validation of arguments is done inside this function
-					setInterfaceStaticFn "$2" "$3" "$4" "$5" "$NAMESERVER1" "$NAMESERVER2"
+					RESULT=$(setInterfaceStaticFn "$2" "$3" "$4" "$5" "$NAMESERVER1" "$NAMESERVER2")
 
 					# Return status of setInterfaceModeFn
-					echo "$?"
-					return 1;
+					echo "$RESULT"
+					return $?;
 				else
 					# Invalid interface
 					echo "-2"
@@ -163,22 +163,9 @@ function showCMDFn() {
 			fi
 		;;
 		"credentials")
-			# Two parameters should be get
-			if [ $# -eq 2 ]; then
+			if [ $# -gt 3 ]; then
 				isValidInterfaceFn "$2"
-				if [ $? -eq 1]; then
-					#getInterfaceWlanCredentials "$2"
-					echo "$?"
-					return 1;
-				else
-					# Invalid interface
-					echo "-2"
-					return 0;
-				fi
-			# More than two parameters means set
-			elif [ $# -gt 3 ]; then
-				isValidInterfaceFn "$2"
-				if [ $? -eq 1]; then
+				if [ $? -eq 1 ]; then
 					# Validation of the data is done inside this function
 
 					# $2 = Interface
@@ -191,9 +178,9 @@ function showCMDFn() {
 						KEY="$5"
 					fi
 
-					setInterfaceWlanCredentials "$2" "$3" "$4" "$KEY"
-					echo "$?"
-					return 1;
+					RETURN=$(setInterfaceWlanCredentials "$2" "$3" "$4" "$KEY")
+					echo "$RETURN"
+					return $?;
 				else
 					# Invalid interface
 					echo "-2"
