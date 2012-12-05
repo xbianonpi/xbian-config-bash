@@ -30,6 +30,7 @@ ARGUMENTS=(select update);
 
 source $BASEPATH/modules/overclocking/functions
 source $BASEPATH/modules/overclocking/dialogs
+source $BASEPATH/functions/config
 
 #|------------------------------------|
 #|           Main program             |
@@ -38,8 +39,48 @@ source $BASEPATH/modules/overclocking/dialogs
 # Executes the GUI version of this module
 function showGUIFn() {
 	#showOCWarningDlg;
-	STATUS=(off off off off off off on);
+	getCurrentOCSettingsFn;	
+	STATUS=(off off off off off off off);
+
+	case "${OCOLDSETTINGS[@]}" in
+		"700 250 400 0")
+			STATUS[0]="on";
+		;;
+		"800 300 400 0")
+			STATUS[1]="on";
+		;;
+		"840 375 400 0")
+			STATUS[2]="on";
+		;;
+		"900 333 450 0")
+			STATUS[3]="on";
+		;;
+		"950 450 450 2")
+			STATUS[4]="on";
+		;;
+		"1000 500 500 6")
+			STATUS[5]="on";
+		;;
+		*)
+			STATUS[6]="on";
+		;;
+	esac;
+
 	showOCSettingsDlg $STATUS;
+	if [ $? -eq 0 ]; then
+		if [ ${STATUS[$(($RETURN-1))]} == "on" ]; then
+			showNoOCChangeDlg;
+		elif [ $RETURN -eq 7 ]; then
+			#updateOCSettingsFn $RETURN;
+			echo;
+		else
+			updateOCSettingsFn $RETURN;
+			if [ $? -eq 1 ]; then
+				showUpdatedOCDlg;
+				ASKFORREBOOT=1;
+			fi
+		fi
+	fi
 }
 
 # Executes the command line version of this module

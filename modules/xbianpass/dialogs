@@ -30,7 +30,8 @@ function showXbianPassInputDlg() {
 function showXbianPassSuccessDlg() {
 	wrapTxtFn "$_XBIANPASSCHANGED"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT" $HEIGHT
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 	return $?;
 }
 
@@ -38,7 +39,8 @@ function showXbianPassSuccessDlg() {
 function showXbianPassNoMatchDlg() {
 	wrapTxtFn "$_XBIANPASSNOMATCH"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
 	return $?;
 }
 
@@ -46,6 +48,7 @@ function showXbianPassNoMatchDlg() {
 function showXbianPassEmptyFieldsDlg() {
 	wrapTxtFn "$_XBIANPASSEMPTYFIELDS"
 	centerTxtFn "$WRAPPEDTXT"
-	showMsgDlg "$CENTEREDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
 	return $?;
 }

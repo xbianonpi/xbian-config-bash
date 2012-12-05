@@ -49,7 +49,7 @@ showMsgDlg() {
 		--backtitle "$BACKTITLE" \
 		--title "$TITLE" \
 		--ok-label "$OKLABEL" \
-		--msgbox "\n$1" $HEIGHT $WIDTH
+		--msgbox "$1" $HEIGHT $WIDTH
 }
 
 # Show a information box
@@ -167,7 +167,8 @@ function showMenuDlg() {
 #  $7 (optional) No Label
 function showRadioDlg() {
 	YESLABEL="$_SELECT"
-	NOLABEL="$_RETURN"	
+	NOLABEL="$_RETURN"
+	HEADER=$1;
 
 	if [ $# -gt 2 ]; then
 		ROWS=$3;
@@ -175,12 +176,14 @@ function showRadioDlg() {
 		ROWS=5;
 	fi
 	WIDTH=$(($DEFAULTWIDTH+15))
+	if [ $# -gt 4 ]; then
+		WIDTH=$5
+	fi
+	
+	centerTxtFn "$_SPACEOPTIONSELECT" $WIDTH;
 	HEIGHT=$((DEFAULTHEIGHT+5));
 	if [ $# -gt 3 ]; then
 		HEIGHT=$4
-	fi
-	if [ $# -gt 4 ]; then
-		WIDTH=$5
 	fi
 	if [ $# -gt 5 ]; then
 		YESLABEL=$6
@@ -188,6 +191,7 @@ function showRadioDlg() {
 	if [ $# -gt 6 ]; then
 		NOLABEL=$7
 	fi
+	
 	IFS=$DEFAULTDELIMITER;
 	RETURN=$( \
 		dialog \
@@ -199,7 +203,7 @@ function showRadioDlg() {
 			--backtitle "$BACKTITLE" \
 			--column-separator "$DEFAULTCOLSEP" \
 			--no-collapse \
-			--radiolist "\n  \Zb$1" $HEIGHT $WIDTH $ROWS \
+			--radiolist "\n$CENTEREDTXT\Zb\n  $HEADER" $HEIGHT $WIDTH $ROWS \
 			$2 3>&1 1>&2 2>&3);
 }
 
@@ -281,5 +285,6 @@ function showPassDlg() {
 # Standard error dialog
 function showErrorDlg() {
 	centerTxtFn "$_ERROR"
-	showMsgDlg "$CENTEREDTXT" 7;
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $DEFAULTHEIGHT;
 }

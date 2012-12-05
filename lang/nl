@@ -21,7 +21,7 @@
 #|             Main Menu			  |
 #|------------------------------------|
 _TITLE="Config"
-_REBOOTREQUIRED="Een herstart is vereist. Wil je nu herstarten?"
+_REBOOTREQUIRED="Een herstart is vereist. Wilt u nu herstarten?"
 
 #|------------------------------------|
 #|              Dialogs	  	   		  |
@@ -43,3 +43,4 @@ _DISABLE="Uitzetten"
 _PASSWORD="Wachtwoord:"
 _CONFIRM="Herhaal:"
 _RETRY="Opnieuw"
+_SPACEOPTIONSELECT="Druk op [spatie] om een andere optie te selecteren"

@@ -86,14 +86,14 @@ function valignTxtFn() {
 	TEXT=$1;
 	IFS=$'\n';
 	if [ $# -gt 1 ]; then
-		HEIGHT=$2;
+		NEWHEIGHT=$2;
 	else
-		HEIGHT=$DEFAULTHEIGHT;
+		NEWHEIGHT=$DEFAULTHEIGHT;
 	fi	
 	
 	LINES=($(echo -e "$TEXT"));
 	ALIGNEDTXT="\n";
-	for (( c=0; c<=$(($(($HEIGHT/2))-4-${#LINES[@]})); c++ )); do
+	for (( c=0; c<=$(($(($NEWHEIGHT/2))-4-${#LINES[@]})); c++ )); do
 		ALIGNEDTXT+="\n";
 	done;
 	ALIGNEDTXT+=$TEXT;
@@ -178,7 +178,7 @@ function createTableFn() {
 				if [ $d -gt 1 ]; then
 					ROWS+="$DEFAULTCOLSEP"
 				fi
-				ROWS+="[ ";
+				ROWS+="\Zn[ ";
 				if [ ${CENTERED[$d]} -eq 1 ]; then					
 					for (( e=0; e<$(($LENGTH/2)); e++ )); do
 						ROWS+=" ";
@@ -198,7 +198,7 @@ function createTableFn() {
 					done
 				fi
 					
-				ROWS+=" ]";
+				ROWS+="\Zn ]";
 			elif [ $d -gt 0 ]; then
 				ROWS+="$DEFAULTDELIMITER"${OLDROW[$d]}"$DEFAULTDELIMITER";
 			else

@@ -17,27 +17,46 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-# Get the current hostname
-#  $1 [Container] Hostname
-# Returns
-#  $HOSTNAME [String]
-function getCurrentHostnameFn() {
-	HOSTNAME=$(cat /etc/hostname);
-	eval "$1=$HOSTNAME";
+function getCurrentOCSettingsFn() {
+	selectConfigVarFn "arm_freq"
+	OCOLDSETTINGS[0]=$RETURN;
+	selectConfigVarFn "core_freq"
+	OCOLDSETTINGS[1]=$RETURN;
+	selectConfigVarFn "sdram_freq"
+	OCOLDSETTINGS[2]=$RETURN;
+	selectConfigVarFn "over_voltage"
+	OCOLDSETTINGS[3]=$RETURN;
+	return $OCOLDSETTINGS;
 }
 
-# Get the current hostname
-#  $1 [String] New hostname
-#  $2 [String] Old hostname
-# Returns
-#  * [Integer]
-#  - 1: Success
-#  - 0: Failed
-function setHostnameFn() {
-	echo "$1" > /etc/hostname
-	hostname $1
-	eval "sed -i 's/$2/$1/g' /etc/hosts";
-	if [ $(hostname) == $1 ]; then
+function updateOCSettingsFn() {
+	case "$RETURN" in
+		1)
+			OCNEWSETTINGS=(700 250 400 0);
+		;;
+		2)
+			OCNEWSETTINGS=(800 300 400 0);
+		;;
+		3)
+			OCNEWSETTINGS=(840 375 400 0);
+		;;
+		4)
+			OCNEWSETTINGS=(900 333 450 0);
+		;;
+		5)
+			OCNEWSETTINGS=(950 450 450 2);
+		;;
+		6)
+			OCNEWSETTINGS=(1000 500 500 6);
+		;;
+	esac;
+	updateConfigVarFn "arm_freq" ${OCNEWSETTINGS[0]};
+	updateConfigVarFn "core_freq" ${OCNEWSETTINGS[1]};
+	updateConfigVarFn "sdram_freq" ${OCNEWSETTINGS[2]};
+	updateConfigVarFn "over_voltage" ${OCNEWSETTINGS[3]};
+	
+	getCurrentOCSettingsFn
+	if [ ${OCOLDSETTINGS[0]} -eq ${OCNEWSETTINGS[0]} ] && [ ${OCOLDSETTINGS[1]} -eq ${OCNEWSETTINGS[1]} ] && [ ${OCOLDSETTINGS[2]} -eq ${OCNEWSETTINGS[2]} ] && [ ${OCOLDSETTINGS[3]} -eq ${OCNEWSETTINGS[3]} ]; then
 		return 1;
 	else
 		return 0;

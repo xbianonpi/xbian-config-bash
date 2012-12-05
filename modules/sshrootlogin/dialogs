@@ -31,21 +31,24 @@ function enableDisableSSHRootLoginDlg() {
 
 # Warns the user that no root password was given, a requirement for ssh root login
 function showEmptyRootPasswordDlg() {
-	wrapTxtFn "_NOSSHROOTPASS";
-	centerTxtFn "$WRAPPEDTXT";
-	showMsgDlg "$CENTEREDTXT" $HEIGHT;
+	wrapTxtFn "$_NOSSHROOTPASS"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT;
 }
 
 # Shows a message that the SSH root login was disabled
 function showSSHRootDisabledDlg() {
 	wrapTxtFn "$_SSHROOTDISABLED"
-	centerTxtFn "$WRAPPEDTXT";	
-	showMsgDlg "$CENTEREDTXT"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 }
 
 # Shows a message that the SSH root login was enabled
 function showSSHRootEnabledDlg() {
 	wrapTxtFn "$_SSHROOTENABLED"
-	centerTxtFn "$WRAPPEDTXT";	
-	showMsgDlg "$CENTEREDTXT"
+	centerTxtFn "$WRAPPEDTXT"	
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
 }
