@@ -24,3 +24,4 @@ _OCNOTCHANGED="Deze overclock instellingen staan al ingesteld"
 _OCCHANGED="De overclock instellingen zijn succesvol aangepast"
 _OCNAME="Naam"
 _OCCUSTOM="~"
+_OCEMPTYFIELDS="Je hebt niet alle velden ingevuld";
