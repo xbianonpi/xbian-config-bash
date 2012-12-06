@@ -45,7 +45,7 @@ function showGUIFn() {
 # Arguments:
 #  *
 #    $1 Action [String]
-#  status|dhcp|static|credentials
+#  list|status|dhcp|static|credentials
 #    $2 Interface [String]
 #  static
 #    $3 IP [String]
