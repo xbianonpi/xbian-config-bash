@@ -23,7 +23,21 @@ if [ ! $(id -u) -eq 0 ]; then
 	exit 0;
 fi
 
-#dialog --title "[Config]" --infobox "\n       Loading. Please wait..." 5 40
+LOADER=0;
+if [[ $# -eq 0 ]]; then
+	while [ $(pgrep dialog | wc -l) -eq 0 ]; do 
+		for a in \\ \| \/ -; do
+			if [ $(pgrep dialog | wc -l) -eq 0 ]; then
+				echo -n $a; 
+				sleep 0.5; 
+				echo -n -e \\r; 
+			else
+				break;
+			fi
+		done; 
+	done &
+	LOADER=$!
+fi
 
 #|------------------------------------|
 #|          Global variables          |
@@ -94,7 +108,7 @@ TITLE="[$_TITLE]"
 #|------------------------------------|
 #|           Main program             |
 #|------------------------------------|
-
+	
 function showMainCloseDlg() {
 
 	DOREBOOT=0;
@@ -195,7 +209,10 @@ function showMainMenuDlg() {
 		IFS="%";
 		# Set the title to the appropriate menu level we're in
 		TITLE="["$CPATH"]"
-
+		if [ $(ps -A | grep $LOADER | wc -l) -gt 0 ]; then
+			kill -9 $LOADER  > /dev/null 2>&1 &
+			wait $! 2>/dev/null
+		fi
 		# Show the main menu
 		if [ $1 -eq 0 ]; then
 			showMenuDlg "" "$MENU" 6 11 $(($DEFAULTWIDTH+15)) $_SELECT $_EXIT

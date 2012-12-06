@@ -288,3 +288,9 @@ function showErrorDlg() {
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $DEFAULTHEIGHT;
 }
+
+function showLoadingDlg() {
+	centerTxtFn "$_LOADING"
+	valignTxtFn "$CENTEREDTXT"
+	showInfoDlg "$ALIGNEDTXT" $DEFAULTHEIGHT;
+}

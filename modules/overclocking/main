@@ -24,6 +24,24 @@
 # The arguments this module accepts
 ARGUMENTS=(select update);
 
+declare -A OCSETTINGS
+# Names of the overclock settings
+OCNAMES=(None Modest XBian Medium High Turbo);
+
+# Values of the overclock settings
+OCSETTINGS[0]="700 250 400 0";
+OCSETTINGS[1]="800 300 400 0";
+OCSETTINGS[2]="840 375 400 0";
+OCSETTINGS[3]="900 333 450 0";
+OCSETTINGS[4]="950 450 450 2";
+OCSETTINGS[5]="1000 500 500 6";
+
+# Define the (possible) dangerous overclock settings
+OCDANGEROUS=(Turbo)
+
+# Define the safe overclock settings
+OCSAFE=(None Modest XBian)
+
 #|------------------------------------|
 #|          Include files             |
 #|------------------------------------|
@@ -38,60 +56,52 @@ source $BASEPATH/functions/config
 
 # Executes the GUI version of this module
 function showGUIFn() {
-	#showOCWarningDlg;
+	showOCWarningDlg;
+	showLoadingDlg;
 	getCurrentOCSettingsFn;	
-	STATUS=(off off off off off off off);
-
-	case "${OCOLDSETTINGS[@]}" in
-		"700 250 400 0")
-			STATUS[0]="on";
-		;;
-		"800 300 400 0")
-			STATUS[1]="on";
-		;;
-		"840 375 400 0")
-			STATUS[2]="on";
-		;;
-		"900 333 450 0")
-			STATUS[3]="on";
-		;;
-		"950 450 450 2")
-			STATUS[4]="on";
-		;;
-		"1000 500 500 6")
-			STATUS[5]="on";
-		;;
-		*)
-			STATUS[6]="on";
-		;;
-	esac;
-
-	showOCSettingsDlg $STATUS;
+	createOCDLGMenu $CURRENTOC;
+	showOCSettingsDlg $OCMENU;
 	if [ $? -eq 0 ]; then
-		if [ ${STATUS[$(($RETURN-1))]} == "on" ]; then
+		if [ $RETURN -eq $(($CURRENTOC+1)) ]; then
 			showNoOCChangeDlg;
-		elif [ $RETURN -eq 7 ]; then
-			#updateOCSettingsFn $RETURN;
-			echo;
+		elif [ $RETURN -eq $((${#OCSETTINGS[@]}+1)) ]; then
+			if [ $CURRENTOC -eq -1 ]; then
+				SETTINGS="${OCOLDSETTINGS[@]}";
+			else
+				SETTINGS=(${OCSETTINGS[$CURRENTOC]});
+			fi
+			showCustomOCDlg "${SETTINGS[@]}";
+			if [ $? -eq 0 ]; then
+				SETTINGS=($(echo $VALUES | sed 's/Mhz //g'));
+				if [ ${#SETTINGS[@]} -eq 4 ]; then
+					updateCustomOCSettingsFn "${SETTINGS[*]}";
+					if [ $? -eq 1 ]; then
+						showUpdatedOCDlg;
+						ASKFORREBOOT=1;
+					else
+						showErrorDlg;
+					fi
+				else
+					showOCEmptyFieldsDlg;
+					showGUIFn;
+				fi
+			else
+				showGUIFn;
+			fi
 		else
 			updateOCSettingsFn $RETURN;
 			if [ $? -eq 1 ]; then
 				showUpdatedOCDlg;
 				ASKFORREBOOT=1;
+			else
+				showErrorDlg;
 			fi
 		fi
 	fi
 }
 
 # Executes the command line version of this module
-#  $1 Argument [String]
-#  $2 Hostname [String]
-# Returns
-#  *Select [String]
-#  - Hostname
-#  *Update [Integer]
-#  - 1: Success
-#  - 0: Failed
 function showCMDFn() {
+	#TODO
 	echo;
 }

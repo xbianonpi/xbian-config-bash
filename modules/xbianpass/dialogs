@@ -26,7 +26,7 @@ function showXbianPassInputDlg() {
 	showPassDlg "$_XBIANPASS"
 }
 
-#Shows xbianpass succesfully changed dialog
+# Shows xbianpass succesfully changed dialog
 function showXbianPassSuccessDlg() {
 	wrapTxtFn "$_XBIANPASSCHANGED"
 	centerTxtFn "$WRAPPEDTXT"
@@ -35,7 +35,7 @@ function showXbianPassSuccessDlg() {
 	return $?;
 }
 
-#Shows xbianpass passwords didn't match dialog
+# Shows xbianpass passwords didn't match dialog
 function showXbianPassNoMatchDlg() {
 	wrapTxtFn "$_XBIANPASSNOMATCH"
 	centerTxtFn "$WRAPPEDTXT"
@@ -44,7 +44,7 @@ function showXbianPassNoMatchDlg() {
 	return $?;
 }
 
-#Shows xbianpass there where empty fields dialog
+# Shows xbianpass there where empty fields dialog
 function showXbianPassEmptyFieldsDlg() {
 	wrapTxtFn "$_XBIANPASSEMPTYFIELDS"
 	centerTxtFn "$WRAPPEDTXT"
