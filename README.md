@@ -2,6 +2,7 @@ xbian-config-bash
 =================
 
 ```
+sudo su
 cd /home/xbian
 git clone --depth 5 https://github.com/xbianonpi/xbian-config-bash.git
 rm /usr/local/sbin/xbian-config
