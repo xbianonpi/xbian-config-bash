@@ -59,7 +59,7 @@ function showGUIFn() {
 	showOCWarningDlg;
 	showLoadingDlg;
 	getCurrentOCSettingsFn;	
-	createOCDLGMenu $CURRENTOC;
+	createOCDLGMenuFn $CURRENTOC;
 	showOCSettingsDlg $OCMENU;
 	if [ $? -eq 0 ]; then
 		if [ $RETURN -eq $(($CURRENTOC+1)) ]; then
