@@ -117,17 +117,26 @@ function updateOCSettingsFn() {
 	NEWOCSETTING=$1;
 	IFS=" ";
 	NEWOCVALUES=(${OCSETTINGS[$NEWOCSETTING]});
-	updateConfigVarFn "arm_freq" ${NEWOCVALUES[0]};
-	updateConfigVarFn "core_freq" ${NEWOCVALUES[1]};
-	updateConfigVarFn "sdram_freq" ${NEWOCVALUES[2]};
-	updateConfigVarFn "over_voltage" ${NEWOCVALUES[3]};
-	IFS=$ORIGINALIFS;
-	getCurrentOCSettingsFn
+	for VALUES in ${NEWOCVALUES[@]}; do
+		if ! [[ "$VALUES" =~ ^[0-9]+$ ]]; then
+			NUMERIC=0
+		fi
+	done
+	if [ $NUMERIC -eq 1 ]; then	
+		updateConfigVarFn "arm_freq" ${NEWOCVALUES[0]};
+		updateConfigVarFn "core_freq" ${NEWOCVALUES[1]};
+		updateConfigVarFn "sdram_freq" ${NEWOCVALUES[2]};
+		updateConfigVarFn "over_voltage" ${NEWOCVALUES[3]};
+		IFS=$ORIGINALIFS;
+		getCurrentOCSettingsFn
 
-	if [ $CURRENTOC -eq $NEWOCSETTING ]; then
-		return 1;
+		if [ $CURRENTOC -eq $NEWOCSETTING ]; then
+			return 1;
+		else
+			return 0;
+		fi
 	else
-		return 0;
+		return 2;
 	fi
 }
 
@@ -139,15 +148,26 @@ function updateOCSettingsFn() {
 #  - 0 Failed
 function updateCustomOCSettingsFn() {
 	NEWOCVALUES=($1);
-	updateConfigVarFn "arm_freq" ${NEWOCVALUES[0]};
-	updateConfigVarFn "core_freq" ${NEWOCVALUES[1]};
-	updateConfigVarFn "sdram_freq" ${NEWOCVALUES[2]};
-	updateConfigVarFn "over_voltage" ${NEWOCVALUES[3]};
-	IFS=$ORIGINALIFS;
-	getCurrentOCSettingsFn
-	if [ "${OCOLDSETTINGS[*]}" == "${NEWOCVALUES[*]}" ]; then
-		return 1;
+	
+	NUMERIC=1;
+	for VALUES in ${NEWOCVALUES[@]}; do
+		if ! [[ "$VALUES" =~ ^[0-9]+$ ]]; then
+			NUMERIC=0
+		fi
+	done
+	if [ $NUMERIC -eq 1 ]; then
+		updateConfigVarFn "arm_freq" ${NEWOCVALUES[0]};
+		updateConfigVarFn "core_freq" ${NEWOCVALUES[1]};
+		updateConfigVarFn "sdram_freq" ${NEWOCVALUES[2]};
+		updateConfigVarFn "over_voltage" ${NEWOCVALUES[3]};
+		IFS=$ORIGINALIFS;
+		getCurrentOCSettingsFn
+		if [ "${OCOLDSETTINGS[*]}" == "${NEWOCVALUES[*]}" ]; then
+			return 1;
+		else
+			return 0;
+		fi
 	else
-		return 0;
+		return 2;
 	fi
 }
