@@ -57,7 +57,7 @@ function getCurrentOCSettingsFn() {
 # Returns
 #  $OCMENU [Array]
 #  - * Rows of the overclock menu
-function createOCDLGMenu() {
+function createOCDLGMenuFn() {
 	OCMENU=();
 
 	for KEY in ${!OCSETTINGS[@]}; do
