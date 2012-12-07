@@ -173,12 +173,9 @@ function showMainMenuDlg() {
 	
 	# If a certain menu items has no subitems, than we've reach of final function we want to execute
 	if [ -z "$ITEMS" ]; then
-		# Grab the line of the module we want to execute
-		
-		LINE=$(cat $BASEPATH/struct | grep ^$(echo $LEVEL | awk '{print substr($0,0,length)}'):);
 		
 		# Grab the system name of the module we want to execute
-		MODULE=$(echo $LINE | rev | cut -f1 -d: | rev);
+		MODULE=$(cat $BASEPATH/struct | grep ^$LEVEL | cut -f2 -d:);
 				
 		# Include the module we want to execute
 		source $BASEPATH/modules/$MODULE/main
