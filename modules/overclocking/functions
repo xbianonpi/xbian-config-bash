@@ -114,7 +114,7 @@ function createOCDLGMenu() {
 #  - 1 Succes
 #  - 0 Failed
 function updateOCSettingsFn() {
-	NEWOCSETTING=$(($RETURN-1));
+	NEWOCSETTING=$1;
 	IFS=" ";
 	NEWOCVALUES=(${OCSETTINGS[$NEWOCSETTING]});
 	updateConfigVarFn "arm_freq" ${NEWOCVALUES[0]};

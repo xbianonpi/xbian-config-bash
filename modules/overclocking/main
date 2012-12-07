@@ -22,7 +22,7 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(select update);
+ARGUMENTS=(select update values list);
 
 declare -A OCSETTINGS
 # Names of the overclock settings
@@ -72,9 +72,11 @@ function showGUIFn() {
 			fi
 			showCustomOCDlg "${SETTINGS[@]}";
 			if [ $? -eq 0 ]; then
-				SETTINGS=($(echo $VALUES | sed 's/Mhz //g'));
-				if [ ${#SETTINGS[@]} -eq 4 ]; then
-					updateCustomOCSettingsFn "${SETTINGS[*]}";
+				NEWSETTINGS=($(echo $VALUES | sed 's/Mhz //g'));
+				if [ "${NEWSETTINGS[*]}" ==  "${SETTINGS[*]}" ]; then
+					showNoOCChangeDlg;
+				elif [ ${#NEWSETTINGS[@]} -eq 4 ]; then
+					updateCustomOCSettingsFn "${NEWSETTINGS[*]}";
 					if [ $? -eq 1 ]; then
 						showUpdatedOCDlg;
 						ASKFORREBOOT=1;
@@ -89,7 +91,7 @@ function showGUIFn() {
 				showGUIFn;
 			fi
 		else
-			updateOCSettingsFn $RETURN;
+			updateOCSettingsFn $(($RETURN-1));
 			if [ $? -eq 1 ]; then
 				showUpdatedOCDlg;
 				ASKFORREBOOT=1;
@@ -101,7 +103,89 @@ function showGUIFn() {
 }
 
 # Executes the command line version of this module
+#  $1 Argument [String]
+#  $2 Overclock preset name [String] (Update|Values)
+#  $3 ARM [Integer] (Update)
+#  $4 CORE [Integer] (Update)
+#  $5 SDRAM [Integer] (Update)
+#  $6 VOLTAGE [Integer] (Update)
+# Returns
+#  *Select [String] The current overclock preset name or 'Custom'
+#  *Update [Integer] Set the overclock to a preset or use custom values
+#   -  1 Success
+#   -  0 Failure 
+#   - -1 Preset does not exist
+#   - -2 Not enough arguments
+#  *Values [String] List of current values seperated by spaces or the values of a preset
+#   - $ARM [Integer]
+#   - $CORE [Integer]
+#   - $SDRAM [Integer]
+#   - $VOLTAGE [Integer]
+#  *List [String] A space seperated list of all presets available
+#   - * [String]
 function showCMDFn() {
-	#TODO
-	echo;
+	case $1 in
+		"select")
+			getCurrentOCSettingsFn;
+			if [ $CURRENTOC -eq -1 ]; then
+				echo "Custom"
+			else
+				echo ${OCNAMES[$CURRENTOC]}
+			fi
+		;;
+		"update")
+			shift;
+			if [ ${1,,} == "custom" ]; then
+				shift
+				if [ $# -eq 4 ]; then
+					NEWSETTINGS=($@);
+					updateCustomOCSettingsFn "${NEWSETTINGS[*]}"
+					if [ $? -eq 1 ]; then
+						echo 1;
+						ASKFORREBOOT=1;
+					else
+						echo 0;
+					fi
+				else
+					echo -2;
+				fi
+			else
+				if [ ! -z $(echo ${OCNAMES[*]} | grep -o -i $1) ]; then
+					for KEY in ${!OCNAMES[@]}; do
+						if [ ${OCNAMES[$KEY],,} == $1 ]; then
+							updateOCSettingsFn $KEY;
+							if [ $? -eq 1 ]; then
+								ASKFORREBOOT=1;
+								echo 1;
+							else
+								echo 0;
+							fi
+						fi
+					done
+				else
+					echo -1;
+				fi
+			fi
+		;;
+		"values")
+			shift;
+			if [ $# -eq 0 ]; then
+				getCurrentOCSettingsFn;
+				echo ${OCSETTINGS[$CURRENTOC]}
+			else
+				if [ ! -z $(echo ${OCNAMES[*]} | grep -o -i $1) ]; then
+					for KEY in ${!OCNAMES[@]}; do
+						if [ ${OCNAMES[$KEY],,} == $1 ]; then
+							echo ${OCSETTINGS[$KEY]}
+						fi
+					done
+				else
+					echo -1;
+				fi
+			fi
+		;;
+		"list")
+			echo ${OCNAMES[*]} "Custom"
+		;;
+	esac 
 }
