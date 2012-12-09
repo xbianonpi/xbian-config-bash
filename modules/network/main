@@ -53,28 +53,130 @@ function showGUIFn() {
 			# Get current configuration
 			IFACE_DATA=$(readNetworkConfigurationFn "$IFACE")
 
+			# Get mode
+			MODE=$(echo "$IFACE_DATA" | grep MODE | cut -f 2 -d" ")
+
 			# Show DHCP/Static selection
-			showIPModeConfigDlg "$IFACE"
+			showIPModeConfigDlg "$MODE"
 			if [ $? -eq 0 ]; then
 				# Set Static/DHCP Settings
 				if [ $RETURN -eq 1 ]; then
 					# DHCP Selected
 					setInterfaceDhcpFn "$IFACE"
-				#else
+					showInterfaceDhcpSuccessDlg
+				else
 					# Static IP Selected
-
+					showInterfaceStaticGUIFn "$IFACE" "$IFACE_DATA"
 				fi
 
 				# If needed, ask for wireless credentials
 				ISWLAN=$(echo -e "$IFACE" | grep wlan)
 				if [ ! -z "$ISWLAN" ]; then
-					showInterfaceCredentialsDlg "$IFACE"
-
+					showWlanCredentialsGUIFn "$IFACE" "$IFACE_DATA"
 				fi
+
+				# Configuration done
+				showGUIFn
+				return 0;
 			fi
 		fi
 	else
 		showNoInterfacesAvailableDlg
+	fi
+}
+
+function showInterfaceStaticGUIFn() {
+	IP=$(echo "$2" | grep IP | cut -f 2 -d" ")
+	NETMASK=$(echo "$2" | grep NETMASK | cut -f 2 -d" ")
+	GATEWAY=$(echo "$2" | grep GATEWAY | cut -f 2 -d" ")
+	NAMESERVER1=$(echo "$2" | grep NAMESERVER1 | cut -f 2 -d" ")
+	NAMESERVER2=$(echo "$2" | grep NAMESERVER2 | cut -f 2 -d" ")
+	showInterfaceStaticDlg "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2"
+	if [ $? -eq 0 ]; then
+		STATICCONF=($(echo -e "$RETURN"))
+		if [ ${#STATICCONF[@]} -gt 2 ]; then
+			IP="${STATICCONF[0]}"
+			NETMASK="${STATICCONF[1]}"
+			GATEWAY="${STATICCONF[2]}"
+			NAMESERVER1=""
+			NAMESERVER2=""
+			if [ ${#STATICCONF[@]} -gt 3 ]; then
+				NAMESERVER1="${STATICCONF[3]}"
+			fi
+			if [ ${#STATICCONF[@]} -gt 4 ]; then
+				NAMESERVER2="${STATICCONF[4]}"
+			fi
+			# Validation of arguments is done inside this function
+			RESULT=$(setInterfaceStaticFn "$1" "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2")
+			if [ $RESULT -eq 1 ]; then
+				showInterfaceStaticSuccessDlg
+			else
+				showInterfaceStaticErrorDlg
+				showInterfaceStaticGUIFn "$1" "$2"
+				return 0;
+			fi
+		else
+			showInterfaceStaticErrorDlg
+			showInterfaceStaticGUIFn "$1" "$2"
+			return 0;
+		fi
+	else
+		showGUIFn
+		return 0;
+	fi
+}
+
+function showWlanCredentialsGUIFn() {
+	PROTECTION=$(echo "$2" | grep PROTECTION | cut -f 2 -d" ")
+	showWlanModeConfigDlg "$PROTECTION"
+	if [ $? -eq 0 ]; then
+		PROTECTION="$RETURN"
+		# WPA and WEP need both ssid and key
+		if [ $PROTECTION -lt 3 ]; then
+			SSID=$(echo -e "$2" | grep SSID | cut -f 2 -d" ")
+			KEY=$(echo -e "$2" | grep KEY | cut -f 2 -d" ")
+			showInterfaceCredentialsDlg "$SSID" "$KEY"
+			if [ $? -eq 0 ]; then
+				CREDENTIALS=($(echo -e "$RETURN"))
+				if [ ${#CREDENTIALS[@]} -eq 2 ];then
+					SSID=${CREDENTIALS[0]}
+					KEY=${CREDENTIALS[1]}
+					if [ $PROTECTION -eq 1 ]; then
+						setInterfaceWlanCredentials "$1" "WPA" "$SSID" "$KEY"
+					else
+						setInterfaceWlanCredentials "$1" "WEP" "$SSID" "$KEY"
+					fi
+					showInterfaceCredentialsSuccessDlg
+				else
+					showInterfaceCredentialsErrorDlg
+					showWlanCredentialsGUIFn "$1" "$2"
+					return 0;
+				fi
+			else
+				showGUIFn
+				return 0;
+			fi
+		# Open network need only ssh, hence different dialog here
+		else
+			SSID=$(echo -e "$2" | grep SSID | cut -f 2 -d" ")
+			showInterfaceSSIDDlg "$SSID"
+			if [ $? -eq 0 ]; then
+				if [ ! -z "$RETURN" ]; then
+					setInterfaceWlanCredentials "$1" "Open" "$RETURN"
+					showInterfaceCredentialsSuccessDlg
+				else
+					showInterfaceCredentialsErrorDlg
+					showGUIFn
+					return 0;
+				fi
+			else
+				showGUIFn
+				return 0;
+			fi
+		fi
+	else
+		showGUIFn
+		return 0;
 	fi
 }
 

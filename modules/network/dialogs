@@ -23,7 +23,23 @@ _SELECTINTERFACE="Select interface to configure"
 _IPDHCP="DHCP"
 _IPSTATIC="Static IP"
 _SELECTHOW="Select how"; _OBTAINIP="should obtain it's IP address"
-
+_SSID="SSID"
+_KEY="KEY"
+_ENTERCREDENTIALS="Enter credentials for selected interface"
+_INVALIDCREDENTIALS="Invalid WLAN credentials entered, both SSID and KEY has to be entered"
+_WLANWEP="WEP"
+_WLANWPA="WPA"
+_WLANOPEN="Open"
+_CREDENTIALSUPDATED="WLAN credentials successfully updated"
+_ENTERSTATICCONFIG="Enter static IP details"
+_IP="IP Address"
+_NETMASK="Netmask"
+_GATEWAY="Gateway"
+_NAMESERVER="Nameserver"
+_INVALIDSTATICCONFIG="Invalid static IP details, please try again"
+_STATICCONFIGUPDATED="Static IP configuration updated"
+_DHCPCONFIGUPDATED="Interface is now configured using DHCP"
+_PROTECTIONSELECTDESC="Select WLAN protection mode"
 function showInterfacesSelectDlg() {
 	# Prepare menu
         MENU=""
@@ -54,6 +70,25 @@ function showIPModeConfigDlg() {
 
 }
 
+function showWlanModeConfigDlg() {
+
+	# Radio states
+	STATUSWPA="off"
+	STATUSWEP="off"
+	STATUSOPEN="off"
+
+	# Pre-select current state
+	if [ "$1" = "WPA" ]; then
+		STATUSWPA="on"
+	elif [ "$1" = "WEP" ]; then
+		STATUSWEP="on"
+	elif [ "$1" = "Open" ]; then
+		STATUSOPEN="on"
+	fi
+	showRadioDlg "$_PROTECTIONSELECTDESC" "1%$_WLANWPA%$STATUSWPA%2%$_WLANWEP%$STATUSWEP%3%$_WLANOPEN%$STATUSOPEN%" 3
+
+}
+
 function showInterfacesLoadingDlg() {
 	wrapTxtFn "$_LOADINGINTERFACES"
 	centerTxtFn "$WRAPPEDTXT"
@@ -66,4 +101,60 @@ function showNoInterfacesAvailableDlg() {
 	centerTxtFn "$WRAPPEDTXT"
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+}
+
+# Ask for credentials for selected interface
+#  $1 SSID
+#  $2 KEY
+function showInterfaceCredentialsDlg() {
+	wrapTxtFn "$_ENTERCREDENTIALS"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showInputForm2Dlg "$ALIGNEDTXT" "$_SSID" "$1" "$_KEY" "$2"
+}
+
+function showInterfaceStaticDlg() {
+	wrapTxtFn "$_ENTERSTATICCONFIG"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showInputForm5Dlg "$ALIGNEDTXT" "$_IP" "$1" "$_NETMASK" "$2" "$_GATEWAY" "$3" "$_NAMESERVER" "$4" "$_NAMESERVER" "$5"
+}
+
+function showInterfaceCredentialsErrorDlg() {
+	wrapTxtFn "$_INVALIDCREDENTIALS"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+}
+
+function showInterfaceCredentialsSuccessDlg() {
+	wrapTxtFn "$_CREDENTIALSUPDATED"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+}
+
+function showInterfaceStaticErrorDlg() {
+	wrapTxtFn "$_INVALIDSTATICCONFIG"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+}
+
+function showInterfaceStaticSuccessDlg() {
+	wrapTxtFn "$_STATICCONFIGUPDATED"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+}
+
+function showInterfaceDhcpSuccessDlg() {
+	wrapTxtFn "$_DHCPCONFIGUPDATED"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+}
+
+function showInterfaceSSIDDlg() {
+        showInputDlg "$_SSID:" $1
 }
