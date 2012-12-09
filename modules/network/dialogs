@@ -17,29 +17,8 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-_LOADINGINTERFACES="Interfaces loading, please wait ..."
-_NOINTERFACES="No network interfaces available"
-_SELECTINTERFACE="Select interface to configure"
-_IPDHCP="DHCP"
-_IPSTATIC="Static IP"
-_SELECTHOW="Select how"; _OBTAINIP="should obtain it's IP address"
-_SSID="SSID"
-_KEY="KEY"
-_ENTERCREDENTIALS="Enter credentials for selected interface"
-_INVALIDCREDENTIALS="Invalid WLAN credentials entered, both SSID and KEY has to be entered"
-_WLANWEP="WEP"
-_WLANWPA="WPA"
-_WLANOPEN="Open"
-_CREDENTIALSUPDATED="WLAN credentials successfully updated"
-_ENTERSTATICCONFIG="Enter static IP details"
-_IP="IP Address"
-_NETMASK="Netmask"
-_GATEWAY="Gateway"
-_NAMESERVER="Nameserver"
-_INVALIDSTATICCONFIG="Invalid static IP details, please try again"
-_STATICCONFIGUPDATED="Static IP configuration updated"
-_DHCPCONFIGUPDATED="Interface is now configured using DHCP"
-_PROTECTIONSELECTDESC="Select WLAN protection mode"
+# Show a menu for selecting interfaces
+#  $1 List of interfaces
 function showInterfacesSelectDlg() {
 	# Prepare menu
         MENU=""
@@ -54,6 +33,9 @@ function showInterfacesSelectDlg() {
         showMenuDlg "$_SELECTINTERFACE" "$MENU"
 }
 
+# Show a radio dialog for selecting DHCP or Static configuration
+# Arguments
+#  $1 Current mode (DHCP|Static)
 function showIPModeConfigDlg() {
 
 	# Radio states
@@ -70,6 +52,9 @@ function showIPModeConfigDlg() {
 
 }
 
+# Show a radio dialog for selecting WLAN Protection mode
+# Arguments
+#  $1 Current status (WPA|WEP|Open)
 function showWlanModeConfigDlg() {
 
 	# Radio states
@@ -103,9 +88,10 @@ function showNoInterfacesAvailableDlg() {
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
-# Ask for credentials for selected interface
-#  $1 SSID
-#  $2 KEY
+# Ask for credentials for the selected interface
+# Arguments
+#  $1 Current SSID
+#  $2 Current KEY
 function showInterfaceCredentialsDlg() {
 	wrapTxtFn "$_ENTERCREDENTIALS"
 	centerTxtFn "$WRAPPEDTXT"
@@ -113,6 +99,13 @@ function showInterfaceCredentialsDlg() {
 	showInputForm2Dlg "$ALIGNEDTXT" "$_SSID" "$1" "$_KEY" "$2"
 }
 
+# Ask for static IP configuration
+# Arguments
+#  $1 Current IP
+#  $2 Current Netmask
+#  $3 Current Gateway
+#  $4 Current Nameserver 1
+#  $5 Current Nameserver 2
 function showInterfaceStaticDlg() {
 	wrapTxtFn "$_ENTERSTATICCONFIG"
 	centerTxtFn "$WRAPPEDTXT"
@@ -155,6 +148,9 @@ function showInterfaceDhcpSuccessDlg() {
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
+# Ask for network SSID in case of open protection
+# Arguments
+#  $1 Current SSID
 function showInterfaceSSIDDlg() {
         showInputDlg "$_SSID:" $1
 }
