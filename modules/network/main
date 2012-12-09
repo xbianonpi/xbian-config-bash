@@ -22,7 +22,7 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(status mode dhcp static credentials);
+ARGUMENTS=(list status mode dhcp static credentials);
 
 #|------------------------------------|
 #|          Include files             |
@@ -82,7 +82,7 @@ function showGUIFn() {
 # Arguments:
 #  *
 #    $1 Action [String]
-#  status|dhcp|static|credentials
+#  list|status|dhcp|static|credentials
 #    $2 Interface [String]
 #  static
 #    $3 IP [String]
