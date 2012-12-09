@@ -26,7 +26,7 @@ function showRootPassInputDlg() {
 	showPassDlg "$_ROOTPASS"
 }
 
-#Shows rootpass succesfully changed dialog
+# Shows rootpass succesfully changed dialog
 function showRootPassSuccessDlg() {
 	wrapTxtFn "$_ROOTPASSCHANGED"
 	centerTxtFn "$WRAPPEDTXT"
@@ -35,7 +35,7 @@ function showRootPassSuccessDlg() {
 	return $?;
 }
 
-#Shows rootpass password didn't match dialog
+# Shows rootpass password didn't match dialog
 function showRootPassNoMatchDlg() {
 	wrapTxtFn "$_ROOTPASSNOMATCH"
 	centerTxtFn "$WRAPPEDTXT"
@@ -44,7 +44,7 @@ function showRootPassNoMatchDlg() {
 	return $?;
 }
 
-#Shows rootpass there where empty fields dialog
+# Shows rootpass there where empty fields dialog
 function showRootPassEmptyFieldsDlg() {
 	wrapTxtFn "$_ROOTPASSEMPTYFIELDS"
 	centerTxtFn "$WRAPPEDTXT"

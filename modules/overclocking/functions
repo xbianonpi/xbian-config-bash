@@ -17,6 +17,16 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
+# Retrieve the current overclocking settings
+# Returns
+#  $CURRENTOC [Integer]
+#  - -1 Custom overclock
+#  - *  Array key of current overclock
+#  $OCOLDSETTINGS [Array]
+#  - 0 ARM Frequency
+#  - 1 Core Frequency
+#  - 2 SDRAM Frequency
+#  - 3 Over voltage
 function getCurrentOCSettingsFn() {
 	selectConfigVarFn "arm_freq"
 	OCOLDSETTINGS[0]=$RETURN;
@@ -26,39 +36,139 @@ function getCurrentOCSettingsFn() {
 	OCOLDSETTINGS[2]=$RETURN;
 	selectConfigVarFn "over_voltage"
 	OCOLDSETTINGS[3]=$RETURN;
-	return $OCOLDSETTINGS;
+	
+	CURRENTOC=-1;
+	for KEY in ${!OCSETTINGS[@]}; do
+		IFS=" ";
+		SETTINGS=(${OCSETTINGS[$KEY]});
+		I=0;
+		for KEY1 in ${!SETTINGS[@]}; do
+			if [ ${SETTINGS[$KEY1]} -eq ${OCOLDSETTINGS[$KEY1]} ]; then
+				I=$(($I+1));
+			fi
+			if [ $I -eq ${#SETTINGS[@]} ]; then
+				CURRENTOC=$KEY;
+			fi
+		done
+	done
 }
 
-function updateOCSettingsFn() {
-	case "$RETURN" in
-		1)
-			OCNEWSETTINGS=(700 250 400 0);
-		;;
-		2)
-			OCNEWSETTINGS=(800 300 400 0);
-		;;
-		3)
-			OCNEWSETTINGS=(840 375 400 0);
-		;;
-		4)
-			OCNEWSETTINGS=(900 333 450 0);
-		;;
-		5)
-			OCNEWSETTINGS=(950 450 450 2);
-		;;
-		6)
-			OCNEWSETTINGS=(1000 500 500 6);
-		;;
-	esac;
-	updateConfigVarFn "arm_freq" ${OCNEWSETTINGS[0]};
-	updateConfigVarFn "core_freq" ${OCNEWSETTINGS[1]};
-	updateConfigVarFn "sdram_freq" ${OCNEWSETTINGS[2]};
-	updateConfigVarFn "over_voltage" ${OCNEWSETTINGS[3]};
-	
-	getCurrentOCSettingsFn
-	if [ ${OCOLDSETTINGS[0]} -eq ${OCNEWSETTINGS[0]} ] && [ ${OCOLDSETTINGS[1]} -eq ${OCNEWSETTINGS[1]} ] && [ ${OCOLDSETTINGS[2]} -eq ${OCNEWSETTINGS[2]} ] && [ ${OCOLDSETTINGS[3]} -eq ${OCNEWSETTINGS[3]} ]; then
-		return 1;
+# Parse the overclock values in a menu structure
+# Returns
+#  $OCMENU [Array]
+#  - * Rows of the overclock menu
+function createOCDLGMenuFn() {
+	OCMENU=();
+
+	for KEY in ${!OCSETTINGS[@]}; do
+		IFS=" ";
+		ROW=$(($KEY+1))","
+		if [ ! -z $(echo "${OCDANGEROUS[*]}" | grep -o ${OCNAMES[$KEY]}) ]; then
+			ROW+="\Z1";
+			SAFE=-1;
+		elif [ ! -z $(echo "${OCSAFE[*]}" | grep -o ${OCNAMES[$KEY]}) ]; then
+			ROW+="\Z2";
+			SAFE=0;
+		else
+			ROW+="\Zn";
+			SAFE=1;
+		fi
+		ROW+="${OCNAMES[$KEY]}";
+		SETTINGS=(${OCSETTINGS[$KEY]});
+		I=0;
+		for KEY1 in ${!SETTINGS[@]}; do
+			I=$(($I+1));
+			ROW+=",";
+			if [ $SAFE -eq -1 ]; then
+				ROW+="\Z1";
+			elif [ $SAFE -eq 0 ]; then
+				ROW+="\Z2";
+			else
+				ROW+="\Zn";
+			fi
+			ROW+=${SETTINGS[$KEY1]};
+		done
+
+		if [ $1 -eq $KEY ]; then
+			ROW+=",on";
+		else
+			ROW+=",off";
+		fi
+		OCMENU+=($ROW);
+	done
+	STATUS="off"
+	if [ $1 -eq -1 ]; then
+		STATUS="on";
+	fi
+	if [ $CURRENTOC -eq -1 ]; then
+		OCMENU+=($(($KEY+2)),"\Z1"$_OCCUSTOM,"\Z1"${OCOLDSETTINGS[0]},"\Z1"${OCOLDSETTINGS[1]},"\Z1"${OCOLDSETTINGS[2]},"\Z1"${OCOLDSETTINGS[3]},$STATUS)
 	else
-		return 0;
+		OCMENU+=($(($KEY+2)),"\Z1"$_OCCUSTOM,"\Z1...","\Z1...","\Z1...","\Z1...",$STATUS)
+	fi
+	IFS=$ORIGINALIFS;
+}
+
+# Update the overclock settings to predefined values
+# Returns
+#  * [Integer]
+#  - 1 Succes
+#  - 0 Failed
+function updateOCSettingsFn() {
+	NEWOCSETTING=$1;
+	IFS=" ";
+	NEWOCVALUES=(${OCSETTINGS[$NEWOCSETTING]});
+	NUMERIC=1
+	for VALUES in ${NEWOCVALUES[@]}; do
+		if ! [[ "$VALUES" =~ ^[0-9]+$ ]]; then
+			NUMERIC=0
+		fi
+	done
+	if [ $NUMERIC -eq 1 ]; then	
+		updateConfigVarFn "arm_freq" ${NEWOCVALUES[0]};
+		updateConfigVarFn "core_freq" ${NEWOCVALUES[1]};
+		updateConfigVarFn "sdram_freq" ${NEWOCVALUES[2]};
+		updateConfigVarFn "over_voltage" ${NEWOCVALUES[3]};
+		IFS=$ORIGINALIFS;
+		getCurrentOCSettingsFn
+
+		if [ $CURRENTOC -eq $NEWOCSETTING ]; then
+			return 1;
+		else
+			return 0;
+		fi
+	else
+		return 2;
+	fi
+}
+
+# Update the overclock settings to custom values
+#  $1 [String] Space seperated values (ARM CORE SDRAM VOLTAGE)
+# Returns
+#  * [Integer]
+#  - 1 Succes
+#  - 0 Failed
+function updateCustomOCSettingsFn() {
+	NEWOCVALUES=($1);
+	
+	NUMERIC=1;
+	for VALUES in ${NEWOCVALUES[@]}; do
+		if ! [[ "$VALUES" =~ ^[0-9]+$ ]]; then
+			NUMERIC=0
+		fi
+	done
+	if [ $NUMERIC -eq 1 ]; then
+		updateConfigVarFn "arm_freq" ${NEWOCVALUES[0]};
+		updateConfigVarFn "core_freq" ${NEWOCVALUES[1]};
+		updateConfigVarFn "sdram_freq" ${NEWOCVALUES[2]};
+		updateConfigVarFn "over_voltage" ${NEWOCVALUES[3]};
+		IFS=$ORIGINALIFS;
+		getCurrentOCSettingsFn
+		if [ "${OCOLDSETTINGS[*]}" == "${NEWOCVALUES[*]}" ]; then
+			return 1;
+		else
+			return 0;
+		fi
+	else
+		return 2;
 	fi
 }
