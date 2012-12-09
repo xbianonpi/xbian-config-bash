@@ -231,7 +231,7 @@ function showInputDlg() {
 		CHANGELABEL=$5
 	fi
 	if [ $# -gt 5 ]; then
-		CHANGELABEL=$6
+		CANCELLABEL=$6
 	fi
 
 	RETURN=$( \
@@ -265,11 +265,12 @@ function showPassDlg() {
 		CHANGELABEL=$5
 	fi
 	if [ $# -gt 5 ]; then
-		CHANGELABEL=$6
+		CANCELLABEL=$6
 	fi
 
 	VALUES=$(dialog \
 			--ok-label "$CHANGELABEL" \
+			--cancel-label $CANCELLABEL \
 			--backtitle "$BACKTITLE" \
 			--title "$TITLE" \
 			--insecure \
