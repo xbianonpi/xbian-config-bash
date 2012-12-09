@@ -291,11 +291,15 @@ function isValidInterfaceFn() {
 #   @1: Textual table
 #       -----------------------
 #       MODE dhcp|static|manual
+#	STATE UP|DOWN
 #       IP X.X.X.X
 #       NETMASK X.X.X:X
 #       GATEWAY X.X.X.X
 #       NAMESERVER1 X.X.X.X
 #       NAMESERVER2 X.X.X.X
+#	PROTECTION WEP|WPA|Open (only for wlan interfaces)
+#	SSID XXXX (only for wlan interfaces)
+#	KEY XXXX (only for wlan interfaces)
 #   @0: Error code
 # Error codes
 #   -4: Invalid interface
@@ -347,6 +351,9 @@ function readNetworkConfigurationFn() {
 			fi
 		fi
 
+		# Get current state
+		STATE=$(ip addr | grep state | grep "$1" | sed 's/.*state/state/g' | cut -f 2 -d" ")
+
 	        # Read nameservers from /etc/resolv.conf
 	        NS1="";
 	        NS2="";
@@ -359,7 +366,9 @@ function readNetworkConfigurationFn() {
 	              NS2=$(echo -e "${NS[1]}");
 	           fi
 	        fi
+
 		echo "MODE $MODE"
+		echo "STATE $STATE"
 		echo "IP $CIP"
 		echo "NETMASK $CSM"
 		echo "GATEWAY $CGW"
