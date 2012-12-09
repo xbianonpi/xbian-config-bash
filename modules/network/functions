@@ -17,12 +17,6 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-# ToDo:
-# ----------------------------
-# DEPRECATED , Should be built in in getStatus
-#   - getInterfaceWlanCredentials "wlan0" # Return MODE ESSID KEY
-# ----------------------------
-
 # Set wlan credentials
 # Arguments
 #  $1 Interface name
