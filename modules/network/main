@@ -22,7 +22,7 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(list status mode dhcp static credentials);
+ARGUMENTS=(list status dhcp static credentials);
 
 #|------------------------------------|
 #|          Include files             |
@@ -250,6 +250,7 @@ function showCMDFn() {
 				isValidInterfaceFn "$2"
 				if [ $? -eq 1 ]; then
 					setInterfaceDhcpFn "$2"
+					echo "1"
 					return 1;
 				else
 					# Invalid interface
