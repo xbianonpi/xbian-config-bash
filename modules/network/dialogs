@@ -17,3 +17,53 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
+_LOADINGINTERFACES="Interfaces loading, please wait ..."
+_NOINTERFACES="No network interfaces available"
+_SELECTINTERFACE="Select interface to configure"
+_IPDHCP="DHCP"
+_IPSTATIC="Static IP"
+_SELECTHOW="Select how"; _OBTAINIP="should obtain it's IP address"
+
+function showInterfacesSelectDlg() {
+	# Prepare menu
+        MENU=""
+	IFACES="$1"
+        I=1
+        for IFACE in ${IFACES[@]}; do
+                MENU+="$I%$IFACE%"
+                I=$(($I+1))
+        done
+
+        # Show interface selector dialog
+        showMenuDlg "$_SELECTINTERFACE" "$MENU"
+}
+
+function showIPModeConfigDlg() {
+
+	# Radio states
+	STATUSDHCP="off"
+	STATUSSTATIC="off"
+
+	# Pre-select current state
+	if [ "$1" = "static" ]; then
+		STATUSSTATIC="on"
+	else
+		STATUSDHCP="on"
+	fi
+	showRadioDlg "" "1%$_IPDHCP%$STATUSDHCP%2%$_IPSTATIC%$STATUSSTATIC" 3
+
+}
+
+function showInterfacesLoadingDlg() {
+	wrapTxtFn "$_LOADINGINTERFACES"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showInfoDlg "$ALIGNEDTXT" $HEIGHT
+}
+
+function showNoInterfacesAvailableDlg() {
+	wrapTxtFn "$_NOINTERFACES"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+}

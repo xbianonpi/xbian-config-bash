@@ -37,8 +37,45 @@ source $BASEPATH/modules/network/dialogs
 
 # Executes the GUI version of this module
 function showGUIFn() {
-	# Not implemented
-	return 0;
+
+	# Notify user that interfaces are loading
+	showInterfacesLoadingDlg
+
+	# Fetch all available interfaces and prepare menu
+	IFACES=($(listNetworkInterfacesFn))
+	if [ ! -z "$IFACES" ]; then
+		showInterfacesSelectDlg "$IFACES"
+		if [ $? -eq 0 ]; then
+
+			# Save selected interface to a variable
+			IFACE=${IFACES[$(($RETURN-1))]}
+
+			# Get current configuration
+			IFACE_DATA=$(readNetworkConfigurationFn "$IFACE")
+
+			# Show DHCP/Static selection
+			showIPModeConfigDlg "$IFACE"
+			if [ $? -eq 0 ]; then
+				# Set Static/DHCP Settings
+				if [ $RETURN -eq 1 ]; then
+					# DHCP Selected
+					setInterfaceDhcpFn "$IFACE"
+				#else
+					# Static IP Selected
+
+				fi
+
+				# If needed, ask for wireless credentials
+				ISWLAN=$(echo -e "$IFACE" | grep wlan)
+				if [ ! -z "$ISWLAN" ]; then
+					showInterfaceCredentialsDlg "$IFACE"
+
+				fi
+			fi
+		fi
+	else
+		showNoInterfacesAvailableDlg
+	fi
 }
 
 # Executes the command line version of this module
