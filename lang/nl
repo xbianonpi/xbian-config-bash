@@ -24,6 +24,18 @@ _TITLE="Config"
 _REBOOTREQUIRED="Een herstart is vereist. Wilt u nu herstarten?"
 
 #|------------------------------------|
+#|             Menu Items			  |
+#|------------------------------------|
+_ITEMSETTINGSNAME="Instellingen"
+_ITEMSETTINGSDESC="Verander systeem instellingen"
+_ITEMSYSTEMNAME="Systeem"
+_ITEMSYSTEMDESC="e.g. Vul SD, Overclocking, Systeemnaam"
+_ITEMACCOUNTSNAME="Accounts"
+_ITEMACCOUNTSDESC="e.g. Verander wachtwoorden, SSH root toegang"
+_ITEMLICENSESNAME="Licenties"
+_ITEMLICENSESDESC="Voeg toe/verwijder hardware licenties"
+
+#|------------------------------------|
 #|              Dialogs	  	   		  |
 #|------------------------------------|
 _YES="Ja"

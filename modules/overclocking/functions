@@ -54,12 +54,12 @@ function getCurrentOCSettingsFn() {
 }
 
 # Parse the overclock values in a menu structure
+#  $1 [Integer] Current OC setting
 # Returns
 #  $OCMENU [Array]
 #  - * Rows of the overclock menu
 function createOCDLGMenuFn() {
 	OCMENU=();
-
 	for KEY in ${!OCSETTINGS[@]}; do
 		IFS=" ";
 		ROW=$(($KEY+1))","

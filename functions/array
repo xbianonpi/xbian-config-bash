@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#Copyright 2012 Hexagon <development@xbian.org>
+#Copyright 2012 CurlyMo <development@xbian.org>
 #
 #This file is part of XBian - XBMC on the Raspberry Pi.
 #
@@ -17,16 +17,14 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-_NAME="Updates"
-_DESC="Check for system updates"
-
-_DOWNLOADPL="Downloading package list..."
-_PLERROR="Package list could not be downloaded, try again later..."
-_CHECKINGFORUD="Checking for updates..."
-_UPTODATE="Your system is up to date"
-_ERRORCHECKUPDATE="An error occurred while checking for updates"
-_ANUPDATE="An update"
-_ISAVAILABLE="is available, do you wan't to update now?"
-_INSTALLINGUPDATE="Installing update, please wait..."
-_UPDATEDTO="System updated to version"
-_ERRORUPDATE="An error occurred while installing the update"
+function searchArrayFn() {
+	VALUE=$1
+	shift;
+	ARRAY=($@)
+	for KEY in ${!ARRAY[@]}; do
+		if [ "${ARRAY[$KEY]}" == "$VALUE" ]; then
+			return $KEY;
+		fi
+	done;
+	return 99
+}

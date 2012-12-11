@@ -24,6 +24,18 @@ _TITLE="Config"
 _REBOOTREQUIRED="A reboot is required. Do you want to reboot now?"
 
 #|------------------------------------|
+#|             Menu Items			  |
+#|------------------------------------|
+_ITEMSETTINGSNAME="Settings"
+_ITEMSETTINGSDESC="Change various system settings"
+_ITEMSYSTEMNAME="System"
+_ITEMSYSTEMDESC="e.g. Resize SD, Overclocking, Hostname"
+_ITEMACCOUNTSNAME="Accounts"
+_ITEMACCOUNTSDESC="e.g. Change passwords, SSH root login"
+_ITEMLICENSESNAME="Licenses"
+_ITEMLICENSESDESC="Add/Remove hardware licenses"
+
+#|------------------------------------|
 #|              Dialogs	  	   		  |
 #|------------------------------------|
 _YES="Yes"
