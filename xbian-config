@@ -175,8 +175,9 @@ function showMainMenuDlg() {
 	if [ -z "$ITEMS" ]; then
 		
 		# Grab the system name of the module we want to execute
-		MODULE=$(cat $BASEPATH/struct | grep ^$LEVEL | cut -f2 -d:);
-				
+		SPECIFICLEVEL=$(echo $LEVEL | awk '{print substr($0,0,length)}');
+		MODULE=$(cat $BASEPATH/struct | grep ^$SPECIFICLEVEL: | cut -f2 -d:);
+
 		# Include the module we want to execute
 		source $BASEPATH/modules/$MODULE/main
 		source $BASEPATH/modules/$MODULE/lang/$LANGUAGE
@@ -194,12 +195,18 @@ function showMainMenuDlg() {
 		MENU="";
 		I=1;
 		for ITEM in ${ITEMS[@]}; do
-			if [ -f $BASEPATH/modules/$ITEM/lang/$LANGUAGE ]; then
-				source $BASEPATH/modules/$ITEM/lang/$LANGUAGE
+			if [ -d $BASEPATH/modules/$ITEM ]; then
+				if [ -f $BASEPATH/modules/$ITEM/lang/$LANGUAGE ]; then
+					source $BASEPATH/modules/$ITEM/lang/$LANGUAGE
+				else
+					source $BASEPATH/modules/$ITEM/lang/en
+				fi
+				MENU+="$I%$_NAME!-!\"$_DESC\"%";
 			else
-				source $BASEPATH/modules/$ITEM/lang/en
+				_NAME=$(echo "_ITEM"$ITEM"NAME" | tr "[:lower:]" "[:upper:]");
+				_DESC=$(echo "_ITEM"$ITEM"DESC" | tr "[:lower:]" "[:upper:]");
+				MENU+="$I%${!_NAME}!-!\"${!_DESC}\"%";
 			fi
-			MENU+="$I%$_NAME!-!\"$_DESC\"%";
 			I=$(($I+1));
 		done;
 		
@@ -235,12 +242,19 @@ function showMainMenuDlg() {
 			IFS=$'\n';
 			MODULE=$(cat $BASEPATH/struct | grep ^$(echo $LEVEL$RETURN)*: | cut -f 2 -d:)
 			
-			if [ -f $BASEPATH/modules/$MODULE/lang/$LANGUAGE ]; then
-				source $BASEPATH/modules/$MODULE/lang/$LANGUAGE
+			if [ -d $BASEPATH/modules/$MODULE ]; then
+				if [ -f $BASEPATH/modules/$MODULE/lang/$LANGUAGE ]; then
+					source $BASEPATH/modules/$MODULE/lang/$LANGUAGE
+				else
+					source $BASEPATH/modules/$MODULE/lang/en
+				fi
+				showMainMenuDlg $(($1+1)) $LEVEL$RETURN$ADD  "$CPATH > $_NAME";
 			else
-				source $BASEPATH/modules/$MODULE/lang/en
+				_NAME=$(echo "_ITEM"$MODULE"NAME" | tr "[:lower:]" "[:upper:]");
+				_DESC=$(echo "_ITEM"$MODULE"DESC" | tr "[:lower:]" "[:upper:]");
+				showMainMenuDlg $(($1+1)) $LEVEL$RETURN$ADD  "$CPATH > ${!_NAME}";
 			fi
-			showMainMenuDlg $(($1+1)) $LEVEL$RETURN$ADD  "$CPATH > $_NAME";
+			
 		fi;
 	fi;
 

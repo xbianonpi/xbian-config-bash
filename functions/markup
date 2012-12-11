@@ -17,6 +17,9 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
+#Disable or enable table column
+TBLCOLUMNCENTER=1;
+
 # Wrap text fit in dialog width
 #  $1 [String]	Text
 #  $2 [Integer] 	Width (optional) 
@@ -32,7 +35,7 @@ function wrapTxtFn() {
 		WIDTH=$DEFAULTWIDTH;
 	fi
 	IFS=" ";
-	WORDS=($(echo $TEXT));
+	WORDS=($TEXT);
 	RAWLINES=();	
 	LINES=();
 	IFS=$'\n';
@@ -150,8 +153,12 @@ function createTableFn() {
 	
 	for (( c=1; c<$NRCOLUMNS; c++ )); do
 		if [ ${WORDLENGTH[$c]} -lt ${#OLDHEADER[$c]} ]; then
+			if [ $TBLCOLUMNCENTER -eq 1 ]; then
+				CENTERED[$c]=1;
+			else
+				CENTERED[$c]=0;
+			fi	
 			WORDLENGTH[$c]=${#OLDHEADER[$c]};
-			CENTERED[$c]=1;
 		else
 			CENTERED[$c]=0;
 		fi
