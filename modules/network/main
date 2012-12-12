@@ -46,7 +46,6 @@ function showGUIFn() {
 	if [ ! -z "$IFACES" ]; then
 		showInterfacesSelectDlg "$IFACES"
 		if [ $? -eq 0 ]; then
-
 			# Save selected interface to a variable
 			IFACE=${IFACES[$(($RETURN-1))]}
 
@@ -78,6 +77,8 @@ function showGUIFn() {
 				# Configuration done
 				showGUIFn
 				return 0;
+			else
+				showGUIFn;
 			fi
 		fi
 	else
@@ -120,9 +121,6 @@ function showInterfaceStaticGUIFn() {
 			showInterfaceStaticGUIFn "$1" "$2"
 			return 0;
 		fi
-	else
-		showGUIFn
-		return 0;
 	fi
 }
 
