@@ -23,6 +23,8 @@ if [ ! $(id -u) -eq 0 ]; then
 	exit 0;
 fi
 
+trap '' 2 20
+
 LOADER=0;
 if [[ $# -eq 0 ]]; then
 	while [ $(pgrep dialog | wc -l) -eq 0 ]; do 

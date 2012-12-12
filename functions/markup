@@ -122,10 +122,19 @@ function createTableFn() {
 	shift;
 	IFS=",";
 	OLDHEADER=($1)
-	IFS=$ORIGINALIFS;
 	shift
-	OLDROWS=($@)
-	
+	OLDROWS=();
+	NEWROW="";
+	IFS=$ORIGINALIFS;
+	KEY=-1;
+	for ROW in $@; do
+		if [[ "$ROW" =~ ^[0-9] ]]; then
+			KEY=$(($KEY+1));
+			OLDROWS[$KEY]+=$ROW;
+		else
+			OLDROWS[$KEY]+=" "$ROW;
+		fi
+	done;
 	NRCOLUMNS=0;
 	WORDLENGTH=();
 	for (( c=0; c<${#OLDROWS[@]}; c++ )); do
@@ -142,16 +151,16 @@ function createTableFn() {
 	done
 	IFS=$ORIGINALIFS;
 	
-	if [ $TYPE == "radio" ]; then
-		NRCOLUMNS=$(($NRCOLUMNS-1));
-	fi
+	# if [ $TYPE == "radio" ]; then
+		# NRCOLUMNS=$(($NRCOLUMNS-1));
+	# fi
 	
 	HEADER=${OLDHEADER[0]};
 	HEADER+=" ";
 	shift
 	CENTERED=();
 	
-	for (( c=1; c<$NRCOLUMNS; c++ )); do
+	for (( c=0; c<$NRCOLUMNS; c++ )); do
 		if [ ${WORDLENGTH[$c]} -lt ${#OLDHEADER[$c]} ]; then
 			if [ $TBLCOLUMNCENTER -eq 1 ]; then
 				CENTERED[$c]=1;
@@ -162,15 +171,24 @@ function createTableFn() {
 		else
 			CENTERED[$c]=0;
 		fi
-		LENGTH=$((${WORDLENGTH[$c]}-${#OLDHEADER[$c]}));
+		ENDOFCOLUMN="true";
+		if [ $TYPE != "radio" ] && [ $c -gt 0 ] && [ $c -lt $NRCOLUMNS ]; then
+			ENDOFCOLUMN="false"
+		fi
+		if [ $TYPE == "radio" ] && [ $c -gt 0 ] && [ $c -lt $(($NRCOLUMNS-1)) ]; then
+			ENDOFCOLUMN="false"
+		fi
+		if [ $ENDOFCOLUMN == "false" ]; then
+			LENGTH=$((${WORDLENGTH[$c]}-${#OLDHEADER[$c]}));
 
-		HEADER+=" [ ";
-		HEADER+=${OLDHEADER[$c]};
-		
-		for (( d=0; d<$(($LENGTH)); d++ )); do
-			HEADER+=" ";
-		done
-		HEADER+=" ]";
+			HEADER+=" [ ";
+			HEADER+=${OLDHEADER[$c]};
+			
+			for (( d=0; d<$(($LENGTH)); d++ )); do
+				HEADER+=" ";
+			done
+			HEADER+=" ]";
+		fi
 		shift;
 	done
 	
@@ -178,10 +196,16 @@ function createTableFn() {
 	for (( c=0; c<${#OLDROWS[@]}; c++ )); do
 		IFS=",";
 		OLDROW=(${OLDROWS[$c]});
-		NRCOLUMNS=${#OLDROW[@]};
-		for (( d=0; d<${#OLDROW[@]}; d++ )); do
+		for (( d=0; d<$NRCOLUMNS; d++ )); do
 			LENGTH=$((${WORDLENGTH[$d]}-${#OLDROW[$d]}));
-			if [ $d -gt 0 ] && [ $d -lt $((${#OLDROW[@]}-1)) ]; then
+			ENDOFCOLUMN="true";
+			if [ $TYPE != "radio" ] && [ $d -gt 0 ] && [ $d -lt $NRCOLUMNS ]; then
+				ENDOFCOLUMN="false"
+			fi
+			if [ $TYPE == "radio" ] && [ $d -gt 0 ] && [ $d -lt $(($NRCOLUMNS-1)) ]; then
+				ENDOFCOLUMN="false"
+			fi
+			if [ $ENDOFCOLUMN == "false" ]; then
 				if [ $d -gt 1 ]; then
 					ROWS+="$DEFAULTCOLSEP"
 				fi
@@ -204,12 +228,13 @@ function createTableFn() {
 						ROWS+=" ";
 					done
 				fi
-					
 				ROWS+="\Zn ]";
-			elif [ $d -gt 0 ]; then
-				ROWS+="$DEFAULTDELIMITER"${OLDROW[$d]}"$DEFAULTDELIMITER";
 			else
-				ROWS+=${OLDROW[$d]}"$DEFAULTDELIMITER";
+				if [ $d -gt 0 ] && [ $TYPE == "radio" ]; then
+					ROWS+="$DEFAULTDELIMITER"${OLDROW[$d]}"$DEFAULTDELIMITER";
+				else
+					ROWS+=${OLDROW[$d]}"$DEFAULTDELIMITER";
+				fi
 			fi
 		done
 	done
