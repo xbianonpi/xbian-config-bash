@@ -232,6 +232,8 @@ function createTableFn() {
 			else
 				if [ $d -gt 0 ] && [ $TYPE == "radio" ]; then
 					ROWS+="$DEFAULTDELIMITER"${OLDROW[$d]}"$DEFAULTDELIMITER";
+				elif [ $c -gt 0 ] && [ $TYPE != "radio" ]; then
+					ROWS+="$DEFAULTDELIMITER"${OLDROW[$d]}"$DEFAULTDELIMITER";
 				else
 					ROWS+=${OLDROW[$d]}"$DEFAULTDELIMITER";
 				fi

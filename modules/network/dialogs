@@ -29,11 +29,12 @@ function showInterfacesSelectDlg() {
 		MENU+=($I",\Zn"$IFACE",\Zn"$IPADDR",\Zn"$NETMASK)
 		I=$(($I+1))
 	done
-		
+	TBLCOLUMNCENTER=0;
 	createTableFn "menu"\
 	"#,\Zb$_NETWORKINTERFACES,\Zb$_NETWORKADDRESS,\Zb$_NETWORKMASK"\
 	"${MENU[@]}";
-
+	TBLCOLUMNCENTER=1;
+	
 	# Show interface selector dialog
 	centerTxtFn "$_SELECTINTERFACE";
 	showMenuDlg "\n$CENTEREDTXT\n $HEADER" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+9))
@@ -61,6 +62,7 @@ function showIPModeConfigDlg() {
 	createTableFn "radio" \
 	"#,\Zb$_NETWORKTYPE"\
 	"${MENU[@]}"
+	
 	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+8));
 	showRadioDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+9))
 }

@@ -48,7 +48,7 @@ function showGUIFn() {
 		if [ $? -eq 0 ]; then
 			# Save selected interface to a variable
 			IFACE=${IFACES[$(($RETURN-1))]}
-
+			
 			# Get current configuration
 			IFACE_DATA=$(readNetworkConfigurationFn "$IFACE")
 
