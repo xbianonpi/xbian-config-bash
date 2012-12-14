@@ -37,7 +37,6 @@ source $BASEPATH/modules/network/dialogs
 
 # Executes the GUI version of this module
 function showGUIFn() {
-
 	# Notify user that interfaces are loading
 	showInterfacesLoadingDlg
 
@@ -53,7 +52,7 @@ function showGUIFn() {
 			IFACE_DATA=$(readNetworkConfigurationFn "$IFACE")
 
 			# Get mode
-			MODE=$(echo "$IFACE_DATA" | grep MODE | cut -f 2 -d" ")
+			MODE=$(echo "$IFACE_DATA" | grep mode | cut -f 2 -d" ")
 
 			# Show DHCP/Static selection
 			showIPModeConfigDlg "$MODE"
@@ -87,11 +86,11 @@ function showGUIFn() {
 }
 
 function showInterfaceStaticGUIFn() {
-	IP=$(echo "$2" | grep IP | cut -f 2 -d" ")
-	NETMASK=$(echo "$2" | grep NETMASK | cut -f 2 -d" ")
-	GATEWAY=$(echo "$2" | grep GATEWAY | cut -f 2 -d" ")
-	NAMESERVER1=$(echo "$2" | grep NAMESERVER1 | cut -f 2 -d" ")
-	NAMESERVER2=$(echo "$2" | grep NAMESERVER2 | cut -f 2 -d" ")
+	IP=$(echo "$2" | grep ip | cut -f 2 -d" ")
+	NETMASK=$(echo "$2" | grep netmask | cut -f 2 -d" ")
+	GATEWAY=$(echo "$2" | grep gateway | cut -f 2 -d" ")
+	NAMESERVER1=$(echo "$2" | grep nameserver1 | cut -f 2 -d" ")
+	NAMESERVER2=$(echo "$2" | grep nameserver2 | cut -f 2 -d" ")
 	showInterfaceStaticDlg "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2"
 	if [ $? -eq 0 ]; then
 		STATICCONF=($(echo -e "$RETURN"))
@@ -125,56 +124,112 @@ function showInterfaceStaticGUIFn() {
 }
 
 function showWlanCredentialsGUIFn() {
-	PROTECTION=$(echo "$2" | grep PROTECTION | cut -f 2 -d" ")
-	showWlanModeConfigDlg "$PROTECTION"
+
+	SSID=$(echo -e "$2" | grep ssid | cut -f 2 -d" ")
+	WLANKEY=$(echo -e "$2" | grep key | cut -f 2 -d" ")
+	PROTECTION=$(echo "$2" | grep protection | cut -f 2 -d" ")
+
+	showScanForWLANDlg;
+
 	if [ $? -eq 0 ]; then
-		PROTECTION="$RETURN"
-		# WPA and WEP need both ssid and key
-		if [ $PROTECTION -lt 3 ]; then
-			SSID=$(echo -e "$2" | grep SSID | cut -f 2 -d" ")
-			KEY=$(echo -e "$2" | grep KEY | cut -f 2 -d" ")
-			showInterfaceCredentialsDlg "$SSID" "$KEY"
+		if [ $RETURN -eq 2 ]; then
+			showWlanModeConfigDlg "$PROTECTION"
 			if [ $? -eq 0 ]; then
-				CREDENTIALS=($(echo -e "$RETURN"))
-				if [ ${#CREDENTIALS[@]} -eq 2 ];then
-					SSID=${CREDENTIALS[0]}
-					KEY=${CREDENTIALS[1]}
-					if [ $PROTECTION -eq 1 ]; then
-						setInterfaceWlanCredentials "$1" "WPA" "$SSID" "$KEY"
-					else
-						setInterfaceWlanCredentials "$1" "WEP" "$SSID" "$KEY"
+				PROTECTION="$RETURN"
+				# WPA and WEP need both ssid and key
+				if [ $PROTECTION -lt 3 ]; then
+					showInterfaceCredentialsDlg "$SSID" "$WLANKEY"
+					if [ $? -eq 0 ]; then
+						CREDENTIALS=($(echo -e "$RETURN"))
+						if [ ${#CREDENTIALS[@]} -eq 2 ];then
+							SSID=${CREDENTIALS[0]}
+							WLANKEY=${CREDENTIALS[1]}
+							if [ $PROTECTION -eq 1 ]; then
+								setInterfaceWlanCredentials "$1" "WPA" "$SSID" "$WLANKEY"
+							else
+								setInterfaceWlanCredentials "$1" "WEP" "$SSID" "$WLANKEY"
+							fi
+							showInterfaceCredentialsSuccessDlg
+						else
+							showInterfaceCredentialsErrorDlg
+							showWlanCredentialsGUIFn "$1" "$2"
+							return 0;
+						fi
+						return 0;
 					fi
-					showInterfaceCredentialsSuccessDlg
+				# Open network need only ssh, hence different dialog here
 				else
-					showInterfaceCredentialsErrorDlg
-					showWlanCredentialsGUIFn "$1" "$2"
-					return 0;
+					SSID=$(echo -e "$2" | grep ssid | cut -f 2 -d" ")
+					showInterfaceSSIDDlg "$SSID"
+					if [ $? -eq 0 ]; then
+						if [ ! -z "$RETURN" ]; then
+							setInterfaceWlanCredentials "$1" "Open" "$RETURN"
+							showInterfaceCredentialsSuccessDlg
+						else
+							showInterfaceCredentialsErrorDlg
+							return 0;
+						fi
+					else
+						return 0;
+					fi
 				fi
-			else
-				showGUIFn
-				return 0;
 			fi
-		# Open network need only ssh, hence different dialog here
 		else
-			SSID=$(echo -e "$2" | grep SSID | cut -f 2 -d" ")
-			showInterfaceSSIDDlg "$SSID"
+			showAvailableWLANDlg $1 $SSID
 			if [ $? -eq 0 ]; then
-				if [ ! -z "$RETURN" ]; then
-					setInterfaceWlanCredentials "$1" "Open" "$RETURN"
-					showInterfaceCredentialsSuccessDlg
+				IFS=" ";
+				WNETWORK=(${WNETWORKS[$(($RETURN-1))]});
+				
+				if [ ${#WNETWORK[@]} -eq 2 ]; then
+					PROTECTION=3;
+				elif [ "${WNETWORK[2]}" == "WPA" ] || [ "${WNETWORK[2]}" == "WPA2" ]; then
+					PROTECTION=1
 				else
-					showInterfaceCredentialsErrorDlg
-					showGUIFn
-					return 0;
+					PROTECTION=2;
 				fi
-			else
-				showGUIFn
-				return 0;
+
+				if [ "$SSID" != "$(echo "${WNETWORK[0]}" | awk '{print substr($0,2,length-2)}')" ]; then
+					WLANKEY="";
+					SSID=$(echo "${WNETWORK[0]}" | awk '{print substr($0,2,length-2)}');
+				fi
+				if [ $PROTECTION -lt 3 ]; then
+					showInterfaceCredentialsDlg "$SSID" "$WLANKEY"
+					if [ $? -eq 0 ]; then
+						CREDENTIALS=($(echo -e "$RETURN"))
+						if [ ${#CREDENTIALS[@]} -eq 2 ];then
+							SSID=${CREDENTIALS[0]}
+							WLANKEY=${CREDENTIALS[1]}
+							if [ $PROTECTION -eq 1 ]; then
+								setInterfaceWlanCredentials "$1" "WPA" "$SSID" "$WLANKEY"
+							else
+								setInterfaceWlanCredentials "$1" "WEP" "$SSID" "$WLANKEY"
+							fi
+							showInterfaceCredentialsSuccessDlg
+						else
+							showInterfaceCredentialsErrorDlg
+							showWlanCredentialsGUIFn "$1" "$2"
+							return 0;
+						fi
+						return 0;
+					fi
+				# Open network need only ssh, hence different dialog here
+				else
+					SSID=$(echo -e "$2" | grep SSID | cut -f 2 -d" ")
+					showInterfaceSSIDDlg "$SSID"
+					if [ $? -eq 0 ]; then
+						if [ ! -z "$RETURN" ]; then
+							setInterfaceWlanCredentials "$1" "Open" "$RETURN"
+							showInterfaceCredentialsSuccessDlg
+						else
+							showInterfaceCredentialsErrorDlg
+							return 0;
+						fi
+					else
+						return 0;
+					fi
+				fi
 			fi
 		fi
-	else
-		showGUIFn
-		return 0;
 	fi
 }
 
@@ -193,7 +248,7 @@ function showWlanCredentialsGUIFn() {
 #  credentials (No arguments return current settings)
 #    $3 Encryption mode (WEP|WPA|Open) [string]
 #    $4 ESSID
-#    $5 KEY (Only used for WEP|WPA)
+#    $5 WLANKEY (Only used for WEP|WPA)
 # Returns:
 #   0: Failure
 #   1: Success
@@ -309,14 +364,14 @@ function showCMDFn() {
 					# $2 = Interface
 					# $3 = WPA|WEP|Open
 					# $4 = ESSID
-					# $5 = KEY (semi-optional, only needed with WPA or WEP)
+					# $5 = WLANKEY (semi-optional, only needed with WPA or WEP)
 
-					KEY=""
+					WLANKEY=""
 					if [ $# -gt 4 ]; then
-						KEY="$5"
+						WLANKEY="$5"
 					fi
 
-					RETURN=$(setInterfaceWlanCredentials "$2" "$3" "$4" "$KEY")
+					RETURN=$(setInterfaceWlanCredentials "$2" "$3" "$4" "$WLANKEY")
 					echo "$RETURN"
 					return $?;
 				else

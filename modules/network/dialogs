@@ -64,7 +64,7 @@ function showIPModeConfigDlg() {
 	"${MENU[@]}"
 	
 	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+8));
-	showRadioDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+9))
+	showRadioDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+8))
 }
 
 # Show a radio dialog for selecting WLAN Protection mode
@@ -85,6 +85,8 @@ function showWlanModeConfigDlg() {
 	elif [ "$1" = "WEP" ]; then
 		STATUSWEP="on"
 	elif [ "$1" = "Open" ]; then
+		STATUSOPEN="on"
+	else
 		STATUSOPEN="on"
 	fi
 	
@@ -123,7 +125,7 @@ function showInterfaceCredentialsDlg() {
 	wrapTxtFn "$_ENTERCREDENTIALS"
 	centerTxtFn "$WRAPPEDTXT"
 	valignTxtFn "$CENTEREDTXT"
-	showInputForm2Dlg "$ALIGNEDTXT" "$_SSID" "$1" "$_KEY" "$2"
+	showInputForm2Dlg "$ALIGNEDTXT" "$_SSID:" "$1" "$_KEY:" "$2"
 }
 
 # Ask for static IP configuration
@@ -137,7 +139,7 @@ function showInterfaceStaticDlg() {
 	wrapTxtFn "$_ENTERSTATICCONFIG"
 	centerTxtFn "$WRAPPEDTXT"
 	valignTxtFn "$CENTEREDTXT"
-	showInputForm5Dlg "$ALIGNEDTXT" "$_NETWORKADDRESS" "$1" "$_NETWORKMASK" "$2" "$_NETWORKGATEWAY" "$3" "$_NAMESERVER" "$4" "$_NAMESERVER" "$5"
+	showInputForm5Dlg "$ALIGNEDTXT" "$_NETWORKADDRESS*:" "$1" "$_NETWORKMASK*:" "$2" "$_NETWORKGATEWAY*:" "$3" "$_NAMESERVER:" "$4" "$_NAMESERVER:" "$5"
 }
 
 function showInterfaceCredentialsErrorDlg() {
@@ -175,9 +177,58 @@ function showInterfaceDhcpSuccessDlg() {
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
+function showAvailableWLANDlg() {
+	scanWLANNetworksFn $1
+	MENU=();
+	IFS=$'\n';
+	X=1;
+	for WNETWORK in ${WNETWORKS[@]}; do
+		IFS=" ";
+		VALUES=($WNETWORK);
+		NAME=$(echo "${VALUES[0]}" | awk '{print substr($0,2,length-2)}');
+		SECURITY=${VALUES[1]};
+		if [ "$SECURITY" == "on" ]; then
+			SECURITY="$_YES"
+		else
+			SECURITY="$_NO"
+		fi
+		if [ ${#VALUES[@]} -eq 2 ]; then
+			TYPE="";
+		else
+			TYPE=${VALUES[2]}
+		fi
+		SELECTED="off";
+		if [ "$NAME" == "$2" ]; then
+			SELECTED="on";
+		fi
+		MENU+=($X",\Zn"$NAME",\Zn"$SECURITY",\Zn"$TYPE","$SELECTED);
+		X=$(($X+1));
+	done
+	createTableFn "radio" \
+	"#,\Zb"$_NETWORKNAME",\Zb"$_NETWORKPROTECTION",\Zb"$_NETWORKTYPE"" \
+	"${MENU[@]}"
+	
+	showRadioDlg "   $HEADER" "$ROWS" 6 15
+}
+
+function showScanForWLANDlg() {
+	MENU=()
+	
+	TBLCOLUMNCENTER=0;
+	createTableFn "menu" \
+	"#,\Zb"$_NETWORKWLAN"" \
+	"1,\Zn"$_NETWORKSCANAVAILABLE"" \
+	"2,\Zn"$_NETWORKCUSTOM""
+	TBLCOLUMNCENTER=1;
+	
+	# Show interface selector dialog
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+10));
+	showMenuDlg "\n$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+8))
+}
+
 # Ask for network SSID in case of open protection
 # Arguments
 #  $1 Current SSID
 function showInterfaceSSIDDlg() {
-        showInputDlg "$_SSID:" $1
+	showInputDlg "$_SSID:" $1
 }
