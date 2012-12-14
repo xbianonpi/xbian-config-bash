@@ -22,7 +22,7 @@
 #  $1 Interface name
 #  $2 Protection (WPA|WEP|Open)
 #  $3 ESSID
-#  $4 KEY (Only needed for WPA and WEP)
+#  $4 WLANKEY (Only needed for WPA and WEP)
 # Return
 #  1: Success
 #  0: Failure
@@ -284,21 +284,21 @@ function isValidInterfaceFn() {
 # Echoes
 #   @1: Textual table
 #       -----------------------
-#       MODE dhcp|static|manual
-#	STATE UP|DOWN
-#       IP X.X.X.X
-#       NETMASK X.X.X:X
-#       GATEWAY X.X.X.X
-#       NAMESERVER1 X.X.X.X
-#       NAMESERVER2 X.X.X.X
-#	PROTECTION WEP|WPA|Open (only for wlan interfaces)
+#       mode dhcp|static|manual
+#	state UP|DOWN
+#       ip X.X.X.X
+#       netmask X.X.X:X
+#       gateway X.X.X.X
+#       nameserver1 X.X.X.X
+#       namserver2 X.X.X.X
+#	protection WEP|WPA|open (only for wlan interfaces)
 #	SSID XXXX (only for wlan interfaces)
-#	KEY XXXX (only for wlan interfaces)
+#	WLANKEY XXXX (only for wlan interfaces)
 #   @0: Error code
 # Error codes
 #   -4: Invalid interface
 function readNetworkConfigurationFn() {
-        isValidInterfaceFn "$1"
+	isValidInterfaceFn "$1"
 	if [ $? -eq 1 ]; then
 		# Read network configuration from /etc/network/interfaces
 		TFILEIFACES=$(cat /etc/network/interfaces)
@@ -311,11 +311,17 @@ function readNetworkConfigurationFn() {
 
 		# Extract DHCP or Static
 		MODE=$(echo -e "$TFILEIFACES" | grep "iface $1" | cut -f 4 -d " ");
-
-		# Extract manual ip configuration
-		CIP=$(echo -e "$CONTENT" | grep address | cut -f 2 -d " ");
-		CSM=$(echo -e "$CONTENT" | grep netmask | cut -f 2 -d " ");
-		CGW=$(echo -e "$CONTENT" | grep gateway | cut -f 2 -d " ");
+		if [ $MODE == "dhcp" ]; then
+			# Extract ip address given by dhcp server
+			CIP=$(ifconfig $1 | sed -n -e 's/:127\.0\.0\.1 //g' -e 's/ *inet addr:\([0-9.]\+\).*/\1/gp');
+			CSM=$(ifconfig $1 | grep Mask | awk '{print $4}' | cut -f2 -d:);
+			CGW=$(grep dhcp-server-identifier /var/lib/dhcp/dhclient.eth0.leases | tail -1 | awk '{print $3}' | awk '{print substr($0,0,length)}');
+		else
+			# Extract manual ip configuration
+			CIP=$(echo -e "$CONTENT" | grep address | cut -f 2 -d " ");
+			CSM=$(echo -e "$CONTENT" | grep netmask | cut -f 2 -d " ");
+			CGW=$(echo -e "$CONTENT" | grep gateway | cut -f 2 -d " ");
+		fi
 
 		# Extract wlan configuration
 		PROTECTION=""
@@ -323,7 +329,7 @@ function readNetworkConfigurationFn() {
 		MODEWPA=$(echo -e "$CONTENT" | grep ^wpa-)
 		MODEWEP=$(echo -e "$CONTENT" | grep ^wireless-essid)
 		if [ ! -z "$MODEOPEN" ]; then
-			PROTECTION="Open"
+			PROTECTION="open"
 		elif [ ! -z "$MODEWPA" ]; then
 			PROTECTION="WPA"
 		elif [ ! -z "$MODEWEP" ]; then
@@ -332,14 +338,14 @@ function readNetworkConfigurationFn() {
 
 		# Extract wlan credentials
 		SSID=""
-		KEY=""
+		WLANKEY=""
 		if [ ! -z "$PROTECTION" ]; then
 			if [ "$PROTECTION" = "WEP" ]; then
 				SSID=$(echo -e "$CONTENT" | grep wireless-essid | cut -f 2 -d" ")
-				KEY=$(echo -e "$CONTENT" | grep wireless-key | cut -f 2 -d" ")
+				WLANKEY=$(echo -e "$CONTENT" | grep wireless-key | cut -f 2 -d" ")
 			elif [ "$PROTECTION" = "WPA" ]; then
 				SSID=$(echo -e "$CONTENT" | grep wpa-ssid | cut -f 2 -d" " | sed 's/\"//g')
-				KEY=$(echo -e "$CONTENT" | grep wpa-psk | cut -f 2 -d" " | sed "s/\"//g")				
+				WLANKEY=$(echo -e "$CONTENT" | grep wpa-psk | cut -f 2 -d" " | sed "s/\"//g")				
 			elif [ "$PROTECTION" = "Open" ]; then
 				SSID=$(echo -e "$CONTENT" | grep wireless-essid | cut -f 2 -d" ")
 			fi
@@ -361,17 +367,17 @@ function readNetworkConfigurationFn() {
 	           fi
 	        fi
 
-		echo "MODE $MODE"
-		echo "STATE $STATE"
-		echo "IP $CIP"
-		echo "NETMASK $CSM"
-		echo "GATEWAY $CGW"
-		echo "NAMESERVER1 $NS1"
-		echo "NAMESERVER2 $NS2"
+		echo "mode $MODE"
+		echo "state $STATE"
+		echo "ip $CIP"
+		echo "netmask $CSM"
+		echo "gateway $CGW"
+		echo "nameserver1 $NS1"
+		echo "namserver2 $NS2"
 		if [ ! -z "$PROTECTION" ]; then
-			echo "PROTECTION $PROTECTION"
-			echo "SSID $SSID"
-			echo "KEY $KEY"
+			echo "protection $PROTECTION"
+			echo "ssid $SSID"
+			echo "key $WLANKEY"
 		fi
 		return 1;
 	else
@@ -417,4 +423,38 @@ function checkValidIpNetmaskFn() {
 	else
 		return 0
         fi
+}
+
+function scanWLANNetworksFn() {
+	IFS=$'\n'
+	IWLIST=($(iwlist $1 scan | sed -ne 's/\(ESSID:\)\([\"\ -_A-Za-z0-9]\{1,\}\)/1:\2/p' -ne 's/\(Encryption key:\)\([a-z]\{1,3\}\)/2:\2/p' -ne 's/\(IE:.*\)\(WPA2\|WPA\)/3:\2/gp' | sed 's/ Version.*//g' | sed 's/^[[:space:]]*\(.*\)[[:space:]]*$/\1/'));
+
+	WNETWORKS=();
+	WLAN=();
+	NUMBERS=();
+	X=0;
+	for VALUE in ${IWLIST[@]}; do
+		NUMBER=$(echo $VALUE | cut -f1 -d:)
+		VALUE1=$(echo $VALUE | cut -f2 -d:)
+		if [ -z ${NUMBERS[$NUMBER]} ]; then
+			NUMBERS[$NUMBER]=1;
+		else
+			NUMBERS[$NUMBER]=$((${NUMBERS[$NUMBER]}+1));
+		fi
+		if [ ${NUMBERS[$NUMBER]} -gt 1 ]; then
+			if [ ${#WLAN[@]} -gt 1 ]; then		
+				WNETWORKS[$X]="${WLAN[@]}";
+				X=$(($X+1));
+			fi
+			NUMBERS=();
+			NUMBERS[$NUMBER]=1;
+			WLAN=();		
+		fi
+		trimLnFn $VALUE1
+		WLAN[$NUMBER]=$TRIMMEDLN;
+	done;
+	if [ ${#WLAN[@]} -gt 1 ]; then	
+		WNETWORKS[$X]="${WLAN[@]}";
+	fi	
+	IFS=$ORIGINALIFS;
 }
