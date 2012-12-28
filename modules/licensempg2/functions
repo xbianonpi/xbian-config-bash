@@ -23,7 +23,6 @@
 #  $LICENSE [String]
 function getCurrentLicenseMPG2Fn() {
 	LICENSE=$(cat /boot/config.txt | grep 'decode_MPG2' | cut -f 2 -d=); 
-	eval "$1=$LICENSE";
 }
 
 # Insert the current license
