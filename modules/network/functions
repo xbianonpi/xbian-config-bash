@@ -425,6 +425,12 @@ function checkValidIpNetmaskFn() {
         fi
 }
 
+# Validate a given netmask
+# Arguments
+#  $1 Netmask
+# Return
+#  1: Valid
+#  0: Invalid
 function scanWLANNetworksFn() {
 	IFS=$'\n'
 	IWLIST=($(iwlist $1 scan | sed -ne 's/\(ESSID:\)\([\"\ -_A-Za-z0-9]\{1,\}\)/1:\2/p' -ne 's/\(Encryption key:\)\([a-z]\{1,3\}\)/2:\2/p' -ne 's/\(IE:.*\)\(WPA2\|WPA\)/3:\2/gp' | sed 's/ Version.*//g' | sed 's/^[[:space:]]*\(.*\)[[:space:]]*$/\1/'));

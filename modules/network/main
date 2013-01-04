@@ -22,7 +22,7 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(list status dhcp static credentials);
+ARGUMENTS=(list status dhcp static credentials scan);
 
 #|------------------------------------|
 #|          Include files             |
@@ -175,7 +175,9 @@ function showWlanCredentialsGUIFn() {
 				fi
 			fi
 		else
-			showAvailableWLANDlg $1 $SSID
+			showScanningForNetworksDlg;
+			scanWLANNetworksFn $1
+			showAvailableWLANDlg $SSID "${WNETWORKS[@]}"
 			if [ $? -eq 0 ]; then
 				IFS=" ";
 				WNETWORK=(${WNETWORKS[$(($RETURN-1))]});
@@ -263,7 +265,7 @@ function showWlanCredentialsGUIFn() {
 #  -5: Interface not configured
 function showCMDFn() {
 	case $1 in
-		"list")
+		list)
 			IFACES=$(listNetworkInterfacesFn)
 			if [ $? -eq 1 ] && [ ! -z "$IFACES" ]; then
 				echo -e "$IFACES"
@@ -274,7 +276,7 @@ function showCMDFn() {
 				return 0;
 			fi
 		;;
-		"status")
+		status)
 			# Check that we have 2 arguments ($1=action, $2=interface)
 			if [ $# -eq 2 ]; then
 				# No need to check for valid interface here as readNetworkConfigurationFn does it
@@ -297,7 +299,7 @@ function showCMDFn() {
 				return 0;
 			fi
 		;;
-		"dhcp")
+		dhcp)
 			# Check that we have 3 arguments ($1=action, $2=interface)
 			if [ $# -eq 2 ]; then
 				isValidInterfaceFn "$2"
@@ -316,7 +318,7 @@ function showCMDFn() {
 				return 0;
 			fi
 		;;
-		"static")
+		static)
 			if [ $# -gt 3 ]; then
 				isValidInterfaceFn "$2"
 				if [ $? -eq 1 ]; then
@@ -355,7 +357,7 @@ function showCMDFn() {
 				return 0;
 			fi
 		;;
-		"credentials")
+		credentials)
 			if [ $# -gt 3 ]; then
 				isValidInterfaceFn "$2"
 				if [ $? -eq 1 ]; then
@@ -384,7 +386,33 @@ function showCMDFn() {
 				echo "-1"
 				return 0;
 			fi
-
+		;;
+		scan)
+			if [ $# == 2 ]; then
+				isValidInterfaceFn "$2"
+				if [ $? -eq 1 ]; then
+					scanWLANNetworksFn $2;
+					IFS=$'\n';
+					for WNETWORK in ${WNETWORKS[@]}; do
+						IFS=" ";
+						VALUES=($WNETWORK);
+						NAME=$(echo ${VALUES[0]} | awk '{print substr($0,2,length-2)}');
+						SECURITY=${VALUES[1]};
+						
+						if [ ${#VALUES[@]} -eq 2 ]; then
+							TYPE="";
+						else
+							TYPE=${VALUES[2]}
+						fi
+						
+						echo $NAME,$SECURITY,$TYPE;
+					done
+				else
+					echo -2
+				fi
+			else
+				echo -1
+			fi
 		;;
 	esac
 }
