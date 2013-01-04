@@ -117,6 +117,13 @@ function showNoInterfacesAvailableDlg() {
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
+function showScanningForNetworksDlg() {
+	wrapTxtFn "$_SCANNINGFORWLAN"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showInfoDlg "$ALIGNEDTXT" $HEIGHT
+}
+
 # Ask for credentials for the selected interface
 # Arguments
 #  $1 Current SSID
@@ -177,10 +184,16 @@ function showInterfaceDhcpSuccessDlg() {
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
+# Shows available wlan networks
+# Arguments
+#  $1 Current SSID
+#  $2 Current networklist
 function showAvailableWLANDlg() {
-	scanWLANNetworksFn $1
 	MENU=();
 	IFS=$'\n';
+	SSID=$1
+	shift;
+	WNETWORKS=($@)
 	X=1;
 	for WNETWORK in ${WNETWORKS[@]}; do
 		IFS=" ";
@@ -198,7 +211,7 @@ function showAvailableWLANDlg() {
 			TYPE=${VALUES[2]}
 		fi
 		SELECTED="off";
-		if [ "$NAME" == "$2" ]; then
+		if [ "$NAME" == "$SSID" ]; then
 			SELECTED="on";
 		fi
 		MENU+=($X",\Zn"$NAME",\Zn"$SECURITY",\Zn"$TYPE","$SELECTED);
