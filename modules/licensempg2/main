@@ -37,7 +37,7 @@ source $BASEPATH/modules/licensempg2/dialogs
 
 # Executes the GUI version of this module
 function showGUIFn() {
-	getCurrentLicenseMPG2Fn LICENSE
+	getCurrentLicenseMPG2Fn
 	CURRENTLICENSE=$LICENSE;
 	showLicenseMPG2InputDlg $CURRENTLICENSE;
 	CODE=$?
@@ -84,13 +84,13 @@ function showGUIFn() {
 function showCMDFn() {
 	case $1 in
 		"select")
-			getCurrentLicenseMPG2Fn LICENSE;
+			getCurrentLicenseMPG2Fn;
 			echo $LICENSE;
 		;;
 		"update")
 			shift;
 			if [ $# -eq 1 ]; then
-				getCurrentLicenseMPG2Fn LICENSE
+				getCurrentLicenseMPG2Fn
 				updateLicenseMPG2Fn $1 $LICENSE;
 				echo $?;
 			else
@@ -107,7 +107,7 @@ function showCMDFn() {
 			fi
 		;;		
 		"delete")
-			getCurrentLicenseMPG2Fn LICENSE
+			getCurrentLicenseMPG2Fn
 			deleteLicenseMPG2Fn $LICENSE;
 			echo $?;
 		;;
