@@ -155,8 +155,10 @@ function showCMDFn() {
 				fi
 			else
 				if [ ! -z $(echo ${OCNAMES[*]} | grep -o -i $1) ]; then
+					MATCH=0;
 					for KEY in ${!OCNAMES[@]}; do
 						if [ ${OCNAMES[$KEY],,} == $1 ]; then
+							MATCH=1;
 							updateOCSettingsFn $KEY;
 							RETURN=$?
 							if [ $RETURN -eq 1 ]; then
@@ -169,6 +171,9 @@ function showCMDFn() {
 							fi
 						fi
 					done
+					if [ $MATCH -eq 0 ]; then
+						echo -1
+					fi
 				else
 					echo -1;
 				fi
@@ -192,7 +197,10 @@ function showCMDFn() {
 			fi
 		;;
 		"list")
-			echo ${OCNAMES[*]} "Custom"
+			for NAME in ${OCNAMES[@]}; do
+				echo $NAME;
+			done;
+			echo "Custom"
 		;;
 	esac 
 }

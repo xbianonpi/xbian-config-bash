@@ -37,7 +37,7 @@ source $BASEPATH/modules/licensevc1/dialogs
 
 # Executes the GUI version of this module
 function showGUIFn() {
-	getCurrentLicenseVC1Fn LICENSE
+	getCurrentLicenseVC1Fn
 	CURRENTLICENSE=$LICENSE;
 	showLicenseVC1InputDlg $CURRENTLICENSE;
 	
@@ -85,13 +85,13 @@ function showGUIFn() {
 function showCMDFn() {
 	case $1 in
 		"select")
-			getCurrentLicenseVC1Fn LICENSE;
+			getCurrentLicenseVC1Fn;
 			echo $LICENSE;
 		;;
 		"update")
 			shift;
 			if [ $# -eq 1 ]; then
-				getCurrentLicenseVC1Fn LICENSE
+				getCurrentLicenseVC1Fn
 				updateLicenseVC1Fn $1 $LICENSE;
 				echo $?;
 			else
@@ -108,7 +108,7 @@ function showCMDFn() {
 			fi
 		;;		
 		"delete")
-			getCurrentLicenseVC1Fn LICENSE
+			getCurrentLicenseVC1Fn
 			deleteLicenseVC1Fn $LICENSE;
 			echo $?;
 		;;

@@ -61,7 +61,7 @@ function showGUIFn() {
 				if [ $RETURN -eq 1 ]; then
 					# DHCP Selected
 					setInterfaceDhcpFn "$IFACE"
-					showInterfaceDhcpSuccessDlg
+					#showInterfaceDhcpSuccessDlg
 				else
 					# Static IP Selected
 					showInterfaceStaticGUIFn "$IFACE" "$IFACE_DATA"
