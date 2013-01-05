@@ -183,7 +183,11 @@ function showCMDFn() {
 			shift;
 			if [ $# -eq 0 ]; then
 				getCurrentOCSettingsFn;
-				echo ${OCSETTINGS[$CURRENTOC]}
+				if [ $CURRENTOC -eq -1 ]; then
+					echo ${OCOLDSETTINGS[*]};
+				else
+					echo ${OCSETTINGS[$CURRENTOC]};
+				fi
 			else
 				if [ ! -z $(echo ${OCNAMES[*]} | grep -o -i $1) ]; then
 					for KEY in ${!OCNAMES[@]}; do
