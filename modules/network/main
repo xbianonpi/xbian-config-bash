@@ -22,7 +22,7 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(list status dhcp static credentials scan);
+ARGUMENTS=(list status dhcp static credentials scan restart progress);
 
 #|------------------------------------|
 #|          Include files             |
@@ -37,9 +37,15 @@ source $BASEPATH/modules/network/dialogs
 
 # Executes the GUI version of this module
 function showGUIFn() {
+	showInterfacesSelectGUIFn;
+	if [ $? -eq 0 ]; then
+		return 0
+	fi
+}
+
+function showInterfacesSelectGUIFn() {
 	# Notify user that interfaces are loading
 	showInterfacesLoadingDlg
-
 	# Fetch all available interfaces and prepare menu
 	IFACES=($(listNetworkInterfacesFn))
 	if [ ! -z "$IFACES" ]; then
@@ -47,41 +53,48 @@ function showGUIFn() {
 		if [ $? -eq 0 ]; then
 			# Save selected interface to a variable
 			IFACE=${IFACES[$(($RETURN-1))]}
-			
 			# Get current configuration
 			IFACE_DATA=$(readNetworkConfigurationFn "$IFACE")
-
 			# Get mode
-			MODE=$(echo "$IFACE_DATA" | grep mode | cut -f 2 -d" ")
-
-			# Show DHCP/Static selection
-			showIPModeConfigDlg "$MODE"
-			if [ $? -eq 0 ]; then
-				# Set Static/DHCP Settings
-				if [ $RETURN -eq 1 ]; then
-					# DHCP Selected
-					setInterfaceDhcpFn "$IFACE"
-					#showInterfaceDhcpSuccessDlg
-				else
-					# Static IP Selected
-					showInterfaceStaticGUIFn "$IFACE" "$IFACE_DATA"
-				fi
-
-				# If needed, ask for wireless credentials
-				ISWLAN=$(echo -e "$IFACE" | grep wlan)
-				if [ ! -z "$ISWLAN" ]; then
-					showWlanCredentialsGUIFn "$IFACE" "$IFACE_DATA"
-				fi
-
-				# Configuration done
-				showGUIFn
-				return 0;
-			else
-				showGUIFn;
-			fi
+			MODE=$(echo -e "$IFACE_DATA" | grep 'mode ' | cut -f 2 -d" ")
+			
+			showIPModeConfigGUIFn;
+			return 0;
 		fi
 	else
 		showNoInterfacesAvailableDlg
+		return 0;
+	fi
+}
+
+function showIPModeConfigGUIFn() {
+	# Show DHCP/Static selection
+	showIPModeConfigDlg "$MODE"
+	if [ $? -eq 0 ]; then
+		# Set Static/DHCP Settings
+		if [ $RETURN -eq 1 ]; then
+			# DHCP Selected
+			setInterfaceDhcpFn "$IFACE"
+			#showInterfaceDhcpSuccessDlg
+			MODE="dhcp"
+		else
+			# Static IP Selected
+			showInterfaceStaticGUIFn "$IFACE" "$IFACE_DATA"
+			MODE="static"
+		fi
+		
+		# If needed, ask for wireless credentials
+		ISWLAN=$(echo -e "$IFACE" | grep wlan)
+		if [ ! -z "$ISWLAN" ]; then
+			showWlanScanGUIFn "$IFACE" "$IFACE_DATA"
+		else
+			# Configuration done
+			showGUIFn
+			return 0;
+		fi
+	else
+		showGUIFn;
+		return 0;
 	fi
 }
 
@@ -120,10 +133,13 @@ function showInterfaceStaticGUIFn() {
 			showInterfaceStaticGUIFn "$1" "$2"
 			return 0;
 		fi
+	else
+		showIPModeConfigGUIFn
+		return 0;
 	fi
 }
 
-function showWlanCredentialsGUIFn() {
+function showWlanScanGUIFn() {
 
 	SSID=$(echo -e "$2" | grep ssid | cut -f 2 -d" ")
 	WLANKEY=$(echo -e "$2" | grep key | cut -f 2 -d" ")
@@ -133,113 +149,170 @@ function showWlanCredentialsGUIFn() {
 
 	if [ $? -eq 0 ]; then
 		if [ $RETURN -eq 2 ]; then
-			showWlanModeConfigDlg "$PROTECTION"
-			if [ $? -eq 0 ]; then
-				PROTECTION="$RETURN"
-				# WPA and WEP need both ssid and key
-				if [ $PROTECTION -lt 3 ]; then
-					showInterfaceCredentialsDlg "$SSID" "$WLANKEY"
-					if [ $? -eq 0 ]; then
-						CREDENTIALS=($(echo -e "$RETURN"))
-						if [ ${#CREDENTIALS[@]} -eq 2 ];then
-							SSID=${CREDENTIALS[0]}
-							WLANKEY=${CREDENTIALS[1]}
-							if [ $PROTECTION -eq 1 ]; then
-								setInterfaceWlanCredentials "$1" "WPA" "$SSID" "$WLANKEY"
-							else
-								setInterfaceWlanCredentials "$1" "WEP" "$SSID" "$WLANKEY"
-							fi
-							showInterfaceCredentialsSuccessDlg
-						else
-							showInterfaceCredentialsErrorDlg
-							showWlanCredentialsGUIFn "$1" "$2"
-							return 0;
-						fi
-						return 0;
-					fi
-				# Open network need only ssh, hence different dialog here
-				else
-					SSID=$(echo -e "$2" | grep ssid | cut -f 2 -d" ")
-					showInterfaceSSIDDlg "$SSID"
-					if [ $? -eq 0 ]; then
-						if [ ! -z "$RETURN" ]; then
-							setInterfaceWlanCredentials "$1" "Open" "$RETURN"
-							showInterfaceCredentialsSuccessDlg
-						else
-							showInterfaceCredentialsErrorDlg
-							return 0;
-						fi
-					else
-						return 0;
-					fi
-				fi
-			fi
+			CUSTOM=1;
+		else
+			CUSTOM=0;
+		fi
+		if [ $CUSTOM -eq 1 ]; then
+			showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
 		else
 			showScanningForNetworksDlg;
 			scanWLANNetworksFn $1
-			showAvailableWLANDlg $SSID "${WNETWORKS[@]}"
+			showAvailableWLANDlg "$SSID" "${WNETWORKS[@]}"
 			if [ $? -eq 0 ]; then
-				IFS=" ";
-				WNETWORK=(${WNETWORKS[$(($RETURN-1))]});
-				
-				if [ ${#WNETWORK[@]} -eq 2 ]; then
-					PROTECTION=3;
-				elif [ "${WNETWORK[2]}" == "WPA" ] || [ "${WNETWORK[2]}" == "WPA2" ]; then
-					PROTECTION=1
-				else
-					PROTECTION=2;
-				fi
-
-				if [ "$SSID" != "$(echo "${WNETWORK[0]}" | awk '{print substr($0,2,length-2)}')" ]; then
-					WLANKEY="";
-					SSID=$(echo "${WNETWORK[0]}" | awk '{print substr($0,2,length-2)}');
-				fi
-				if [ $PROTECTION -lt 3 ]; then
-					showInterfaceCredentialsDlg "$SSID" "$WLANKEY"
-					if [ $? -eq 0 ]; then
-						CREDENTIALS=($(echo -e "$RETURN"))
-						if [ ${#CREDENTIALS[@]} -eq 2 ];then
-							SSID=${CREDENTIALS[0]}
-							WLANKEY=${CREDENTIALS[1]}
-							if [ $PROTECTION -eq 1 ]; then
-								setInterfaceWlanCredentials "$1" "WPA" "$SSID" "$WLANKEY"
-							else
-								setInterfaceWlanCredentials "$1" "WEP" "$SSID" "$WLANKEY"
-							fi
-							showInterfaceCredentialsSuccessDlg
-						else
-							showInterfaceCredentialsErrorDlg
-							showWlanCredentialsGUIFn "$1" "$2"
-							return 0;
-						fi
-						return 0;
-					fi
-				# Open network need only ssh, hence different dialog here
-				else
-					SSID=$(echo -e "$2" | grep SSID | cut -f 2 -d" ")
-					showInterfaceSSIDDlg "$SSID"
-					if [ $? -eq 0 ]; then
-						if [ ! -z "$RETURN" ]; then
-							setInterfaceWlanCredentials "$1" "Open" "$RETURN"
-							showInterfaceCredentialsSuccessDlg
-						else
-							showInterfaceCredentialsErrorDlg
-							return 0;
-						fi
+				if [ ! -z $RETURN ]; then
+					IFS=" ";
+					WNETWORK=(${WNETWORKS[$(($RETURN-1))]});
+					
+					if [ ${#WNETWORK[@]} -eq 2 ] || [ "${WNETWORK[1]}" == "off" ]; then
+						PROTECTION="Open";
+					elif [ "${WNETWORK[2]}" == "WPA" ] || [ "${WNETWORK[2]}" == "WPA2" ]; then
+						PROTECTION="WPA"
 					else
-						return 0;
+						PROTECTION="WEP";
 					fi
+
+					if [ "$SSID" != "$(echo "${WNETWORK[0]}" | awk '{print substr($0,2,length-2)}')" ]; then
+						WLANKEY="";
+						SSID=$(echo "${WNETWORK[0]}" | awk '{print substr($0,2,length-2)}');
+					fi
+					showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
+				else
+					showWlanScanGUIFn $1 $2
+					return 0;
 				fi
+			else
+				showWlanScanGUIFn $1 $2
+				return 0;
 			fi
 		fi
+	else
+		showIPModeConfigGUIFn;
+		return 0;
 	fi
+}
+
+function showWlanProtectionGUIFn() {
+	CUSTOM=$4
+	PROTECTION=$3
+	if [ $CUSTOM -eq 1 ]; then
+		showWlanModeConfigDlg "$PROTECTION"
+		if [ $? -eq 0 ]; then
+			NEWPROTECTION="$RETURN"
+		else
+			showWlanScanGUIFn $1 $2
+			return 0;	
+		fi			
+	else
+		if [ $PROTECTION == "Open" ]; then
+			NEWPROTECTION=3;
+		elif [ $PROTECTION == "WPA" ]; then
+			NEWPROTECTION=1
+		else
+			NEWPROTECTION=2;
+		fi	
+	fi
+	
+	if [ $NEWPROTECTION -lt 3 ]; then
+		showInterfaceCredentialsDlg "$SSID" "$WLANKEY"
+		if [ $? -eq 0 ]; then
+			CREDENTIALS=($(echo -e "$RETURN"))
+			if [ ${#CREDENTIALS[@]} -eq 2 ];then
+				SSID=${CREDENTIALS[0]}
+				WLANKEY=${CREDENTIALS[1]}
+				if [ $NEWPROTECTION -eq 1 ]; then
+					setInterfaceWlanCredentials "$1" "WPA" "$SSID" "$WLANKEY"
+				else
+					setInterfaceWlanCredentials "$1" "WEP" "$SSID" "$WLANKEY"
+				fi
+				
+				showInterfaceCredentialsSuccessDlg
+				showWlanRestartGUIFn $1 $SSID
+				if [ $STATUS -eq 3 ]; then
+					showGUIFn;
+					return 0;
+				elif [ $STATUS -eq 2 ]; then
+					showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
+					return 0;
+				fi
+			else
+				showInterfaceCredentialsErrorDlg
+				showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
+				return 0;
+			fi
+		elif [ $CUSTOM -eq 1 ]; then
+			showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
+			return 0;
+		else
+			showWlanScanGUIFn "$1" "$2"
+			return 0;
+		fi
+	else
+		showInterfaceSSIDDlg "$SSID"
+		if [ $? -eq 0 ]; then
+			if [ ! -z "$RETURN" ]; then
+				setInterfaceWlanCredentials "$1" "Open" "$RETURN"
+				showInterfaceCredentialsSuccessDlg
+				showWlanRestartGUIFn $1 $SSID
+				if [ $STATUS -eq 3 ]; then
+					showGUIFn;
+					return 0;
+				elif [ $STATUS -eq 2 ]; then
+					showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
+					return 0;
+				fi
+			else
+				showInterfaceCredentialsErrorDlg
+				showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
+				return 0;
+			fi
+		else
+			showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
+			return 0;
+		fi
+	fi
+}
+
+function showWlanRestartGUIFn() {
+	showRestartWLANDlg $1
+	restartWLANAdapterFn "$1"
+	LASTSTATUS=-1;
+	while [ $(kill -0 $PROCESSID 2>/dev/null >/dev/null; echo $?) -eq 0 ]; do
+		getWLANConnectStatusFn;
+		if [ $LASTSTATUS -ne $STATUS ]; then
+			LASTSTATUS=$STATUS;
+			if [ $STATUS -eq 1 ]; then
+				showWLANConnectingDlg $2
+			elif [ $STATUS -eq 2 ]; then
+				showWLANConnectionFailedDlg $2
+			elif [ $STATUS -eq 3 ]; then
+				showWLANConnectionSuccessDlg $2
+			fi
+		fi
+	done;
+	
+	getWLANConnectStatusFn;
+	if [ $LASTSTATUS -ne $STATUS ]; then
+		LASTSTATUS=$STATUS;
+		if [ $STATUS -eq 1 ]; then
+			showWLANConnectingDlg $2
+		elif [ $STATUS -eq 2 ]; then
+			showWLANConnectionFailedDlg $2
+		elif [ $STATUS -eq 3 ]; then
+			showWLANConnectionSuccessDlg $2
+		fi
+	fi
+	
+	clearWLANStatusFn;
+	
+	return $STATUS;
 }
 
 # Executes the command line version of this module
 # Arguments:
 #  *
 #    $1 Action [String]
-#  list|status|dhcp|static|credentials
+#  list|status|dhcp|static|credentials|scan|restart|progress
 #    $2 Interface [String]
 #  static
 #    $3 IP [String]
@@ -254,6 +327,7 @@ function showWlanCredentialsGUIFn() {
 # Returns:
 #   0: Failure
 #   1: Success
+#   2: Connecting to wlan
 # Echoes:
 #   @0: Error code, see below
 #   @1: What the user asked for
@@ -263,6 +337,7 @@ function showWlanCredentialsGUIFn() {
 #  -3: No interfaces available
 #  -4: Invalid interface
 #  -5: Interface not configured
+#  -6: WLAN already restarting
 function showCMDFn() {
 	case $1 in
 		list)
@@ -388,7 +463,7 @@ function showCMDFn() {
 			fi
 		;;
 		scan)
-			if [ $# == 2 ]; then
+			if [ $# == 2 ] && [[ "$2" =~ "wlan" ]]; then
 				isValidInterfaceFn "$2"
 				if [ $? -eq 1 ]; then
 					scanWLANNetworksFn $2;
@@ -412,6 +487,35 @@ function showCMDFn() {
 				fi
 			else
 				echo -1
+			fi
+		;;
+		restart)
+			if [ $# == 2 ] && [[ "$2" =~ "wlan" ]]; then
+				isValidInterfaceFn "$2"
+				if [ $? -eq 1 ]; then
+					restartWLANAdapterFn $2
+					if [ $PROCESSID -gt 0 ]; then
+						echo 1
+					else
+						echo -6
+					fi
+				else
+					echo -2
+				fi
+			else
+				echo -1
+			fi
+		;;
+		progress)
+			getWLANConnectStatusFn;
+			if [ $STATUS -eq 1 ]; then
+				echo 2;
+			elif [ $STATUS -eq 2 ] || [ $STATUS -eq 0 ]; then
+				echo 0;
+				clearWLANStatusFn;
+			elif [ $STATUS -eq 3 ]; then
+				echo 1;
+				clearWLANStatusFn;
 			fi
 		;;
 	esac

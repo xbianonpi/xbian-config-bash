@@ -50,7 +50,7 @@ function showIPModeConfigDlg() {
 	STATUSSTATIC="off"
 	
 	# Pre-select current state
-	if [ "$1" = "static" ]; then
+	if [ "$1" == "static" ]; then
 		STATUSSTATIC="on"
 	else
 		STATUSDHCP="on"
@@ -195,6 +195,7 @@ function showAvailableWLANDlg() {
 	shift;
 	WNETWORKS=($@)
 	X=1;
+	
 	for WNETWORK in ${WNETWORKS[@]}; do
 		IFS=" ";
 		VALUES=($WNETWORK);
@@ -244,4 +245,32 @@ function showScanForWLANDlg() {
 #  $1 Current SSID
 function showInterfaceSSIDDlg() {
 	showInputDlg "$_SSID:" $1
+}
+
+function showRestartWLANDlg() {
+	wrapTxtFn "$_RESTARTINGADAPTER $1"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showInfoDlg "$ALIGNEDTXT" $HEIGHT
+}
+
+function showWLANConnectingDlg() {
+	wrapTxtFn "$_TRYINGCONNECTINGTO $1"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showInfoDlg "$ALIGNEDTXT" $HEIGHT
+}
+
+function showWLANConnectionFailedDlg() {
+	wrapTxtFn "$_FAILEDTOCONNECTTO $1"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+}
+
+function showWLANConnectionSuccessDlg() {
+	wrapTxtFn "$_SUCCESSFULLYCONNECTEDTO $1"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }

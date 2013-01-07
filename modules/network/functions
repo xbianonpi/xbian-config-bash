@@ -340,13 +340,13 @@ function readNetworkConfigurationFn() {
 		SSID=""
 		WLANKEY=""
 		if [ ! -z "$PROTECTION" ]; then
-			if [ "$PROTECTION" = "WEP" ]; then
+			if [ "$PROTECTION" == "WEP" ]; then
 				SSID=$(echo -e "$CONTENT" | grep wireless-essid | cut -f 2 -d" ")
 				WLANKEY=$(echo -e "$CONTENT" | grep wireless-key | cut -f 2 -d" ")
-			elif [ "$PROTECTION" = "WPA" ]; then
+			elif [ "$PROTECTION" == "WPA" ]; then
 				SSID=$(echo -e "$CONTENT" | grep wpa-ssid | cut -f 2 -d" " | sed 's/\"//g')
 				WLANKEY=$(echo -e "$CONTENT" | grep wpa-psk | cut -f 2 -d" " | sed "s/\"//g")				
-			elif [ "$PROTECTION" = "Open" ]; then
+			elif [ "$PROTECTION" == "open" ]; then
 				SSID=$(echo -e "$CONTENT" | grep wireless-essid | cut -f 2 -d" ")
 			fi
 		fi
@@ -461,6 +461,55 @@ function scanWLANNetworksFn() {
 	done;
 	if [ ${#WLAN[@]} -gt 1 ]; then	
 		WNETWORKS[$X]="${WLAN[@]}";
-	fi	
+	fi
 	IFS=$ORIGINALIFS;
+}
+
+# Restart a wlan adapter
+# Arguments
+#  $1 Interface name
+# Return
+#  @: Process id of the ifup process
+#  0: Process ifup not running
+function restartWLANAdapterFn() {
+	if [ $(kill -0 $(pgrep ifup) 2>/dev/null >/dev/null; echo $?) -eq 1 ]; then
+		ifdown $1 2>/dev/null 1>/dev/null 3>/dev/null;
+		nohup ifup $1 2>/tmp/wlanstatus 1>/dev/null >/dev/null 3>/dev/null &
+		PROCESSID=$!;
+	else
+		PROCESSID="0";
+	fi
+	return $PROCESSID;
+}
+
+# Gets the status of the wlan restart
+# Return
+#  0: The wlan status file does not exist
+#  1: Connecting to wlan network
+#  2: Successfully connected to network
+#  3: Failed to connected to network
+function getWLANConnectStatusFn() {
+	STATUS=0;
+	if [ -f /tmp/wlanstatus ]; then
+		if [ $(cat /tmp/wlanstatus | grep "DHCPDISCOVER" | wc -l) -gt 0 ]; then
+			STATUS=1;
+		fi;
+		if [ $(cat /tmp/wlanstatus | grep 'DHCPOFFERS\|Terminated' | wc -l) -gt 0 ]; then
+			STATUS=2;
+		fi;
+		if [ $(cat /tmp/wlanstatus | grep 'RTNETLINK' | wc -l) -gt 0 ]; then
+			STATUS=3;
+		fi;
+		if [ $(cat /tmp/wlanstatus | grep "bound" | wc -l) -gt 0 ]; then
+			STATUS=3;
+		fi;
+	fi
+	
+	return $STATUS;
+}
+
+function clearWLANStatusFn() {
+	if [ -f /tmp/wlanstatus ]; then
+		rm /tmp/wlanstatus
+	fi
 }

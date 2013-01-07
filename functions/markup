@@ -76,12 +76,18 @@ function centerTxtFn() {
 	LINES=($(echo -e "$TEXT"));
 
 	CENTEREDTXT="";
+	X=0;
 	for LINE in ${LINES[@]}; do
 		NRSPACES=$(($(($WIDTH-6))-$((${#LINE}))));
 		for (( c=0; c<=$(($NRSPACES/2)); c++ )); do
 			CENTEREDTXT+=" ";
 		done;
-		CENTEREDTXT+=$LINE;
+		X=$(($X+1));
+		if [ ${#LINES[@]} -gt 1 ]; then
+			CENTEREDTXT+=$LINE"\n";
+		else
+			CENTEREDTXT+=$LINE;
+		fi
 	done;
 }
 
