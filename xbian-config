@@ -25,21 +25,6 @@ fi
 
 trap '' 2 20
 
-LOADER=0;
-if [[ $# -eq 0 ]]; then
-	while [ $(pgrep dialog | wc -l) -eq 0 ]; do 
-		for a in \\ \| \/ -; do
-			if [ $(pgrep dialog | wc -l) -eq 0 ]; then
-				echo -n $a; 
-				sleep 0.5; 
-				echo -n -e \\r; 
-			else
-				break;
-			fi
-		done; 
-	done &
-	LOADER=$!
-fi
 
 #|------------------------------------|
 #|          Global variables          |
@@ -79,38 +64,8 @@ BASEPATH="/usr/local/include/xbian-config"
 LANGUAGE="en";
 
 #|------------------------------------|
-#|          Include files             |
-#|------------------------------------|
-
-# Main language
-source $BASEPATH/lang/$LANGUAGE
-
-# Common xbian-config functions
-source $BASEPATH/functions/packages
-
-# Pre-requirements
-source $BASEPATH/prereqs
-
-# Standard dialogs
-source $BASEPATH/functions/dialogs
-
-# Text markup
-source $BASEPATH/functions/markup
-
-# System functions
-source $BASEPATH/functions/system
-
-#|------------------------------------|
-#|          Global variables          |
-#|------------------------------------|
-
-# Current dialog title
-TITLE="[$_TITLE]"
-
-#|------------------------------------|
 #|           Main program             |
-#|------------------------------------|
-	
+#|------------------------------------|	
 function showMainCloseDlg() {
 
 	DOREBOOT=0;
@@ -259,11 +214,77 @@ function showMainMenuDlg() {
 			
 		fi;
 	fi;
-
 }
 
-# Check xbian-config was opened using arguments
-if [[ $# -gt 0 ]]; then
+if [[ $# -eq 0 ]]; then
+	#|------------------------------------|
+	#|              GUI Mode              |
+	#|------------------------------------|
+	
+	LOADER=0;
+	while [ $(pgrep dialog | wc -l) -eq 0 ]; do 
+		for a in \\ \| \/ -; do
+			if [ $(pgrep dialog | wc -l) -eq 0 ]; then
+				echo -n $a; 
+				sleep 0.5; 
+				echo -n -e \\r; 
+			else
+				break;
+			fi
+		done; 
+	done &
+	LOADER=$!
+
+	#|------------------------------------|
+	#|          Include files             |
+	#|------------------------------------|
+
+	# Main language
+	source $BASEPATH/lang/$LANGUAGE
+
+	# Common xbian-config functions
+	source $BASEPATH/functions/packages
+
+	# Pre-requirements
+	source $BASEPATH/prereqs
+
+	# Standard dialogs
+	source $BASEPATH/functions/dialogs
+
+	# Text markup
+	source $BASEPATH/functions/markup
+
+	# System functions
+	source $BASEPATH/functions/system
+
+	#|------------------------------------|
+	#|          Global variables          |
+	#|------------------------------------|
+
+	# Current dialog title
+	TITLE="[$_TITLE]"
+
+	#Run script inside screen, so it's doesn't fill the whole terminal history
+	#SCREEN=$(screen -r | grep "Attached" | wc -l);
+	#if [ $SCREEN -eq 0 ]; then
+	#	`screen $0`
+	#else
+		showMainMenuDlg 0 "";
+	#fi
+	
+else
+	#|------------------------------------|
+	#|              CLI Mode              |
+	#|------------------------------------|
+
+	#|------------------------------------|
+	#|          Include files             |
+	#|------------------------------------|
+
+	# System functions
+	source $BASEPATH/functions/system
+
+	# Check xbian-config was opened using arguments
 	MODULE=$1;
 	if [ -f $BASEPATH/modules/$MODULE/main ]; then
 		source $BASEPATH/modules/$MODULE/main
@@ -283,12 +304,4 @@ if [[ $# -gt 0 ]]; then
 			echo ${ARGUMENTS[@]};
 		fi
 	fi
-else
-	#Run script inside screen, so it's doesn't fill the whole terminal history
-	#SCREEN=$(screen -r | grep "Attached" | wc -l);
-	#if [ $SCREEN -eq 0 ]; then
-	#	`screen $0`
-	#else
-		showMainMenuDlg 0 "";
-	#fi
 fi
