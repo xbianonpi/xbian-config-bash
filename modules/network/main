@@ -337,7 +337,12 @@ function showWlanRestartGUIFn() {
 #  -3: No interfaces available
 #  -4: Invalid interface
 #  -5: Interface not configured
-#  -6: WLAN already restarting
+#  -6: Invalid IP
+#  -7: Invalid netmask
+#  -8: Invalid Gateway
+#  -9: Invalid DNS
+#  -10: Invalid wireless protection
+#  -11: WLAN already restarting
 function showCMDFn() {
 	case $1 in
 		list)
@@ -497,7 +502,7 @@ function showCMDFn() {
 					if [ $PROCESSID -gt 0 ]; then
 						echo 1
 					else
-						echo -6
+						echo -11
 					fi
 				else
 					echo -2
