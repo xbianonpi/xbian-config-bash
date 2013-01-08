@@ -1,0 +1,113 @@
+#!/bin/bash
+#
+#Copyright 2012 CurlyMo <development@xbian.org>
+#
+#This file is part of XBian - XBMC on the Raspberry Pi.
+#
+#XBian is free software: you can redistribute it and/or modify it under the
+#terms of the GNU General Public License as published by the Free Software
+#Foundation, either version 3 of the License, or (at your option) any later
+#version.
+#
+#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#details.
+#
+#You should have received a copy of the GNU General Public License along
+#with XBian. If not, see <http://www.gnu.org/licenses/>
+
+function showRetrievingCurrentTZDlg() {
+	wrapTxtFn "$_TZLOADINGCURRENT"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT" 
+	showInfoDlg "$ALIGNEDTXT" $HEIGHT;
+}
+
+function showTZNoCategorySelectedDlg() {
+	wrapTxtFn "$_TZNOCATEGORYSELECTED"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT" 
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT;
+}
+
+function showTZNoLocationSelectedDlg() {
+	wrapTxtFn "$_TZNOLOCATIONSELECTED"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT" 
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT;
+}
+
+function showTZLoadingLocationsDlg() {
+	wrapTxtFn "$_TZLOADINGLOCATIONS"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT" 
+	showInfoDlg "$ALIGNEDTXT" $HEIGHT;
+}
+
+function showTZCategoryDlg() {
+	MENU=();
+	X=0;
+	
+	for TZCATEGORY in ${TZCATEGORIES[@]}; do
+		X=$(($X+1));
+		if [ "$TZCATEGORY" == "${CURRENTTZ[0]}" ]; then
+			STATUS="on";
+		else
+			STATUS="off";
+		fi
+		MENU+=($X,"\Zn"$TZCATEGORY","$STATUS);
+	done;
+	createTableFn "radio" \
+	"# ,\Zb$_TIMEZONE" \
+	"${MENU[@]}"
+	
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+8)); 
+	showRadioDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} 15;
+}
+
+
+function showTZLocationDlg() {
+	CURRENTTZ=($1);
+	IFS=" ";
+	TZLOCATIONS=($2);
+	IFS=$ORIGINALIFS;
+	
+	MENU=();
+	X=0;
+	for TZLOCATION in ${TZLOCATIONS[@]}; do
+		X=$(($X+1));
+		if [ "$TZLOCATION" == "${CURRENTTZ[1]}" ]; then
+			STATUS="on";
+		else
+			STATUS="off";
+		fi
+		MENU+=($X,"\Zn"$TZLOCATION","$STATUS);
+	done;
+
+	if [ $X -gt 100 ]; then
+		NRSIGN="#  ";
+	elif [ $X -gt 10 ]; then
+		NRSIGN="# ";
+	else
+		NRSIGN="#";
+	fi
+	
+	createTableFn "radio" \
+	"$NRSIGN,\Zb$_TZLOCATION" \
+	"${MENU[@]}"
+	if [ $X -gt 100 ]; then
+		centerTxtFn "$HEADER" $(($DEFAULTWIDTH+10)); 
+	elif [ $X -gt 10 ]; then
+		centerTxtFn "$HEADER" $(($DEFAULTWIDTH+10)); 
+	else
+		centerTxtFn "$HEADER" $(($DEFAULTWIDTH+12)); 
+	fi
+	showRadioDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} 15;
+}
+
+function showCurrentDateTimeDlg() {
+	centerTxtFn "$_TZOLDANDNEW\n$2\n$1"
+	valignTxtFn "$CENTEREDTXT" 
+	showMsgDlg "$ALIGNEDTXT" 9;
+}
