@@ -72,9 +72,10 @@ function showMainCloseDlg() {
 
 	# Is a reboot needed for the changes to get effect
 	if [ $ASKFORREBOOT -eq 1 ]; then
-		wrapTxtFn "$_REBOOTREQUIRED" 60
-		centerTxtFn "$WRAPPEDTXT" 60
-		showConfirmDlg "$CENTEREDTXT" $HEIGHT 60;
+		wrapTxtFn "$_REBOOTREQUIRED"
+		centerTxtFn "$WRAPPEDTXT"
+		valignTxtFn "$CENTEREDTXT"
+		showConfirmDlg "$ALIGNEDTXT";
 	
 		# 0: Do reboot
 		# 1: Don't reboot
@@ -286,7 +287,13 @@ else
 
 	# Check xbian-config was opened using arguments
 	MODULE=$1;
-	if [ -f $BASEPATH/modules/$MODULE/main ]; then
+	if [ $MODULE == "reboot" ]; then
+		if [ -f /tmp/xbian-config-reboot ]; then
+			cat /tmp/xbian-config-reboot;
+		else
+			echo 0;
+		fi;
+	elif [ -f $BASEPATH/modules/$MODULE/main ]; then
 		source $BASEPATH/modules/$MODULE/main
 		shift;
 		# If the module was called with arguments
