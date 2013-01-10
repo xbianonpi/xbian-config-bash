@@ -28,8 +28,8 @@ ARGUMENTS=(status rootpass enable disable);
 #|          Include files             |
 #|------------------------------------|
 
-source $BASEPATH/modules/sshrootlogin/functions
-source $BASEPATH/modules/sshrootlogin/dialogs
+source $BASEPATH/modules/sshroot/functions
+source $BASEPATH/modules/sshroot/dialogs
 
 #|------------------------------------|
 #|           Main program             |

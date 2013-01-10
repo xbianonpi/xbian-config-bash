@@ -25,7 +25,8 @@
 function enableDisableSSHRootLoginDlg() {
 	wrapTxtFn "$_SSHROOTENABLE";
 	centerTxtFn "$WRAPPEDTXT";
-	showConfirmDlg "$CENTEREDTXT" $HEIGHT 55 "$_ENABLE" "$_DISABLE"
+	valignTxtFn "$CENTEREDTXT"
+	showConfirmDlg "$ALIGNEDTXT" $HEIGHT 55 "$_ENABLE" "$_DISABLE"
 	return $?;
 }
 
