@@ -22,7 +22,7 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(list status dhcp static credentials scan restart progress);
+ARGUMENTS=(list status dhcp static credentials scan restart progress type connection);
 
 #|------------------------------------|
 #|          Include files             |
@@ -30,6 +30,7 @@ ARGUMENTS=(list status dhcp static credentials scan restart progress);
 
 source $BASEPATH/modules/network/functions
 source $BASEPATH/modules/network/dialogs
+source $BASEPATH/functions/markup
 
 #|------------------------------------|
 #|           Main program             |
@@ -312,7 +313,7 @@ function showWlanRestartGUIFn() {
 # Arguments:
 #  *
 #    $1 Action [String]
-#  list|status|dhcp|static|credentials|scan|restart|progress
+#  list|status|dhcp|static|credentials|scan|restart|progress|type|connection
 #    $2 Interface [String]
 #  static
 #    $3 IP [String]
@@ -495,17 +496,22 @@ function showCMDFn() {
 			fi
 		;;
 		restart)
-			if [ $# == 2 ] && [[ "$2" =~ "wlan" ]]; then
-				isValidInterfaceFn "$2"
+			if [ $# == 2 ]; then
+				getAdapterTypeFn $2;
 				if [ $? -eq 1 ]; then
-					restartWLANAdapterFn $2
-					if [ $PROCESSID -gt 0 ]; then
-						echo 1
+					isValidInterfaceFn "$2"
+					if [ $? -eq 1 ]; then
+						restartWLANAdapterFn $2
+						if [ $PROCESSID -gt 0 ]; then
+							echo 1
+						else
+							echo -11
+						fi
 					else
-						echo -11
+						echo -2
 					fi
 				else
-					echo -2
+					echo -2;
 				fi
 			else
 				echo -1
@@ -521,6 +527,32 @@ function showCMDFn() {
 			elif [ $STATUS -eq 3 ]; then
 				echo 1;
 				clearWLANStatusFn;
+			fi
+		;;
+		type)
+			if [ $# == 2 ]; then
+				isValidInterfaceFn "$2"
+				if [ $? -eq 1 ]; then
+					getAdapterTypeFn $2;
+					echo $?;
+				else
+					echo -2;
+				fi
+			else
+				echo -1;
+			fi
+		;;
+		connection)
+			if [ $# == 2 ]; then
+				getAdapterTypeFn $2;
+				if [ $? -eq 0 ]; then
+					getConnectionStatusFn $2
+					echo $?;
+				else
+					echo -1;
+				fi
+			else
+				echo -1;
 			fi
 		;;
 	esac
