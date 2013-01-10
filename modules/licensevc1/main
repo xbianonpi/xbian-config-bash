@@ -47,7 +47,7 @@ function showGUIFn() {
 			updateLicenseVC1Fn $RETURN $CURRENTLICENSE
 			if [ $? -eq 1 ]; then
 				showLicenseVC1UpdatedDlg;
-				ASKFORREBOOT=1;
+				askForRebootFn;
 			else
 				showErrorDlg;
 			fi
@@ -55,7 +55,7 @@ function showGUIFn() {
 			insertLicenseVC1Fn $RETURN;
 			if [ $? -eq 1 ]; then
 				showLicenseVC1InsertedDlg;
-				ASKFORREBOOT=1;
+				askForRebootFn;
 			else
 				showErrorDlg;
 			fi
@@ -65,7 +65,7 @@ function showGUIFn() {
 			deleteLicenseVC1Fn $CURRENTLICENSE;
 			if [ $? -eq 1 ]; then
 				showLicenseVC1DeletedDlg;
-				ASKFORREBOOT=1;
+				askForRebootFn;
 			else
 				showErrorDlg;
 			fi

@@ -47,7 +47,7 @@ function showGUIFn() {
 			setHostnameFn $RETURN $CURRENTHOSTNAME
 			if [ $? -eq 1 ]; then
 				showHostnameSuccessDlg;
-				ASKFORREBOOT=1;
+				askForRebootFn;
 			else
 				showErrorDlg;
 			fi

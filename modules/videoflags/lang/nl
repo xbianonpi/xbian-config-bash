@@ -16,25 +16,13 @@
 #
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
-#
 
-# update/insert Raspberry PI config variable
-#  $1 [String] Key
-#  $2 [Mixed] Value
-updateConfigVarFn() {
-	sed -i "/$1=/d" /boot/config.txt
-	echo "$1=$2" >> /boot/config.txt
-	sed -i '/^$/d' /boot/config.txt
-}
-
-# select Raspberry PI config variable
-#  $1 [String] Key
-selectConfigVarFn() {
-	RETURN=$(cat /boot/config.txt | grep $1= | cut -f 2 -d=);
-}
-
-# remove Raspberry PI config variable
-#  $1 [String] Key
-deleteConfigVarFn() {
-	sed -i "/$1=/d" /boot/config.txt
-}
+_NAME="Video uitvoer"
+_DESC="Verander HDMI, CEC en overscan instellingen"
+_VIDEOFLAGS="Video instellingen"
+_VIDEOFLAGSSUCCESS="Video instellingen succesvol bijgewerkt"
+_HDMIFORCEHOTPLUG="HDMI forceer hotplug"
+_HDMIIGNOREHOTPLUG="HDMI negeer hotplug"
+_HDMIIGNORECECINIT="HDMI negeer CEC init"
+_HDMIIGNORECEC="HDMI zet CEC uit"
+_DISABLEOVERSCAN="Zet overscan uit"

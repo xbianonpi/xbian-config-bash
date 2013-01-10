@@ -150,7 +150,7 @@ function createTableFn() {
 		for (( d=0; d<${#OLDROW[@]}; d++ )); do
 			if [ $c -eq 0 ]; then
 				WORDLENGTH+=(${#OLDROW[$d]});
-			elif [ ${WORDLENGTH[$d]} -lt ${#OLDROW[$d]} ]; then
+			elif [[ "${WORDLENGTH[$d]}" =~ ^[0-9] ]] && [ ${WORDLENGTH[$d]} -lt ${#OLDROW[$d]} ]; then
 				WORDLENGTH[$d]=${#OLDROW[$d]}
 			fi
 		done

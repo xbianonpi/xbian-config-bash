@@ -34,6 +34,8 @@ _ITEMACCOUNTSNAME="Accounts"
 _ITEMACCOUNTSDESC="e.g. Verander wachtwoorden, SSH root toegang"
 _ITEMLICENSESNAME="Licenties"
 _ITEMLICENSESDESC="Voeg toe/verwijder hardware licenties"
+_ITEMCONNECTIVITYNAME="Connectiviteit"
+_ITEMCONNECTIVITYDESC="e.g. Video uitvoer"
 
 #|------------------------------------|
 #|              Dialogs	  	   		  |
@@ -56,4 +58,5 @@ _PASSWORD="Wachtwoord:"
 _CONFIRM="Herhaal:"
 _RETRY="Opnieuw"
 _SPACEOPTIONSELECT="Druk op [spatie] om een andere optie te selecteren"
+_SPACECHECKSELECT="Druk op [spatie] om een optie aan of uit te zetten"
 _LOADING="De module is aan het laden. Een ogenblik geduld..."

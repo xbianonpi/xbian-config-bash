@@ -56,7 +56,7 @@ function showUpdateAvailableDlg() {
 	wrapTxtFn "$_ANUPDATE ($1) $_ISAVAILABLE"
 	centerTxtFn "$WRAPPEDTXT"
 	valignTxtFn "$CENTEREDTXT"
-	showConfirmDlg "$ALIGNEDTXT"
+	showConfirmDlg "$ALIGNEDTXT" $HEIGHT;
 }
 
 function showInstallingUpdateDlg() {

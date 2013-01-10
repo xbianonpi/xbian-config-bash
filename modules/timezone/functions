@@ -17,12 +17,11 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-# Update password
-#  $1 [String] New password
+# Get current timezone
 # Returns
-#  * [Integer]
-#  - 1: Success
-#  - 0: Failed
+#  @ Array
+#  1 Timezone
+#  2 Location
 function getCurrentTZFn() {
 	if [ -L /etc/localtime ]; then
 		IFS="\/"

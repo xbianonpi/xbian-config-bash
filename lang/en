@@ -34,6 +34,8 @@ _ITEMACCOUNTSNAME="Accounts"
 _ITEMACCOUNTSDESC="e.g. Change passwords, SSH root login"
 _ITEMLICENSESNAME="Licenses"
 _ITEMLICENSESDESC="Add/Remove hardware licenses"
+_ITEMCONNECTIVITYNAME="Connectivity"
+_ITEMCONNECTIVITYDESC="e.g. Video output"
 
 #|------------------------------------|
 #|              Dialogs	  	   		  |
@@ -56,4 +58,5 @@ _PASSWORD="Password:"
 _CONFIRM="Confirm:"
 _RETRY="Retry"
 _SPACEOPTIONSELECT="Press [space] to select a different option"
+_SPACECHECKSELECT="Press [space] to enable or disable an option"
 _LOADING="Loading module. Please wait..."

@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+#Copyright 2012 CurlyMo <development@xbian.org>
+#
+#This file is part of XBian - XBMC on the Raspberry Pi.
+#
+#XBian is free software: you can redistribute it and/or modify it under the
+#terms of the GNU General Public License as published by the Free Software
+#Foundation, either version 3 of the License, or (at your option) any later
+#version.
+#
+#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#details.
+#
+#You should have received a copy of the GNU General Public License along
+#with XBian. If not, see <http://www.gnu.org/licenses/>
+
+function showVideoFlagsDlg() {
+	MENU=();
+	
+	X=0;
+	for FLAG in ${VIDEOFLAGS[@]}; do
+		X=$(($X+1));
+		_LABEL="_"$(echo $FLAG | sed -e 's/_//g' | tr "[:lower:]" "[:upper:]");
+		if [ ! -z ${!_LABEL} ]; then
+			LABEL=${!_LABEL};
+		else
+			LABEL=$FLAG;
+		fi
+		
+		if [ ${VIDEOSETTINGS[$FLAG]} -eq 0 ]; then
+			MENU+=($X",\Zn"$LABEL",off");
+		else
+			MENU+=($X",\Zn"$LABEL",on");
+		fi
+	done;
+	createTableFn "radio" \
+	"#,\Zb$_VIDEOFLAGS" \
+	"${MENU[@]}"
+	
+	if [ ${#HEADER} -ge 52 ]; then
+		centerTxtFn "$HEADER" $(($DEFAULTWIDTH+12));
+	else
+		centerTxtFn "$HEADER" $(($DEFAULTWIDTH+10));
+	fi
+	showChecklistDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+9))
+}
+
+function showVideoFlagsSuccessDlg() {
+	wrapTxtFn "$_VIDEOFLAGSSUCCESS"
+	centerTxtFn "$WRAPPEDTXT"
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
+}

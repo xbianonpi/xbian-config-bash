@@ -27,3 +27,8 @@ function clrFSCacheFn() {
 	rm -rf /tmp/xbianpackages
 	rm -rf /tmp/xbiancache
 }
+
+function askForRebootFn() {
+	ASKFORREBOOT=1;
+	echo 1 > /tmp/xbian-config-reboot
+}
