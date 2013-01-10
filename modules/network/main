@@ -22,7 +22,7 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(list status dhcp static credentials scan restart progress type connection);
+ARGUMENTS=(list status dhcp static credentials scan restart progress type);
 
 #|------------------------------------|
 #|          Include files             |
@@ -537,19 +537,6 @@ function showCMDFn() {
 					echo $?;
 				else
 					echo -2;
-				fi
-			else
-				echo -1;
-			fi
-		;;
-		connection)
-			if [ $# == 2 ]; then
-				getAdapterTypeFn $2;
-				if [ $? -eq 0 ]; then
-					getConnectionStatusFn $2
-					echo $?;
-				else
-					echo -1;
 				fi
 			else
 				echo -1;

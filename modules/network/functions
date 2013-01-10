@@ -249,18 +249,7 @@ setInterfaceStaticFn() {
 #  1: Success
 #  0: Error
 function listNetworkInterfacesFn() {
-	# List all interfaces
-	IFS=" ";
-	ARRAY=($(ip addr | grep state | grep -v lo: | cut -f 2 -d":" | sed 's/ //g' | sed ':a;N;$!ba;s/\n/ /g'))
-	IFACES="";
-	for IFACE in ${ARRAY[@]}; do
-		if [ ! -d "/sys/class/net/$IFACE/wireless" ] && [ -d "/sys/class/net/$IFACE" ] && [ $(cat /sys/class/net/$IFACE/carrier) -eq 1 ]; then
-			IFACES="$IFACE\n";
-		elif [ -d "/sys/class/net/$IFACE/wireless" ]; then
-			IFACES="$IFACE\n";
-		fi
-	done
-	IFS=$ORIGINALIFS;
+	IFACES=$(ip addr | grep state | grep -v lo: | cut -f 2 -d":" | sed 's/ //g');
 	if [ ! -z "$IFACES" ]; then
 		echo -e "$IFACES"
 		return 1
@@ -532,13 +521,4 @@ function getAdapterTypeFn() {
 	else
 		return 1;
 	fi
-}
-
-function getConnectionStatusFn() {
-	if [ ! -d "/sys/class/net/$1/wireless" ] && [ -d "/sys/class/net/$1" ] && [ $(cat /sys/class/net/$1/carrier) -eq 1 ]; then
-		return 1;
-	else
-		return 0;
-	fi
-}
-	
+}	
