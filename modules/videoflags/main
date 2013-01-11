@@ -68,7 +68,7 @@ function showCMDFn() {
 		;;
 		select)
 			if [ $# -eq 2 ]; then
-				if [ $(echo ${VIDEOFLAGS[@]} | grep -o $2 | wc -l) -eq 1 ]; then
+				if [ $(echo ${VIDEOFLAGS[@]} | grep -o $2 | wc -l) -gt 0 ]; then
 					getVideoFlagsFn;
 					echo ${VIDEOSETTINGS[$2]};
 				fi
@@ -78,7 +78,7 @@ function showCMDFn() {
 		;;
 		update)
 			if [ $# -eq 3 ]; then
-				if [ $(echo ${VIDEOFLAGS[@]} | grep -o $2 | wc -l) -eq 1 ]; then
+				if [ $(echo ${VIDEOFLAGS[@]} | grep -o $2 | wc -l) -gt 0 ]; then
 					if [[ $3 =~ ^[01] ]]; then
 						if [ $3 -eq 0 ]; then
 							deleteConfigVarFn $2
