@@ -195,7 +195,7 @@ function showAvailableWLANDlg() {
 	shift;
 	WNETWORKS=($@)
 	X=1;
-	
+	SIGNAL="";
 	for WNETWORK in ${WNETWORKS[@]}; do
 		IFS=",";
 		VALUES=($WNETWORK);
@@ -211,13 +211,25 @@ function showAvailableWLANDlg() {
 		if [ "$NAME" == "$SSID" ]; then
 			SELECTED="on";
 		fi
-		MENU+=($X",\Zn"$NAME",\Zn"$SECURITY",\Zn"${VALUES[1]}",\Zn"${VALUES[3]}","$SELECTED);
+		if [ ${VALUES[3]} -eq 100 ]; then
+			SIGNAL="*****";
+		elif [ ${VALUES[3]} -gt 80 ]; then
+			SIGNAL="****";
+		elif [ ${VALUES[3]} -gt 60 ]; then
+			SIGNAL="***";
+		elif [ ${VALUES[3]} -gt 40 ]; then
+			SIGNAL="**";
+		elif [ ${VALUES[3]} -gt 20 ]; then
+			SIGNAL="*";
+		fi
+		MENU+=($X",\Zn"$NAME",\Zn"$SECURITY",\Zn"${VALUES[1]}",\Zn"$SIGNAL","$SELECTED);
 		X=$(($X+1));
 	done
+	TBLCOLUMNCENTER=0;
 	createTableFn "radio" \
 	"#,\Zb"$_NETWORKNAME",\Zb"$_NETWORKPROTECTION",\Zb"$_NETWORKTYPE,"\Zb"$_WLANSIGNAL"" \
 	"${MENU[@]}"
-	
+	TBLCOLUMNCENTER=1;
 	showRadioDlg "   $HEADER" "$ROWS" 6 15
 }
 
