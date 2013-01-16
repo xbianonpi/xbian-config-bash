@@ -68,9 +68,11 @@ function showCMDFn() {
 		;;
 		select)
 			if [ $# -eq 2 ]; then
-				if [ $(echo ${VIDEOFLAGS[@]} | grep -o $2 | wc -l) -eq 1 ]; then
+				if [ $(echo ${VIDEOFLAGS[@]} | grep -o $2 | wc -l) -gt 0 ]; then
 					getVideoFlagsFn;
 					echo ${VIDEOSETTINGS[$2]};
+				else
+					echo 0;
 				fi
 			else
 				echo 0;

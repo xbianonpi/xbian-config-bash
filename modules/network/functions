@@ -432,37 +432,62 @@ function checkValidIpNetmaskFn() {
 #  0: Invalid
 function scanWLANNetworksFn() {
 	IFS=$'\n'
-	IWLIST=($(iwlist $1 scan | sed -ne 's/\(ESSID:\)\([\"\ -_A-Za-z0-9]\{1,\}\)/1:\2/p' -ne 's/\(Encryption key:\)\([a-z]\{1,3\}\)/2:\2/p' -ne 's/\(IE:.*\)\(WPA2\|WPA\)/3:\2/gp' | sed 's/ Version.*//g' | sed 's/^[[:space:]]*\(.*\)[[:space:]]*$/\1/'));
-
+	OUTPUT=($(iwlist $1 scan));
+	#IWLIST=($(iwlist $1 scan | sed -ne 's/\(ESSID:\)\([\"\ -_A-Za-z0-9]\{1,\}\)/1:\2/p' -ne 's/\(Encryption key:\)\([a-z]\{1,3\}\)/2:\2/p' -ne 's/\(IE:.*\)\(WPA2\|WPA\)/3:\2/gp' -ne 's/\(.*Signal level=\)\([0-9]\{1,3\}\)\(\/100\)/4:\2/gp' | sed 's/ Version.*//g' | sed 's/^[[:space:]]*\(.*\)[[:space:]]*$/\1/'));
+	
 	WNETWORKS=();
 	WLAN=();
 	NUMBERS=();
-	X=0;
-	for VALUE in ${IWLIST[@]}; do
-		NUMBER=$(echo $VALUE | cut -f1 -d:)
-		VALUE1=$(echo $VALUE | cut -f2 -d:)
-		if [ -z ${NUMBERS[$NUMBER]} ]; then
-			NUMBERS[$NUMBER]=1;
-		else
-			NUMBERS[$NUMBER]=$((${NUMBERS[$NUMBER]}+1));
+	X=-1;
+	for LINE in ${OUTPUT[@]}; do
+		if [[ $LINE =~ "Cell" ]]; then
+			if [ $X -gt -1 ]; then
+				if [ "${WLAN[2]}" == "on" ] && [ "${WLAN[1]}" == "Open" ]; then
+					WLAN[1]="WEP";
+				fi
+				if [ ${#WLAN[0]} -gt 2 ]; then
+					WNETWORKS[$X]="${WLAN[0]},${WLAN[1]},${WLAN[2]},${WLAN[3]}";
+				fi
+				WLAN=();
+				WLAN[1]="Open";
+			fi
+			X=$(($X+1));
 		fi
-		if [ ${NUMBERS[$NUMBER]} -gt 1 ]; then
-			if [ ${#WLAN[@]} -gt 1 ]; then	
-				if [ ${#WLAN[1]} -gt 2 ]; then
-					WNETWORKS[$X]="${WLAN[@]}";
-					X=$(($X+1));
+		if [[ $LINE =~ "ESSID" ]]; then
+			WLAN[0]=$(echo $LINE | cut -f2 -d":");
+		fi
+		if [ ${#WLAN[0]} -gt 2 ]; then
+			if [[ $LINE =~ "WPA" ]]; then
+				WLAN[1]=WPA
+			fi
+			if [[ $LINE =~ "Encryption key" ]]; then
+				WLAN[2]=$(echo $LINE | cut -f2 -d":");
+			fi
+			if [[ $LINE =~ "Signal level" ]]; then
+				WLAN[3]=$(echo $LINE | cut -f3 -d"=" | cut -f1 -d"/");
+			fi
+		fi
+	done;
+	if [ ${#WLAN[0]} -gt 2 ]; then
+		WNETWORKS[$X]="${WLAN[0]},${WLAN[1]},${WLAN[2]},${WLAN[3]}";
+	fi
+	IFS=",";
+	SWITCH=1;
+	while [ $SWITCH -eq 1 ]; do
+		SWITCH=0;
+		for((C=0;C<=$X;C++)); do
+			VALUES=(${WNETWORKS[$C]});
+			VALUES1=(${WNETWORKS[$(($C+1))]});
+			if [ ! -z "${VALUES1[3]}" ] && [ ! -z "${VALUES[3]}" ]; then
+				if [ ${VALUES[3]} -lt ${VALUES1[3]} ]; then
+					TEMP=${WNETWORKS[$C]};
+					WNETWORKS[$C]=${WNETWORKS[$(($C+1))]};
+					WNETWORKS[$(($C+1))]=$TEMP;
+					SWITCH=1;
 				fi
 			fi
-			NUMBERS=();
-			NUMBERS[$NUMBER]=1;
-			WLAN=();		
-		fi
-		trimLnFn $VALUE1
-		WLAN[$NUMBER]=$TRIMMEDLN;
+		done;
 	done;
-	if [ ${#WLAN[@]} -gt 1 ]; then	
-		WNETWORKS[$X]="${WLAN[@]}";
-	fi
 	IFS=$ORIGINALIFS;
 }
 

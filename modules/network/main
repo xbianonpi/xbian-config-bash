@@ -162,10 +162,10 @@ function showWlanScanGUIFn() {
 			showAvailableWLANDlg "$SSID" "${WNETWORKS[@]}"
 			if [ $? -eq 0 ]; then
 				if [ ! -z $RETURN ]; then
-					IFS=" ";
+					IFS=",";
 					WNETWORK=(${WNETWORKS[$(($RETURN-1))]});
 					
-					if [ ${#WNETWORK[@]} -eq 2 ] || [ "${WNETWORK[1]}" == "off" ]; then
+					if [ "${WNETWORK[1]}" == "off" ] || [ "${WNETWORK[2]}" == "Open" ]; then
 						PROTECTION="Open";
 					elif [ "${WNETWORK[2]}" == "WPA" ] || [ "${WNETWORK[2]}" == "WPA2" ]; then
 						PROTECTION="WPA"
@@ -473,20 +473,9 @@ function showCMDFn() {
 				isValidInterfaceFn "$2"
 				if [ $? -eq 1 ]; then
 					scanWLANNetworksFn $2;
-					IFS=$'\n';
+					IFS=$ORIGNALIFS;
 					for WNETWORK in ${WNETWORKS[@]}; do
-						IFS=" ";
-						VALUES=($WNETWORK);
-						NAME=$(echo ${VALUES[0]} | awk '{print substr($0,2,length-2)}');
-						SECURITY=${VALUES[1]};
-						
-						if [ ${#VALUES[@]} -eq 2 ]; then
-							TYPE="";
-						else
-							TYPE=${VALUES[2]}
-						fi
-						
-						echo $NAME,$SECURITY,$TYPE;
+						echo $WNETWORK;
 					done
 				else
 					echo -2
