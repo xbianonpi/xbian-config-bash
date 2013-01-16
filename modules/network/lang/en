@@ -34,6 +34,7 @@ _INVALIDCREDENTIALS="Invalid WLAN credentials entered, both SSID and KEY has to 
 _WLANWEP="WEP"
 _WLANWPA="WPA"
 _WLANOPEN="Open"
+_WLANSIGNAL="Signal"
 _CREDENTIALSUPDATED="WLAN credentials successfully updated"
 _ENTERSTATICCONFIG="Enter static IP details"
 _NETWORKINTERFACES="Interfaces"

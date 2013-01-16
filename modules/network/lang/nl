@@ -34,6 +34,7 @@ _INVALIDCREDENTIALS="Ongeldige WLAN waardes ingevuld, zowel de SSID als de sleut
 _WLANWEP="WEP"
 _WLANWPA="WPA"
 _WLANOPEN="Open"
+_WLANSIGNAL="Signaal"
 _CREDENTIALSUPDATED="WLAN waardes succesvol bijgewerkt"
 _ENTERSTATICCONFIG="Geef statische IP gegevens"
 _NETWORKINTERFACES="Adapters"

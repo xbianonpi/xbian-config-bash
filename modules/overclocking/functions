@@ -36,14 +36,15 @@ function getCurrentOCSettingsFn() {
 	OCOLDSETTINGS[2]=$RETURN;
 	selectConfigVarFn "over_voltage"
 	OCOLDSETTINGS[3]=$RETURN;
-	
+
 	CURRENTOC=-1;
+	NREMPTY=0;
 	for KEY in ${!OCSETTINGS[@]}; do
 		IFS=" ";
 		SETTINGS=(${OCSETTINGS[$KEY]});
 		I=0;
 		for KEY1 in ${!SETTINGS[@]}; do
-			if [ ${SETTINGS[$KEY1]} -eq ${OCOLDSETTINGS[$KEY1]} ]; then
+			if [ ! -z ${OCOLDSETTINGS[$KEY1]} ] && [ ${SETTINGS[$KEY1]} -eq ${OCOLDSETTINGS[$KEY1]} ]; then
 				I=$(($I+1));
 			fi
 			if [ $I -eq ${#SETTINGS[@]} ]; then
@@ -51,6 +52,17 @@ function getCurrentOCSettingsFn() {
 			fi
 		done
 	done
+	X=0;
+	DEFAULTVALUES=(${OCSETTINGS[0]});
+	for KEY in ${!OCOLDSETTINGS[@]}; do
+		if [ -z "${OCOLDSETTINGS[$KEY]}" ]; then
+			X=$(($X+1));
+			OCOLDSETTINGS[$KEY]=${DEFAULTVALUES[$KEY]};
+		fi
+	done;
+	if [ $X -eq 4 ]; then
+		CURRENTOC=0;
+	fi
 }
 
 # Parse the overclock values in a menu structure
