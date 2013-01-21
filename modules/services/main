@@ -182,11 +182,17 @@ function showGUIFn() {
 # insert | update
 #  $3 Daemons
 # Returns
-# - 4: Running but autostart disabled
-# - 3: Not running but autostart enabled
-# - 2: Not running and autostart disabled
-# - 1: Success
-# - 0: Failed
+# -  4: Running but autostart disabled
+# -  3: Not running but autostart enabled
+# -  2: Not running and autostart disabled
+# -  1: Success
+# -  0: Failed
+# - -1: Invalid number of arguments
+# - -2: Service not available
+# - -3: Service already running
+# - -4: Service already stopped
+# - -5: Autostart already enabled
+# - -6: Autostart already disabled
 function showCMDFn() {
 	case $1 in
 		list)
