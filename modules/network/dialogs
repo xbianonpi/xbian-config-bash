@@ -232,7 +232,6 @@ function showAvailableWLANDlg() {
 	"#,\Zb"$_NETWORKNAME",\Zb"$_NETWORKPROTECTION",\Zb"$_NETWORKTYPE,"\Zb"$_WLANSIGNAL"" \
 	"${MENU[@]}"
 	TBLCOLUMNCENTER=1;
-	
 	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+7));
 	showRadioDlg "$CENTEREDTXT" "$ROWS" 6 15
 }
