@@ -153,7 +153,7 @@ function showMenuDlg() {
 			--colors \
 			--cancel-label $NOLABEL \
 			--column-separator "$DEFAULTCOLSEP" \
-			--menu "$1" $HEIGHT $WIDTH $ROWS \
+			--menu "\n$1" $HEIGHT $WIDTH $ROWS \
 			$2 3>&1 1>&2 2>&3)
 }
 
@@ -165,11 +165,9 @@ function showMenuDlg() {
 #  $5 (optional) Width
 #  $6 (optional) Yes label
 #  $7 (optional) No Label
-#  $8 (optional) Opt. label
 function showRadioDlg() {
 	YESLABEL="$_SELECT"
 	NOLABEL="$_RETURN"
-	OPTLABEL=0;
 	HEADER=$1;
 
 	if [ $# -gt 2 ]; then
@@ -182,7 +180,7 @@ function showRadioDlg() {
 		WIDTH=$5
 	fi
 	
-	centerTxtFn "$_SPACEOPTIONSELECT" $WIDTH;
+	centerTxtFn "$_SPACEOPTIONSELECT" $(($DEFAULTWIDTH+11))
 	HEIGHT=$(($DEFAULTHEIGHT+5));
 	if [ $# -gt 3 ]; then
 		HEIGHT=$4
@@ -193,10 +191,7 @@ function showRadioDlg() {
 	if [ $# -gt 6 ]; then
 		NOLABEL=$7
 	fi
-	if [ $# -gt 7 ]; then
-		OPTLABEL="$8"
-	fi
-	
+
 	IFS=$DEFAULTDELIMITER;
 	RETURN=$( \
 		dialog \
@@ -208,7 +203,7 @@ function showRadioDlg() {
 			--backtitle "$BACKTITLE" \
 			--column-separator "$DEFAULTCOLSEP" \
 			--no-collapse \
-			--radiolist "\n$CENTEREDTXT\Zb\n  $HEADER" $HEIGHT $WIDTH $ROWS \
+			--radiolist "\n$CENTEREDTXT\n  $HEADER" $HEIGHT $WIDTH $ROWS \
 			$2 3>&1 1>&2 2>&3);
 }
 
@@ -237,7 +232,7 @@ function showChecklistDlg() {
 		WIDTH=$5
 	fi
 	
-	centerTxtFn "$_SPACECHECKSELECT" $WIDTH;
+	centerTxtFn "$_SPACECHECKSELECT" $(($DEFAULTWIDTH+11));
 	HEIGHT=$(($DEFAULTHEIGHT+5));
 	if [ $# -gt 3 ]; then
 		HEIGHT=$4
@@ -263,7 +258,7 @@ function showChecklistDlg() {
 			--backtitle "$BACKTITLE" \
 			--column-separator "$DEFAULTCOLSEP" \
 			--no-collapse \
-			--checklist "\n$CENTEREDTXT\Zb\n  $HEADER" $HEIGHT $WIDTH $ROWS \
+			--checklist "\n$CENTEREDTXT\n  $HEADER" $HEIGHT $WIDTH $ROWS \
 			$2 3>&1 1>&2 2>&3);
 }
 
@@ -343,13 +338,13 @@ function showPassDlg() {
 
 # Standard error dialog
 function showErrorDlg() {
-	centerTxtFn "$_ERROR"
+	centerTxtFn "$_ERROR" $(($DEFAULTWIDTH-4))
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $DEFAULTHEIGHT;
 }
 
 function showLoadingDlg() {
-	centerTxtFn "$_LOADING"
+	centerTxtFn "$_LOADING" $(($DEFAULTWIDTH-4))
 	valignTxtFn "$CENTEREDTXT"
 	showInfoDlg "$ALIGNEDTXT" $DEFAULTHEIGHT;
 }

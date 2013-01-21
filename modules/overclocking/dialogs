@@ -19,7 +19,7 @@
 
 # Shows the overclocking warning
 function showOCWarningDlg() {
-	wrapTxtFn "$_OCWARNING"
+	wrapTxtFn "$_OCWARNING" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT"
 	showMsgDlg "$WRAPPEDTXT" $HEIGHT
 }
@@ -29,24 +29,24 @@ function showOCWarningDlg() {
 function showOCSettingsDlg() {
 	OCMENU=$1;
 	createTableFn "radio"\
-	"   #,\Zb$_OCNAME,\ZbARM,\ZbCORE,\ZbSDRAM,\ZbOvervolt"\
+	"#,\Zb$_OCNAME,\ZbARM,\ZbCORE,\ZbSDRAM,\ZbOvervolt"\
 	"${OCMENU[@]}";
-	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+15))
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+7))
 	showRadioDlg "$CENTEREDTXT" "$ROWS" ${#OCMENU[@]} 16	
 }
 
 # Shows the overclocking settings not changed dialog
 function showNoOCChangeDlg() {
-	wrapTxtFn "$_OCNOTCHANGED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_OCNOTCHANGED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
 # Shows the overclocking settings updated dialog
 function showUpdatedOCDlg() {
-	wrapTxtFn "$_OCCHANGED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_OCCHANGED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
@@ -78,8 +78,8 @@ function showCustomOCDlg() {
 
 #Shows the empty fields dialog
 function showOCEmptyFieldsDlg() {
-	wrapTxtFn "$_OCEMPTYFIELDS"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_OCEMPTYFIELDS" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
 	return $?;

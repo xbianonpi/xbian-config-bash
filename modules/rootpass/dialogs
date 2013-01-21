@@ -28,8 +28,8 @@ function showRootPassInputDlg() {
 
 # Shows rootpass succesfully changed dialog
 function showRootPassSuccessDlg() {
-	wrapTxtFn "$_ROOTPASSCHANGED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_ROOTPASSCHANGED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 	return $?;
@@ -37,8 +37,8 @@ function showRootPassSuccessDlg() {
 
 # Shows rootpass password didn't match dialog
 function showRootPassNoMatchDlg() {
-	wrapTxtFn "$_ROOTPASSNOMATCH"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_ROOTPASSNOMATCH" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
 	return $?;
@@ -46,8 +46,8 @@ function showRootPassNoMatchDlg() {
 
 # Shows rootpass there where empty fields dialog
 function showRootPassEmptyFieldsDlg() {
-	wrapTxtFn "$_ROOTPASSEMPTYFIELDS"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_ROOTPASSEMPTYFIELDS" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT $DEFAULTWIDTH $_RETRY
 	return $?;

@@ -34,24 +34,24 @@ function showKernelVersionsDlg() {
 
 # Show the kernel has successfully switched message
 function showKernelSwitchedSuccesfullDlg() {
-	wrapTxtFn "$_KERNELSWITCHSUCCESS"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_KERNELSWITCHSUCCESS"  $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 }
 
 # Show the kernel version is already running message
 function showKernelAlreadyRunningDlg() {
-	wrapTxtFn "$_KERNELALREADYRUNNING"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_KERNELALREADYRUNNING" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 }
 
 # Show the only one kernel installed message
 function showKernelSingleInstalledDlg() {
-	wrapTxtFn "$_SINGLEKERNELINSTALLED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_SINGLEKERNELINSTALLED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 }

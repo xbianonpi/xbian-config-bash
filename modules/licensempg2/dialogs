@@ -29,8 +29,8 @@ function showLicenseMPG2InputDlg() {
 
 #Shows the license successfulle inserted dialog
 function showLicenseMPG2InsertedDlg() {
-	wrapTxtFn "$_MPG2INSERTED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_MPG2INSERTED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 	return $?;
@@ -38,8 +38,8 @@ function showLicenseMPG2InsertedDlg() {
 
 #Shows the license successfulle updated dialog
 function showLicenseMPG2UpdatedDlg() {
-	wrapTxtFn "$_MPG2UPDATED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_MPG2UPDATED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 	return $?;
@@ -47,8 +47,8 @@ function showLicenseMPG2UpdatedDlg() {
 
 #Shows the license successfulle removed dialog
 function showLicenseMPG2DeletedDlg() {
-	wrapTxtFn "$_MPG2DELETED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_MPG2DELETED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 	return $?;

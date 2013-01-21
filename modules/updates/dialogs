@@ -18,64 +18,64 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 function showPackageListDownloadDlg() {
-	wrapTxtFn "$_DOWNLOADPL"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_DOWNLOADPL" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showInfoDlg "$ALIGNEDTXT"
 }
 
 function showPackageListErrorDlg() {
-	wrapTxtFn "$_PLERROR"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_PLERROR" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 }
 
 function showCheckingForUpdatesDlg() {
-	wrapTxtFn "$_CHECKINGFORUD"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_CHECKINGFORUD" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showInfoDlg "$ALIGNEDTXT"
 }
 
 function showUpdatesUpToDateDlg() {
-	wrapTxtFn "$_UPTODATE"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_UPTODATE" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 }
 
 function showUpdateErrorDlg() {
-	wrapTxtFn "$_ERRORCHECKUPDATE"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_ERRORCHECKUPDATE" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 }
 
 function showUpdateAvailableDlg() {
-	wrapTxtFn "$_ANUPDATE ($1) $_ISAVAILABLE"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_ANUPDATE ($1) $_ISAVAILABLE" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showConfirmDlg "$ALIGNEDTXT" $HEIGHT;
 }
 
 function showInstallingUpdateDlg() {
-	wrapTxtFn "$_INSTALLINGUPDATE"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_INSTALLINGUPDATE" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showInfoDlg "$ALIGNEDTXT"
 }
 
 function showSystemUpdatedDlg() {
-	wrapTxtFn "$_UPDATEDTO $1"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_UPDATEDTO $1" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 }
 
 function showUpdateErrorOccurredDlg() {
-	wrapTxtFn "$_ERRORUPDATE"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_ERRORUPDATE" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 }

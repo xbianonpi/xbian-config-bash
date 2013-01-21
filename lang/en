@@ -42,6 +42,8 @@ _ITEMCONNECTIVITYDESC="e.g. Video output"
 #|------------------------------------|
 _YES="Yes"
 _NO="No"
+_ON="On"
+_OFF="Off"
 _INSERT="Insert"
 _REMOVE="Remove"
 _UPDATE="Update"

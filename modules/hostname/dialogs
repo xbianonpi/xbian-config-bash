@@ -29,8 +29,8 @@ function showHostnameInputDlg() {
 
 #Shows hostname succesfully changed dialog
 function showHostnameSuccessDlg() {
-	wrapTxtFn "$_HOSTNAMECHANGED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_HOSTNAMECHANGED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 	return $?;

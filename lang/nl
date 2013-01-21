@@ -42,6 +42,8 @@ _ITEMCONNECTIVITYDESC="e.g. Video uitvoer"
 #|------------------------------------|
 _YES="Ja"
 _NO="Nee"
+_ON="Aan"
+_OFF="Uit"
 _INSERT="Invoegen"
 _REMOVE="Verwijderen"
 _UPDATE="Bijwerken"

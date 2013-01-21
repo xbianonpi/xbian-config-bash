@@ -23,8 +23,8 @@
 #  - 1: Enable ssh root login
 #  - 0: Disable ssh root login
 function enableDisableSSHRootLoginDlg() {
-	wrapTxtFn "$_SSHROOTENABLE";
-	centerTxtFn "$WRAPPEDTXT";
+	wrapTxtFn "$_SSHROOTENABLE" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showConfirmDlg "$ALIGNEDTXT" $HEIGHT 55 "$_ENABLE" "$_DISABLE"
 	return $?;
@@ -32,24 +32,24 @@ function enableDisableSSHRootLoginDlg() {
 
 # Warns the user that no root password was given, a requirement for ssh root login
 function showEmptyRootPasswordDlg() {
-	wrapTxtFn "$_NOSSHROOTPASS"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_NOSSHROOTPASS" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT;
 }
 
 # Shows a message that the SSH root login was disabled
 function showSSHRootDisabledDlg() {
-	wrapTxtFn "$_SSHROOTDISABLED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_SSHROOTDISABLED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 }
 
 # Shows a message that the SSH root login was enabled
 function showSSHRootEnabledDlg() {
-	wrapTxtFn "$_SSHROOTENABLED"
-	centerTxtFn "$WRAPPEDTXT"	
+	wrapTxtFn "$_SSHROOTENABLED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 }
