@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#Copyright 2012 Hexagon <development@xbian.org>
+#Copyright 2012 Hexagon & CurlyMo <development@xbian.org>
 #
 #This file is part of XBian - XBMC on the Raspberry Pi.
 #
@@ -36,8 +36,10 @@ function showInterfacesSelectDlg() {
 	TBLCOLUMNCENTER=1;
 	
 	# Show interface selector dialog
-	centerTxtFn "$_SELECTINTERFACE";
-	showMenuDlg "\n$CENTEREDTXT\n $HEADER" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+9))
+	centerTxtFn "$_SELECTINTERFACE" $(($DEFAULTWIDTH+11));
+	HEADER1=$CENTEREDTXT;
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+11));
+	showMenuDlg "$HEADER1\n$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+9))
 }
 
 # Show a radio dialog for selecting DHCP or Static configuration
@@ -63,7 +65,7 @@ function showIPModeConfigDlg() {
 	"#,\Zb$_NETWORKTYPE"\
 	"${MENU[@]}"
 	
-	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+8));
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+6));
 	showRadioDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+8))
 }
 
@@ -98,28 +100,28 @@ function showWlanModeConfigDlg() {
 	"#,\Zb$_NETWORKPROTECTION"\
 	"${MENU[@]}"
 	
-	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+10));
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+6));
 	showRadioDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+9))
 
 }
 
 function showInterfacesLoadingDlg() {
-	wrapTxtFn "$_LOADINGINTERFACES"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_LOADINGINTERFACES" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showInfoDlg "$ALIGNEDTXT" $HEIGHT
 }
 
 function showNoInterfacesAvailableDlg() {
-	wrapTxtFn "$_NOINTERFACES"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_NOINTERFACES" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
 function showScanningForNetworksDlg() {
-	wrapTxtFn "$_SCANNINGFORWLAN"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_SCANNINGFORWLAN" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showInfoDlg "$ALIGNEDTXT" $HEIGHT
 }
@@ -129,8 +131,8 @@ function showScanningForNetworksDlg() {
 #  $1 Current SSID
 #  $2 Current KEY
 function showInterfaceCredentialsDlg() {
-	wrapTxtFn "$_ENTERCREDENTIALS"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_ENTERCREDENTIALS" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showInputForm2Dlg "$ALIGNEDTXT" "$_SSID:" "$1" "$_KEY:" "$2"
 }
@@ -143,43 +145,43 @@ function showInterfaceCredentialsDlg() {
 #  $4 Current Nameserver 1
 #  $5 Current Nameserver 2
 function showInterfaceStaticDlg() {
-	wrapTxtFn "$_ENTERSTATICCONFIG"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_ENTERSTATICCONFIG" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showInputForm5Dlg "$ALIGNEDTXT" "$_NETWORKADDRESS*:" "$1" "$_NETWORKMASK*:" "$2" "$_NETWORKGATEWAY*:" "$3" "$_NAMESERVER:" "$4" "$_NAMESERVER:" "$5"
 }
 
 function showInterfaceCredentialsErrorDlg() {
-	wrapTxtFn "$_INVALIDCREDENTIALS"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_INVALIDCREDENTIALS" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
 function showInterfaceCredentialsSuccessDlg() {
-	wrapTxtFn "$_CREDENTIALSUPDATED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_CREDENTIALSUPDATED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
 function showInterfaceStaticErrorDlg() {
-	wrapTxtFn "$_INVALIDSTATICCONFIG"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_INVALIDSTATICCONFIG" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
 function showInterfaceStaticSuccessDlg() {
-	wrapTxtFn "$_STATICCONFIGUPDATED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_STATICCONFIGUPDATED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
 function showInterfaceDhcpSuccessDlg() {
-	wrapTxtFn "$_DHCPCONFIGUPDATED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_DHCPCONFIGUPDATED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
@@ -195,13 +197,13 @@ function showAvailableWLANDlg() {
 	shift;
 	WNETWORKS=($@)
 	X=1;
-	
+	SIGNAL="";
 	for WNETWORK in ${WNETWORKS[@]}; do
 		IFS=",";
 		VALUES=($WNETWORK);
 
 		NAME=$(echo "${VALUES[0]}" | awk '{print substr($0,2,length-2)}');
-		SECURITY=${VALUES[1]};
+		SECURITY=${VALUES[2]};
 		if [ "$SECURITY" == "on" ]; then
 			SECURITY="$_YES"
 		else
@@ -211,14 +213,28 @@ function showAvailableWLANDlg() {
 		if [ "$NAME" == "$SSID" ]; then
 			SELECTED="on";
 		fi
-		MENU+=($X",\Zn"$NAME",\Zn"$SECURITY",\Zn"${VALUES[1]}",\Zn"${VALUES[3]}","$SELECTED);
+		if [ ${VALUES[3]} -eq 100 ]; then
+			SIGNAL="*****";
+		elif [ ${VALUES[3]} -gt 80 ]; then
+			SIGNAL="****";
+		elif [ ${VALUES[3]} -gt 60 ]; then
+			SIGNAL="***";
+		elif [ ${VALUES[3]} -gt 40 ]; then
+			SIGNAL="**";
+		elif [ ${VALUES[3]} -gt 20 ]; then
+			SIGNAL="*";
+		fi
+		MENU+=($X",\Zn"$NAME",\Zn"$SECURITY",\Zn"${VALUES[1]}",\Zn"$SIGNAL","$SELECTED);
 		X=$(($X+1));
 	done
+	TBLCOLUMNCENTER=0;
 	createTableFn "radio" \
 	"#,\Zb"$_NETWORKNAME",\Zb"$_NETWORKPROTECTION",\Zb"$_NETWORKTYPE,"\Zb"$_WLANSIGNAL"" \
 	"${MENU[@]}"
+	TBLCOLUMNCENTER=1;
 	
-	showRadioDlg "   $HEADER" "$ROWS" 6 15
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+7));
+	showRadioDlg "$CENTEREDTXT" "$ROWS" 6 15
 }
 
 function showScanForWLANDlg() {
@@ -232,8 +248,8 @@ function showScanForWLANDlg() {
 	TBLCOLUMNCENTER=1;
 	
 	# Show interface selector dialog
-	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+10));
-	showMenuDlg "\n$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+8))
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+11));
+	showMenuDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+8))
 }
 
 # Ask for network SSID in case of open protection
@@ -244,29 +260,29 @@ function showInterfaceSSIDDlg() {
 }
 
 function showRestartWLANDlg() {
-	wrapTxtFn "$_RESTARTINGADAPTER $1"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_RESTARTINGADAPTER $1" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showInfoDlg "$ALIGNEDTXT" $HEIGHT
 }
 
 function showWLANConnectingDlg() {
-	wrapTxtFn "$_TRYINGCONNECTINGTO $1"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_TRYINGCONNECTINGTO $1" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showInfoDlg "$ALIGNEDTXT" $HEIGHT
 }
 
 function showWLANConnectionFailedDlg() {
-	wrapTxtFn "$_FAILEDTOCONNECTTO $1"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_FAILEDTOCONNECTTO $1" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
 function showWLANConnectionSuccessDlg() {
-	wrapTxtFn "$_SUCCESSFULLYCONNECTEDTO $1"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_SUCCESSFULLYCONNECTEDTO $1" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }

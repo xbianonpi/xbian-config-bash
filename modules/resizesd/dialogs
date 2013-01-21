@@ -18,29 +18,29 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 function showSDConfirmationDlg() {
-	wrapTxtFn "$_SDCONFIRM"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_SDCONFIRM" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showConfirmDlg "$ALIGNEDTXT" $HEIGHT;
 }
 
 function showSDResizeNotNeededDlg() {
-	wrapTxtFn "$_SDRESIZENOTNEEDED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_SDRESIZENOTNEEDED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT;
 }
 
 function showSDRebootDlg() {
-	wrapTxtFn "$_SDREBOOT"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_SDREBOOT" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT;
 }
 
 function showSDErrorDlg() {
-	wrapTxtFn "$_SDERROR"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_SDERROR" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT;
 }

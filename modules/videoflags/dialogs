@@ -40,17 +40,13 @@ function showVideoFlagsDlg() {
 	"#,\Zb$_VIDEOFLAGS" \
 	"${MENU[@]}"
 	
-	if [ ${#HEADER} -ge 52 ]; then
-		centerTxtFn "$HEADER" $(($DEFAULTWIDTH+12));
-	else
-		centerTxtFn "$HEADER" $(($DEFAULTWIDTH+10));
-	fi
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+6));
 	showChecklistDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+9))
 }
 
 function showVideoFlagsSuccessDlg() {
-	wrapTxtFn "$_VIDEOFLAGSSUCCESS"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_VIDEOFLAGSSUCCESS" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 }

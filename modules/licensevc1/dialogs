@@ -29,8 +29,8 @@ function showLicenseVC1InputDlg() {
 
 #Shows the license successfulle inserted dialog
 function showLicenseVC1InsertedDlg() {
-	wrapTxtFn "$_VC1INSERTED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_VC1INSERTED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 	return $?;
@@ -38,8 +38,8 @@ function showLicenseVC1InsertedDlg() {
 
 #Shows the license successfulle updated dialog
 function showLicenseVC1UpdatedDlg() {
-	wrapTxtFn "$_VC1UPDATED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_VC1UPDATED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 	return $?;
@@ -47,8 +47,8 @@ function showLicenseVC1UpdatedDlg() {
 
 #Shows the license successfulle removed dialog
 function showLicenseVC1DeletedDlg() {
-	wrapTxtFn "$_VC1DELETED"
-	centerTxtFn "$WRAPPEDTXT"
+	wrapTxtFn "$_VC1DELETED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"
 	return $?;

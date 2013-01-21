@@ -21,7 +21,7 @@
 TBLCOLUMNCENTER=1;
 
 # Wrap text fit in dialog width
-#  $1 [String]	Text
+#  $1 [String]		Text
 #  $2 [Integer] 	Width (optional) 
 # Returns
 #  $HEIGHT [Integer]		Needed height for the dialog
@@ -40,12 +40,11 @@ function wrapTxtFn() {
 	LINES=();
 	IFS=$'\n';
 	for WORD in ${WORDS[@]}; do
-		if [ $((${#RAWLINES}+${#WORD})) -lt $(($WIDTH-10)) ]; then
+		if [ $((${#RAWLINES}+${#WORD})) -lt $(($WIDTH)) ]; then
 			RAWLINES+=$WORD" ";
 		else
-			RAWLINES+=$WORD" ";
 			LINES+=($(echo $RAWLINES | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'));
-			RAWLINES="";
+			RAWLINES=$WORD" ";
 		fi
 	done;
 	LINES+=($RAWLINES);
@@ -76,13 +75,21 @@ function centerTxtFn() {
 	LINES=($(echo -e "$TEXT"));
 
 	CENTEREDTXT="";
-	X=0;
 	for LINE in ${LINES[@]}; do
-		NRSPACES=$(($(($WIDTH-6))-$((${#LINE}))));
-		for (( c=0; c<=$(($NRSPACES/2)); c++ )); do
+		NEWLINE=$(echo $LINE | sed 's/\\Z[0-9a-z]\{1\}//g');
+		NRSPACES=$(($(($WIDTH/2))-$((${#LINE}/2))));
+		
+		if [ $(($NRSPACES%2)) -eq 1 ] && [ $((${#NEWLINE}%2)) -eq 1 ] && [ $((${#LINE}%2)) -eq 1 ]; then
+			NRSPACES=$(($NRSPACES));
+		elif [ $(($NRSPACES%2)) -eq 0 ] && [ $((${#NEWLINE}%2)) -eq 1 ] && [ $((${#LINE}%2)) -eq 1 ]; then
+			NRSPACES=$(($NRSPACES));
+		fi
+		if [ $NRSPACES -lt 0 ]; then
+			NRSPACES=1;
+		fi
+		for (( c=0; c<$NRSPACES; c++ )); do
 			CENTEREDTXT+=" ";
 		done;
-		X=$(($X+1));
 		if [ ${#LINES[@]} -gt 1 ]; then
 			CENTEREDTXT+=$LINE"\n";
 		else
@@ -161,8 +168,16 @@ function createTableFn() {
 		# NRCOLUMNS=$(($NRCOLUMNS-1));
 	# fi
 	
-	HEADER=${OLDHEADER[0]};
-	HEADER+=" ";
+	if [ $TYPE == "radio" ]; then
+		HEADER="  "${OLDHEADER[0]};
+	else
+		HEADER=${OLDHEADER[0]};
+	fi
+	if [ ${#OLDROWS[@]} -ge 10 ]; then
+		HEADER+="   ";
+	else
+		HEADER+="  ";
+	fi
 	shift
 	CENTERED=();
 	
@@ -187,13 +202,13 @@ function createTableFn() {
 		if [ $ENDOFCOLUMN == "false" ]; then
 			LENGTH=$((${WORDLENGTH[$c]}-${#OLDHEADER[$c]}));
 
-			HEADER+=" [ ";
+			HEADER+="\Zb[ ";
 			HEADER+=${OLDHEADER[$c]};
 			
 			for (( d=0; d<$(($LENGTH)); d++ )); do
 				HEADER+=" ";
 			done
-			HEADER+=" ]";
+			HEADER+="\Zb ] ";
 		fi
 		shift;
 	done

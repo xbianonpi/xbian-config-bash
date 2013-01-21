@@ -1,0 +1,11 @@
+xbmc:
+samba:smbd,nmbd
+lirc:
+apache2:
+ssh:
+transmission:
+headphones:
+sickbeard:
+nzbgetd:
+couchpotato:
+sabnzbdplus:
