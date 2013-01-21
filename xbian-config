@@ -49,7 +49,7 @@ ORIGINALIFS=$IFS;
 APTBASE="http://apt.xbian.org/dists/wheezy/main/binary-armhf/"
 
 # Location of the xbian-config script files
-BASEPATH="/usr/local/include/xbian-config1"
+BASEPATH="/usr/local/include/xbian-config"
 
 # XBMC language array
 # declare -A LANGARRAY
