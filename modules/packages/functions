@@ -68,19 +68,19 @@ function getPackageCategoryListFn() {
 
 function getAllPackagesFn() {
 	IFS=$'\n';
-	PACKAGES=($(echo -e "$CONTENT" | grep "Package:" | sed -ne 's/\(Package:[A-Za-z\ -]\{1,\}\)-\([a-z]\{1,\}\)/\2/p' | uniq | sort));
+	PACKAGES=($(echo -e "$CONTENT" | grep "Package:" | grep -v "xbian-update" | sed -ne 's/\(Package:[A-Za-z\ -]\{1,\}\)-\([a-z]\{1,\}\)/\2/p' | uniq | sort));
 	IFS=$ORIGINALIFS;
 }
 
 	
 function getPackagesFromCategoryFn() {
 	IFS=$'\n';
-	PACKAGES=($(echo -e "$CONTENT" | awk -vRS='' "/Section: $1/"'{print $0"\n"}' | grep "Package:" | sed -ne 's/\(Package:[A-Za-z\ -]\{1,\}\)-\([a-z]\{1,\}\)/\2/p' | uniq | sort));
+	PACKAGES=($(echo -e "$CONTENT" | grep -v "xbian-update" | awk -vRS='' "/Section: $1/"'{print $0"\n"}' | grep "Package:" | sed -ne 's/\(Package:[A-Za-z\ -]\{1,\}\)-\([a-z]\{1,\}\)/\2/p' | uniq | sort));
 	IFS=$ORIGINALIFS;
 }
 
 function getPackageStatusFn() {
-	if [ $(echo -e "$ALLPKGLST" | grep "xbian[-A-Za-z]\{1,\}$1[[:space:]]\{1,\}install$" | wc -l) -ge 1 ]; then
+	if [ $(echo -e "$ALLPKGLST" | grep -v "xbian-update" | grep "xbian[-A-Za-z]\{1,\}$1[[:space:]]\{1,\}install$" | wc -l) -ge 1 ]; then
 		return 1;
 	else
 		return 0;
@@ -94,14 +94,14 @@ function getPackageVersionFn() {
 } 
 
 function updateAllPackagesListFn() {
-	ALLPKGLST=$(dpkg --get-selections xbian*);
+	ALLPKGLST=$(dpkg --get-selections "xbian*");
 }
 
 #Gets the package information
 # $1: Package name
 function getPackageInformationFn() {
 	NAME=$1;
-	INFO=$(echo -e "$CONTENT" | awk -vRS='' "/Package:[A-Za-z -]+$NAME/"'{print $0"\n"}');
+	INFO=$(echo -e "$CONTENT" | awk -vRS='' "/Package:[A-Za-z -]+$NAME/"'{print $0"\n"}' | grep -v "xbian-update");
 	IFS=$'\n';
 	VERSIONS=($(echo -e "$INFO" | sed -ne 's/\(Version: \)\([0-9\.]\{1,\}\)/\2/p'));
 	X=0;
