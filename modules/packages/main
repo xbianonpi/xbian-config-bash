@@ -150,38 +150,40 @@ function showGUIFn() {
 # list | status | info | installtest | install | removetest | remove
 #  $2 Package [String]
 # Returns
-#  *Update [Integer]
-#  - 1: Success
-#  - 0: Failed
-#  *List
-#  - 0 arguments
-#  - [categoryname],[# packages],[# installed]
-#  - 1 argument
-#  - [packagename],[installed]
+# list | status | info | installtest | install | removetest | remove
+#  -  1: Success
+#  -  0: Failed
+#  - -1: Wrong number of arguments
+#  - -2: Package not found
+#  *list
+#  -  0 arguments
+#  -  [categoryname],[# packages],[# installed]
+#  -  1 argument
+#  -  [packagename],[installed]
 #  *status
-#  - 1: Installed, 0: Not-Installed
+#  -  1: Installed, 0: Not-Installed
 #  *info
-#  - name: Full package name
-#  - versionl: Locally installed package version
-#  - versioni: Remote available package version
-#  - sized: Download size
-#  - sizei: Installed size
-#  - desc: Full package description
-#  - dep: Full dependency list
+#  -  name: Full package name
+#  -  versionl: Locally installed package version
+#  -  versioni: Remote available package version
+#  -  sized: Download size
+#  -  sizei: Installed size
+#  -  desc: Full package description
+#  -  dep: Full dependency list
 #  *installtest | install - (Simulates an) apt-get install
-#  - 1: Package can be installed without problems
-#  - 2: This package is already installed
-#  - 3: Package not found in apt repository
-#  - 4: A newer version of this package is already installed
-#  - 5: There is a size mismatch for the remote package
-#  - 6: The package itself got an internal error
+#  -  1: Package can be installed without problems
+#  -  2: This package is already installed
+#  -  3: Package not found in apt repository
+#  -  4: A newer version of this package is already installed
+#  -  5: There is a size mismatch for the remote package
+#  -  6: The package itself got an internal error
 #  *removetest | remove - (Simulates an) apt-get remove
-#  - 1: Package can be removed without problems
-#  - 2: This package is not installed
-#  - 3: This is an essential pacakge and cannot be removed
+#  -  1: Package can be removed without problems
+#  -  2: This package is not installed
+#  -  3: This is an essential pacakge and cannot be removed
 #  *progress
-#  - 1: Apt is still running
-#  - 0: Apt is not running
+#  -  1: Apt is still running
+#  -  0: Apt is not running
 #  *updatedb - Updates local and remote apt library (when needed)
 function showCMDFn() {
 	case $1 in
