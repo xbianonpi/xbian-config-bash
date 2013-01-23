@@ -161,13 +161,13 @@ function showGUIFn() {
 #  *status
 #  - 1: Installed, 0: Not-Installed
 #  *info
-#  - Name: Full package name
-#  - VersionL: Locally installed package version
-#  - VersionI: Remote available package version
-#  - SizeD: Download size
-#  - SizeI: Installed size
-#  - Desc: Full package description
-#  - Dep: Full dependency list
+#  - name: Full package name
+#  - versionl: Locally installed package version
+#  - versioni: Remote available package version
+#  - sized: Download size
+#  - sizei: Installed size
+#  - desc: Full package description
+#  - dep: Full dependency list
 #  *installtest | install - (Simulates an) apt-get install
 #  - 1: Package can be installed without problems
 #  - 2: This package is already installed
@@ -176,7 +176,7 @@ function showGUIFn() {
 #  - 5: There is a size mismatch for the remote package
 #  - 6: The package itself got an internal error
 #  *removetest | remove - (Simulates an) apt-get remove
-#  - 1: Package can be remoted without problems
+#  - 1: Package can be removed without problems
 #  - 2: This package is not installed
 #  - 3: This is an essential pacakge and cannot be removed
 #  *progress
@@ -242,13 +242,13 @@ function showCMDFn() {
 				getAllPackagesFn;
 				if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
 					getPackageInformationFn $2;
-					echo "Name "${PKGINFO[0]} 
-					echo "VersionL "${PKGINFO[1]};
-					echo "VersionI "$(getPackageVersionFn ${PKGINFO[0]});
-					echo "SizeD " ${PKGINFO[3]};
-					echo "SizeI " ${PKGINFO[2]};
-					echo "Desc" ${PKGINFO[4]};
-					echo "Dep" ${PKGINFO[5]};
+					echo "name "${PKGINFO[0]} 
+					echo "versionl "${PKGINFO[1]};
+					echo "versioni "$(getPackageVersionFn ${PKGINFO[0]});
+					echo "sized " ${PKGINFO[3]};
+					echo "sizei " ${PKGINFO[2]};
+					echo "desc" ${PKGINFO[4]};
+					echo "dep" ${PKGINFO[5]};
 				else
 					echo -2;
 				fi
