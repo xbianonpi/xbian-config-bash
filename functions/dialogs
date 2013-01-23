@@ -75,6 +75,36 @@ showInfoDlg() {
 		--infobox "\n$1" $HEIGHT $WIDTH
 }
 
+# Show a text dialog
+#  $1 File
+#  $2 (optional) Height
+#  $3 (optional) Width
+#  $4 (optional) OK Label
+showTextDlg() {
+	OKLABEL="$_CLOSE"
+
+	# Default width and height
+	HEIGHT=$DEFAULTHEIGHT
+	WIDTH=$DEFAULTWIDTH
+	# Overridden width and height
+	if [ $# -gt 1 ]; then
+		HEIGHT=$2
+	fi
+	if [ $# -gt 2 ]; then
+		WIDTH=$3
+	fi
+	if [ $# -gt 3 ]; then
+		OKLABEL=$4
+	fi
+	
+	# Show messagebox
+	dialog \
+		--backtitle "$BACKTITLE" \
+		--title "$TITLE" \
+		--ok-label "$OKLABEL" \
+		--textbox "$1" $HEIGHT $WIDTH
+}
+
 # Show a yes/no dialog
 #  $1 Text
 #  $2 (optional) Height

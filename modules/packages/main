@@ -1,0 +1,380 @@
+#!/bin/bash
+#
+#Copyright 2012 CurlyMo <development@xbian.org>
+#
+#This file is part of XBian - XBMC on the Raspberry Pi.
+#
+#XBian is free software: you can redistribute it and/or modify it under the
+#terms of the GNU General Public License as published by the Free Software
+#Foundation, either version 3 of the License, or (at your option) any later
+#version.
+#
+#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#details.
+#
+#You should have received a copy of the GNU General Public License along
+#with XBian. If not, see <http://www.gnu.org/licenses/>
+
+#|------------------------------------|
+#|          Global variables          |
+#|------------------------------------|
+
+# The arguments this module accepts
+ARGUMENTS=(list info installtest install removetest remove progress status updatedb);
+CONTENT=$(cat $BASEPATH/config/pkglist);
+ALLPKGLST=$(dpkg --get-selections);
+
+#|------------------------------------|
+#|          Include files             |
+#|------------------------------------|
+
+source $BASEPATH/modules/packages/functions
+source $BASEPATH/modules/packages/dialogs
+
+#|------------------------------------|
+#|           Main program             |
+#|------------------------------------|
+
+function showPackageActionsFn() {
+	PACKAGE=${PACKAGES[$2]};
+	getPackageInformationFn "$PACKAGE";
+	showPackageOptionsDlg;
+	if [ $? -eq 0 ]; then
+		if [ $RETURN -eq 1 ]; then
+			showPackageInfoDlg "${PKGINFO[*]}";
+			showPackageActionsFn $1 $2;
+		elif [ $RETURN -eq 2 ]; then
+			showConfirmInstallUpdateDlg;
+			if [ $? -eq 0 ]; then
+				showInstallUpdatePackageDlg;
+				installPackageFn 1 "${PKGINFO[0]}=${PKGINFO[1]}";
+				STATUS=$?;
+				if [ $STATUS -eq 1 ]; then
+					showPackageAlreadyInstalledDlg;
+				elif [ $STATUS -eq 2 ]; then
+					showPackageVersionNotExistDlg;
+				elif [ $STATUS -eq 3 ]; then
+					showPackageNotExistsDlg;
+				elif [ $STATUS -eq 4 ]; then
+					showPackageDowngradeDlg;
+				elif [ $STATUS -ge 5 ]; then
+					showPackageAdvErrorDlg;
+				elif [ $STATUS -eq 0 ]; then
+					installPackageFn 0 "${PKGINFO[0]}=${PKGINFO[1]}";
+				fi
+				showAskForLogDlg;
+				if [ $? -eq 0 ]; then
+					showInstallLogDlg;
+				fi
+				showGUIFn;
+			else
+				showPackageActionsFn $1 $2;
+			fi
+		elif [ $RETURN -eq 3 ]; then
+			showConfirmRemoveDlg;
+			if [ $? -eq 0 ]; then			
+				showRemovingPackageDlg;
+				removePackageFn 0 "${PKGINFO[0]}";
+				STATUS=$?;
+				if [ $STATUS -eq 1 ]; then
+					showPackageNotInstalledDlg;
+				elif [ $STATUS -eq 2 ]; then
+					showPackageEssentialDlg
+				elif [ $STATUS -eq 0 ]; then
+					showPackageRemovedSuccessDlg
+				fi
+				showAskForLogDlg;
+				if [ $? -eq 0 ]; then
+					showInstallLogDlg;
+				fi
+				showGUIFn;
+			else
+				showPackageActionsFn $1 $2;
+			fi
+		else
+			showPackageActionsFn $1 $2;
+		fi
+	else
+		showPackageListFn $1 $2;
+	fi
+}
+
+function showPackageListFn() {
+	CATEGORY=${CATEGORIES[$1]};
+	getPackagesFromCategoryFn "$CATEGORY"
+	showPackagesListDlg "${PACKAGES[*]}"
+	if [ $? -eq 0 ]; then
+		showPackageActionsFn $1 $(($RETURN-1));
+	else
+		showGUIFn;
+	fi
+}
+
+function showGUIFn() {
+	if [ $REMOTEPKGDBUPDATED -eq 0 ]; then
+		showDownloadPackageListDlg;
+		updateAptMirrorsFn;
+		if [ $? -eq 0 ]; then
+			showFailedToRetrieveAptMirrosDlg;
+		else
+			downloadPackageListFn;
+			REMOTEPKGDBUPDATED=$?
+		fi;
+	fi
+	if [ $LOCALPKGDBUPDATED -eq 0 ]; then
+		if [ $REMOTEPKGDBUPDATED -eq 1 ]; then
+			localPackageDBOutdatedFn;
+			if [ $? -eq 1 ]; then
+				showUpdateAptDBDlg;
+				updateAptFn;
+				if [ $? -eq 1 ]; then
+					LOCALPKGDBUPDATED=1;
+				else
+					showUpdateAptDBFailedDlg;
+				fi
+			fi
+		fi
+	fi
+	showGettingLocalPackageInfoDlg;
+	getPackageCategoryListFn;
+	showPackageCategoryListDlg "${CATEGORIES[*]}";
+	if [ $? -eq 0 ]; then
+		showPackageListFn $(($RETURN-1));
+	fi
+}
+
+# Executes the command line version of this module
+#  $1 Argument [String]
+# list | status | info | installtest | install | removetest | remove
+#  $2 Package [String]
+# Returns
+#  *Update [Integer]
+#  - 1: Success
+#  - 0: Failed
+#  *List
+#  - 0 arguments
+#  - [categoryname],[# packages],[# installed]
+#  - 1 argument
+#  - [packagename],[installed]
+#  *status
+#  - 1: Installed, 0: Not-Installed
+#  *info
+#  - Name: Full package name
+#  - VersionL: Locally installed package version
+#  - VersionI: Remote available package version
+#  - SizeD: Download size
+#  - SizeI: Installed size
+#  - Desc: Full package description
+#  - Dep: Full dependency list
+#  *installtest | install - (Simulates an) apt-get install
+#  - 1: Package can be installed without problems
+#  - 2: This package is already installed
+#  - 3: Package not found in apt repository
+#  - 4: A newer version of this package is already installed
+#  - 5: There is a size mismatch for the remote package
+#  - 6: The package itself got an internal error
+#  *removetest | remove - (Simulates an) apt-get remove
+#  - 1: Package can be remoted without problems
+#  - 2: This package is not installed
+#  - 3: This is an essential pacakge and cannot be removed
+#  *progress
+#  - 1: Apt is still running
+#  - 0: Apt is not running
+#  *updatedb - Updates local and remote apt library (when needed)
+function showCMDFn() {
+	case $1 in
+		list)
+			if [ $# -eq 1 ]; then
+				getPackageCategoryListFn;
+				updateAllPackagesListFn;
+				for CATEGORY in ${CATEGORIES[@]}; do
+					getPackagesFromCategoryFn $CATEGORY;
+					X=0;
+					for PACKAGE in ${PACKAGES[@]}; do
+						getPackageStatusFn $PACKAGE;
+						if [ $? -eq 1 ]; then
+							X=$(($X+1));
+						fi
+					done
+					echo $CATEGORY,${#PACKAGES[@]},$X;
+				done;
+			elif [ $# -eq 2 ]; then
+				updateAllPackagesListFn;
+				getPackageCategoryListFn;
+				if [ $(echo ${CATEGORIES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					getPackagesFromCategoryFn "$2"
+					for PACKAGE in ${PACKAGES[@]}; do
+						getPackageStatusFn $PACKAGE;
+						if [ $? -eq 1 ]; then
+							echo $PACKAGE,1
+						else
+							echo $PACKAGE,0
+						fi
+					done
+				else
+					echo -1;
+				fi
+			else
+				echo -1;
+			fi
+		;;
+		status)
+			if [ $# -eq 2 ]; then
+				getAllPackagesFn;
+				if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					getPackageStatusFn $2;
+					if [ $? -eq 1 ]; then
+						echo 1;
+					else
+						echo 0;
+					fi
+				else
+					echo -2;
+				fi
+			else
+				echo -1;
+			fi
+		;;
+		info)
+			if [ $# -eq 2 ]; then
+				getAllPackagesFn;
+				if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					getPackageInformationFn $2;
+					echo "Name "${PKGINFO[0]} 
+					echo "VersionL "${PKGINFO[1]};
+					echo "VersionI "$(getPackageVersionFn ${PKGINFO[0]});
+					echo "SizeD " ${PKGINFO[3]};
+					echo "SizeI " ${PKGINFO[2]};
+					echo "Desc" ${PKGINFO[4]};
+					echo "Dep" ${PKGINFO[5]};
+				else
+					echo -2;
+				fi
+			else
+				echo -1;
+			fi
+		;;
+		installtest)
+			if [ $# -eq 2 ]; then
+				getAllPackagesFn;
+				if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					getPackageInformationFn $2;
+					installPackageFn 1 ${PKGINFO[0]};
+					RETURN=$?;
+					case $RETURN in
+						0)
+							echo 1;
+						;;
+						*)
+							echo $(($RETURN+1));
+						;;
+					esac
+				else
+					echo -2;
+				fi
+			else
+				echo -1;
+			fi
+		;;
+		install)
+			if [ $# -eq 2 ]; then
+				getAllPackagesFn;
+				if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					getPackageInformationFn $2;
+					installPackageFn 2 ${PKGINFO[0]};
+					RETURN=$?;
+					case $RETURN in
+						0)
+							echo 1;
+						;;
+						*)
+							echo $(($RETURN+1));
+						;;
+					esac
+				else
+					echo -2;
+				fi
+			else
+				echo -1;
+			fi
+		;;
+		removetest)
+			if [ $# -eq 2 ]; then
+				getAllPackagesFn;
+				if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					getPackageInformationFn $2;
+					removePackageFn 1 ${PKGINFO[0]}
+					RETURN=$?;
+					case $RETURN in
+						0)
+							echo 1;
+						;;
+						*)
+							echo $(($RETURN+6));
+						;;
+					esac	
+				else
+					echo -2;
+				fi
+			else
+				echo -1;
+			fi
+		;;
+		remove)
+			if [ $# -eq 2 ]; then
+				getAllPackagesFn;
+				if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					getPackageInformationFn $2;
+					removePackageFn 2 ${PKGINFO[0]};
+					RETURN=$?;
+					case $RETURN in
+						0)
+							echo 1;
+						;;
+						*)
+							echo $(($RETURN+6));
+						;;
+					esac
+				else
+					echo -2;
+				fi
+			else
+				echo -1;
+			fi
+		;;
+		progress)
+			if [ $(kill -0 $(pgrep apt-get) 2>/dev/null; echo $?) -eq 0 ]; then
+				echo 1;
+			else
+				echo 0;
+			fi
+		;;
+		updatedb)
+			STATUS=0;
+			updateAptMirrorsFn;
+			if [ $? -eq 1 ]; then
+				downloadPackageListFn;
+				if [ $? -eq 1 ]; then
+					localPackageDBOutdatedFn;
+					if [ $? -eq 1 ]; then
+						updateAptFn;
+						if [ $? -eq 1 ]; then
+							STATUS=1;
+						else
+							STATUS=0;
+						fi
+					else
+						STATUS=1;
+					fi
+				else
+					STATUS=1;
+				fi
+			else
+				STATUS=0;
+			fi
+			echo $STATUS;
+		;;
+	esac
+}
