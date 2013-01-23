@@ -1,4 +1,4 @@
-xbmc:
+xbmc:xbmc.bin
 samba:smbd,nmbd
 lirc:
 apache2:
