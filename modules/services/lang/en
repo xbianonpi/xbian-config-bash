@@ -19,7 +19,7 @@
 
 _NAME="Services"
 _DESC="Start/stop and manage services"
-_LOADINGSERVICES="Loading services status..."
+_LOADINGSERVICES="Loading status of services..."
 _RESTARTINGSERVICE="Restarting service..."
 _FAILEDTORESTARTSERVICE="Failed to restart the service..."
 _STARTINGSERVICE="Starting service..."

@@ -310,14 +310,13 @@ function readNetworkConfigurationFn() {
 
 		# Extract DHCP or Static
 		MODE=$(echo -e "$TFILEIFACES" | grep "iface $1" | cut -f 4 -d " ");
+		CIP=$(ifconfig $1 | sed -n -e 's/:127\.0\.0\.1 //g' -e 's/ *inet addr:\([0-9.]\+\).*/\1/gp');
 		if [ $MODE == "dhcp" ]; then
 			# Extract ip address given by dhcp server
-			CIP=$(ifconfig $1 | sed -n -e 's/:127\.0\.0\.1 //g' -e 's/ *inet addr:\([0-9.]\+\).*/\1/gp');
 			CSM=$(ifconfig $1 | grep Mask | awk '{print $4}' | cut -f2 -d:);
 			CGW=$(grep dhcp-server-identifier /var/lib/dhcp/dhclient.eth0.leases | tail -1 | awk '{print $3}' | awk '{print substr($0,0,length)}');
 		else
 			# Extract manual ip configuration
-			CIP=$(echo -e "$CONTENT" | grep address | cut -f 2 -d " ");
 			CSM=$(echo -e "$CONTENT" | grep netmask | cut -f 2 -d " ");
 			CGW=$(echo -e "$CONTENT" | grep gateway | cut -f 2 -d " ");
 		fi
@@ -517,7 +516,7 @@ function restartWLANAdapterFn() {
 function getWLANConnectStatusFn() {
 	STATUS=0;
 	if [ -f /tmp/wlanstatus ]; then
-		if [ $(cat /tmp/wlanstatus | grep "DHCPDISCOVER" | wc -l) -gt 0 ]; then
+		if [ $(cat /tmp/aptstatus | grep '^done' | wc -l) -gt 0 ]; then
 			STATUS=1;
 		fi;
 		if [ $(cat /tmp/wlanstatus | grep 'DHCPOFFERS\|Terminated' | wc -l) -gt 0 ]; then

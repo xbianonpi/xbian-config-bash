@@ -40,13 +40,14 @@ DEBUG=0;
 ASKFORREBOOT=0;
 
 # Check if the package database needs to be updates
-#PACKAGEDBUPDATED=0;
+LOCALPKGDBUPDATED=0;
+REMOTEPKGDBUPDATED=0;
 
 # Standard delimiter
 ORIGINALIFS=$IFS;
 
 # Url for the main APT repository Package location
-APTBASE="http://apt.xbian.org/dists/wheezy/main/binary-armhf/"
+APTBASE="http://apt.xbian.org/"
 
 # Location of the xbian-config script files
 BASEPATH="/usr/local/include/xbian-config"

@@ -1,0 +1,261 @@
+#!/bin/bash
+#
+#Copyright 2012 CurlyMo <development@xbian.org>
+#
+#This file is part of XBian - XBMC on the Raspberry Pi.
+#
+#XBian is free software: you can redistribute it and/or modify it under the
+#terms of the GNU General Public License as published by the Free Software
+#Foundation, either version 3 of the License, or (at your option) any later
+#version.
+#
+#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#details.
+#
+#You should have received a copy of the GNU General Public License along
+#with XBian. If not, see <http://www.gnu.org/licenses/>
+
+# Executes the GUI version of this module
+function updateAptMirrorsFn() {
+	if [ $(wget --spider http://apt.xbian.org/mirror.txt >/dev/null 1>/dev/null 2>/dev/null; echo $?) -eq 0 ]; then
+		URL=$APTBASE"mirror.txt"
+		wget -O - "$URL" > $BASEPATH/config/aptmirror 2>/dev/null
+		return 1;
+	else
+		return 0;
+	fi
+	
+}
+
+function localPackageDBOutdatedFn() {
+	if [ $(find /var/lib/apt/periodic/update-success-stamp -mtime +7 | grep xbian | wc -l) -gt 0 ]; then
+		if [ "$(md5sum /var/lib/apt/lists/apt.xbian.org*Packages | awk '{print $1}')" == "$(md5sum $BASEPATH/config/pkglist | awk '{print $1}')" ]; then
+			return 0;
+		else
+			return 1;
+		fi
+	fi
+	if [ $(find /var/lib/apt/periodic/update-success-stamp -mtime +7 | grep -v xbian | wc -l) -gt 0 ]; then
+		return 1;
+	fi
+}
+
+function downloadPackageListFn() {
+	RETURN=0;
+	if [ -f "$BASEPATH/config/aptmirror" ]; then
+		IFS=$'\n';
+		MIRRORS=($(cat $BASEPATH/config/aptmirror));
+		for MIRROR in ${MIRRORS[@]}; do
+			URL=$MIRROR"/dists/wheezy/main/binary-armhf/Packages"
+			if [ $(wget --spider $URL >/dev/null 1>/dev/null 2>/dev/null; echo $?) -eq 0 ]; then
+				wget -O - $URL > $BASEPATH/config/pkglist 2>/dev/null
+				RETURN=1;
+				break;
+			fi
+		done
+		IFS=$ORIGINALIFS;
+	fi
+	return $RETURN;
+}
+
+function getPackageCategoryListFn() {
+	if [ -f "$BASEPATH/config/pkglist" ]; then
+		CATEGORIES=($(echo -e "$CONTENT" | grep "Section:" | grep -v "update" | cut -f 2 -d: | sort | uniq | sed 's/^\ //;s/\ $//'));
+	fi
+}
+
+function getAllPackagesFn() {
+	IFS=$'\n';
+	PACKAGES=($(echo -e "$CONTENT" | grep "Package:" | sed -ne 's/\(Package:[A-Za-z\ -]\{1,\}\)-\([a-z]\{1,\}\)/\2/p' | uniq | sort));
+	IFS=$ORIGINALIFS;
+}
+
+	
+function getPackagesFromCategoryFn() {
+	IFS=$'\n';
+	PACKAGES=($(echo -e "$CONTENT" | awk -vRS='' "/Section: $1/"'{print $0"\n"}' | grep "Package:" | sed -ne 's/\(Package:[A-Za-z\ -]\{1,\}\)-\([a-z]\{1,\}\)/\2/p' | uniq | sort));
+	IFS=$ORIGINALIFS;
+}
+
+function getPackageStatusFn() {
+	if [ $(echo -e "$ALLPKGLST" | grep "xbian[-A-Za-z]\{1,\}$1[[:space:]]\{1,\}install$" | wc -l) -ge 1 ]; then
+		return 1;
+	else
+		return 0;
+	fi
+}
+
+#Retrieves the package version
+# $1: Full name of the package
+function getPackageVersionFn() {
+	dpkg-query -W -f='${Version}\n' "$1" 2>/dev/null
+} 
+
+function updateAllPackagesListFn() {
+	ALLPKGLST=$(dpkg --get-selections xbian*);
+}
+
+#Gets the package information
+# $1: Package name
+function getPackageInformationFn() {
+	NAME=$1;
+	INFO=$(echo -e "$CONTENT" | awk -vRS='' "/Package:[A-Za-z -]+$NAME/"'{print $0"\n"}');
+	IFS=$'\n';
+	VERSIONS=($(echo -e "$INFO" | sed -ne 's/\(Version: \)\([0-9\.]\{1,\}\)/\2/p'));
+	X=0;
+	I=0;
+	for KEY in ${!VERSIONS[@]}; do
+		if [ $(echo "${VERSIONS[$KEY]} > $X" | bc) -eq 1 ]; then
+			X=${VERSIONS[$KEY]};
+			I=$KEY;
+		fi
+	done;
+	PKGINFO=();
+	INFO=$(echo -e "$INFO" | awk -vRS='' "/Version: $X/"'{print $0"\n"}');
+	PKGINFO[0]=$(echo -e "$INFO" | sed -ne 's/\(Package: \)\([A-Za-z0-9. -]\{1,\}\)/\2/p' | sort -r);
+	PKGINFO[1]=$X;
+	PKGINFO[2]=$(($(echo -e "$INFO" | sed -ne 's/\(Installed-Size: \)\([0-9]\{1,\}\)/\2/p')*1024));
+	PKGINFO[3]=$(echo -e "$INFO" | sed -ne 's/\(^Size: \)\([0-9]\{1,\}\)/\2/p');
+	PKGINFO[4]=$(echo -e "$INFO" | sed -ne 's/\(Description: \)\([A-Za-z0-9\ ]\{1,\}\)/\2/p');
+	PKGINFO[5]=$(echo -e "$INFO" | sed -ne 's/\(Depends: \)\([A-Za-z0-9\ ]\{1,\}\)/\2/p')
+	IFS=$ORIGNALIFS;
+}
+
+#Installs a package
+# $1: Simulate or not
+# $2: Full package name
+function installPackageFn() {
+	NAME=$(echo $2 | rev | cut -f 1 -d"-" | rev);
+	if [ $(getPackageStatusFn $NAME; echo $?) -eq 1 ]; then
+		return 6;
+	else
+		if [ $1 -eq 1 ]; then
+			apt-get install -s $2 &>/tmp/aptstatus
+			CODE=$?;
+			if [ $CODE -eq 0 ]; then
+				if [ $(cat /tmp/aptstatus | grep "already the newest version" | wc -l) -eq 1 ]; then
+					return 1;
+				elif [ $(cat /tmp/aptstatus | grep "was not found" | wc -l) -eq 1 ]; then
+					return 2;
+				elif [ $(cat /tmp/aptstatus | grep "Unable to locate package" | wc -l) -eq 1 ]; then
+					return 3;
+				elif [ $(cat /tmp/aptstatus | grep "DOWNGRADED" | wc -l) -eq 1 ]; then
+					return 4;
+				else
+					return 0;
+				fi
+			elif [ $CODE -eq 100 ]; then
+				if [ $(cat /tmp/aptstatus | grep -i "size mismatch" | wc -l) -eq 1 ]; then
+					return 5;
+				elif [ $(cat /tmp/aptstatus | grep -i "returned an error code" | wc -l) -eq 1 ]; then
+					return 6;
+				fi
+			fi
+		elif [ $1 -eq 0 ]; then
+			apt-get install -y $2 &>/tmp/aptstatus
+		elif [ $1 -eq 2 ]; then
+			nohup apt-get install -y $2 &>/tmp/aptstatus &
+		fi
+	fi
+}
+
+#Remove a package
+# $1: Simulate or not
+# $2: Full package name
+function removePackageFn() {
+	NAME=$(echo $2 | rev | cut -f 1 -d"-" | rev);
+	if [ $(getPackageStatusFn $NAME; echo $?) -eq 0 ]; then
+		return 1;
+	else
+		if [ $1 -eq 1 ]; then
+			apt-get purge -s $2 &>/tmp/aptstatus
+			if [ $? -eq 0 ]; then	
+				if [ $(cat /tmp/aptstatus | grep "is not installed, so not removed" | wc -l) -eq 1 ]; then
+					return 1;
+				elif [ $(cat /tmp/aptstatus | grep "essential package" | wc -l) -eq 1 ]; then
+					return 2;
+				else
+					
+					return 0;
+				fi
+			fi
+		elif [ $1 -eq 0 ]; then
+			apt-get purge -y $2 &>/tmp/aptstatus
+		elif [ $1 -eq 2 ]; then
+			nohup apt-get purge -y $2 &>/tmp/aptstatus &
+		fi
+	fi
+}
+
+function updateAptFn() {
+	apt-get update &>/tmp/aptstatus
+	if [ $? -eq 0 ]; then
+		return 1;
+	else
+		return 0;
+	fi
+}
+
+# sed -i 's/\r/\n/g' /tmp/aptstatus
+# #Packages new
+# cat /tmp/aptstatus | sed -ne 's/\([0-9]\{1,\}[a-z\, ]\{1,\} \)\([0-9]\{1,3\}\)\( .*\)/\2/p'
+# #Packages upgraded
+# cat /tmp/aptstatus | sed -ne 's/\([0-9]\{1,\}\)\([a-z\, ]\{1,\} \)\([0-9]\{1,3\}\)\( .*\)/\1/p'
+# #Latest download package
+# cat /tmp/aptstatus | grep '[A-Za-z]\{1,\}:[0-9]\{1,\} [a-z]\{4,5\}:' | tail -n 1
+# #Package number
+# cat /tmp/aptstatus | grep '[A-Za-z]\{1,\}:[0-9]\{1,\} [a-z]\{4,5\}:' | tail -n 1 | sed -ne 's/\([A-Za-z]\{1,\}:\)\([0-9]\{1,\}\).*/\2/p'
+# #Package name
+# cat /tmp/aptstatus | grep '[A-Za-z]\{1,\}:[0-9]\{1,\} [a-z]\{4,5\}:' | awk '{print $4}'
+# #Download klaar
+# cat /tmp/aptstatus | grep "Preconfiguring packages ..."
+# #Reading database percentages
+# cat /tmp/aptstatus | sed -ne 's/\(.*\)\([A-Za-z]\{1,\}\)\( ... \)\([0-9]\{1,3\}\)%/\4/p'
+# #Installing
+# cat /tmp/aptstatus | grep 'Unpacking' | tail -n 1 | awk '{print $2}'
+# #Configuring
+# cat /tmp/aptstatus | grep 'Setting up' | tail -n 1 | awk '{print $3}'
+# #Done
+# cat /tmp/aptstatus | grep '^done'
+# function getAptInstallStatusFn() {
+	# STATUS=0;
+	# if [ -f /tmp/aptstatus ]; then
+		# sed -i 's/\r/\n/g' /tmp/aptstatus
+		# if [ $(cat /tmp/aptstatus | grep '^done' | wc -l) -gt 0 ]; then
+			# #Done
+			# STATUS=1;
+		# elif [ $(cat /tmp/aptstatus | grep 'Setting up' | tail -n 1 | awk '{print $3}' | wc -l) -gt 0 ]; then
+			# #Configuring packages
+			# STATUS=2;
+		# elif [ $(cat /tmp/aptstatus | grep 'Unpacking' | tail -n 1 | awk '{print $2}' | wc -l) -gt 0 ]; then
+			# #Installing packages
+			# STATUS=3;
+		# elif [ $(cat /tmp/aptstatus | sed -ne 's/\(.*\)\([A-Za-z]\{1,\}\)\( ... \)\([0-9]\{1,3\}\)%/\4/p' | wc -l) -gt 0 ]; then
+			# #Reading database
+			# STATUS=4;
+		# elif [ $(cat /tmp/aptstatus | grep '[A-Za-z]\{1,\}:[0-9]\{1,\} [a-z]\{4,5\}:' | tail -n 1 | wc -l) -gt 0 ]; then
+			# #Downloading packages
+			# STATUS=5;
+		# elif [ $(cat /tmp/aptstatus | grep 'Buidling dependency tree' | tail -n 1 | wc -l) -gt 0 ]; then
+			# STATUS=6;
+		# elif [ $(cat /tmp/aptstatus | grep "already the newest version" | wc -l) -eq 1 ]; then
+			# STATUS=7;
+		# elif [ $(cat /tmp/aptstatus | grep "was not found" | wc -l) -eq 1 ]; then
+			# STATUS=8;
+		# elif [ $(cat /tmp/aptstatus | grep "Unable to locate package" | wc -l) -eq 1 ]; then
+			# STATUS=9;
+		# elif [ $(cat /tmp/aptstatus | grep "DOWNGRADED" | wc -l) -eq 1 ]; then
+			# STATUS=10;
+		# elif [ $(cat /tmp/aptstatus | grep -i "size mismatch" | wc -l) -eq 1 ]; then
+			# STATUS=11;
+		# elif [ $(cat /tmp/aptstatus | grep -i "returned an error code" | wc -l) -eq 1 ]; then
+			# STATUS=12;
+		# else
+			# STATUS=1;
+		# fi
+	# fi
+	
+	# return $STATUS;
+# }
