@@ -516,7 +516,7 @@ function restartWLANAdapterFn() {
 function getWLANConnectStatusFn() {
 	STATUS=0;
 	if [ -f /tmp/wlanstatus ]; then
-		if [ $(cat /tmp/aptstatus | grep '^done' | wc -l) -gt 0 ]; then
+		if [ $(cat /tmp/wlanstatus | grep "DHCPDISCOVER" | wc -l) -gt 0 ]; then
 			STATUS=1;
 		fi;
 		if [ $(cat /tmp/wlanstatus | grep 'DHCPOFFERS\|Terminated' | wc -l) -gt 0 ]; then
