@@ -107,58 +107,74 @@ function restartServiceFn() {
 
 function startServiceFn() {
 	getServiceNameFn $1;
-	/etc/init.d/$NAME start 2>/dev/null 1>/dev/null >/dev/null;
-	RETURN=$?;
-	X=0;
-	while [ $(getServiceRunningStatusFn $NAME; echo $?) -eq 0 ] && [ $X -lt 10 ]; do
-		sleep 1;
-		PROCESSES=$(ps -A);
-		X=$(($X+1));
-	done;
-	return $RETURN;
+	if [ -f "/etc/init.d/$NAME" ]; then
+		/etc/init.d/$NAME start 2>/dev/null 1>/dev/null >/dev/null;
+		RETURN=$?;
+		X=0;
+		while [ $(getServiceRunningStatusFn $NAME; echo $?) -eq 0 ] && [ $X -lt 10 ]; do
+			sleep 1;
+			PROCESSES=$(ps -A);
+			X=$(($X+1));
+		done;
+		return $RETURN;
+	else
+		return 1;
+	fi
 }
 
 function stopServiceFn() {
 	getServiceNameFn $1;
-	/etc/init.d/$NAME stop 2>/dev/null 1>/dev/null >/dev/null;
-	RETURN=$?;
-	X=0;
-	while [ $(getServiceRunningStatusFn $NAME; echo $?) -eq 1 ] && [ $X -lt 10 ]; do
-		sleep 1;
-		PROCESSES=$(ps -A);
-		X=$(($X+1));
-	done;
-	return $RETURN;
+	if [ -f "/etc/init.d/$NAME" ]; then
+		/etc/init.d/$NAME stop 2>/dev/null 1>/dev/null >/dev/null;
+		RETURN=$?;
+		X=0;
+		while [ $(getServiceRunningStatusFn $NAME; echo $?) -eq 1 ] && [ $X -lt 10 ]; do
+			sleep 1;
+			PROCESSES=$(ps -A);
+			X=$(($X+1));
+		done;
+		return $RETURN;
+	else
+		return 1;
+	fi
 }
 
 function disableAutoStartFn() {
 	getServiceNameFn $1;
-	update-rc.d $NAME remove 2>/dev/null 1>/dev/null >/dev/null;
-	RETURN=$?;
-	X=0;
-	while [ $(getServiceAutoStartStatusFn $NAME; echo $?) -eq 1 ] && [ $X -lt 10 ]; do
-		sleep 1;
-		X=$(($X+1));
-	done;
-	if [ $X -eq 9 ]; then
-		RETURN=0;
+	if [ -f "/etc/init.d/$NAME" ]; then	
+		update-rc.d $NAME remove 2>/dev/null 1>/dev/null >/dev/null;
+		RETURN=$?;
+		X=0;
+		while [ $(getServiceAutoStartStatusFn $NAME; echo $?) -eq 1 ] && [ $X -lt 10 ]; do
+			sleep 1;
+			X=$(($X+1));
+		done;
+		if [ $X -eq 9 ]; then
+			RETURN=0;
+		fi
+		return $RETURN;
+	else
+		return 1;
 	fi
-	return $RETURN;
 }
 
 function enableAutoStartFn() {
 	getServiceNameFn $1;
-	update-rc.d $NAME defaults 2>/dev/null 1>/dev/null >/dev/null;
-	RETURN=$?;
-	X=0;
-	while [ $(getServiceAutoStartStatusFn $NAME; echo $?) -eq 0 ] && [ $X -lt 10 ]; do
-		sleep 1;
-		X=$(($X+1));
-	done;
-	if [ $X -eq 9 ]; then
-		RETURN=0;
+	if [ -f "/etc/init.d/$NAME" ]; then
+		update-rc.d $NAME defaults 2>/dev/null 1>/dev/null >/dev/null;
+		RETURN=$?;
+		X=0;
+		while [ $(getServiceAutoStartStatusFn $NAME; echo $?) -eq 0 ] && [ $X -lt 10 ]; do
+			sleep 1;
+			X=$(($X+1));
+		done;
+		if [ $X -eq 9 ]; then
+			RETURN=0;
+		fi
+		return $RETURN;
+	else
+		return 1;
 	fi
-	return $RETURN;
 }
 
 function getServiceConfFn() {
