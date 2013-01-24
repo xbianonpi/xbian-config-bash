@@ -22,7 +22,7 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(list status start restart stop autostart insert update delete);
+ARGUMENTS=(list select status start restart stop autostart insert update delete);
 if [ -f "$BASEPATH/config/services" ]; then
 	SERVICES=$(cat $BASEPATH/config/services | sort);
 else
@@ -179,7 +179,7 @@ function showGUIFn() {
 
 # Executes the command line version of this module
 #  $1 Argument [String]
-# status | start | stop | restart | autostart | insert | update | delete
+# status | select | start | stop | restart | autostart | insert | update | delete
 #  $2 Service [String]
 # autostart
 #  $3 Action [String] Possible values 'enable' or 'disable'
@@ -206,6 +206,22 @@ function showCMDFn() {
 					for SERVICE in ${SERVICES[@]}; do
 						echo $SERVICE | cut -f 1 -d:
 					done;
+				else
+					echo -7;
+				fi
+			else
+				echo -1;
+			fi
+		;;
+		select)
+			if [ $# -eq 2 ]; then
+				if [ -f "$BASEPATH/config/services" ]; then
+					if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+						getServiceIDFn $2;
+						echo $(echo ${SERVICES[$KEY]} | cut -f 2 -d':' | sed 's/,/ /g');
+					else
+						echo -2;
+					fi
 				else
 					echo -7;
 				fi
