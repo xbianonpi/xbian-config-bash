@@ -204,7 +204,10 @@ function showCMDFn() {
 			if [ $# -eq 1 ]; then
 				if [ -f "$BASEPATH/config/services" ]; then
 					for SERVICE in ${SERVICES[@]}; do
-						echo $SERVICE | cut -f 1 -d:
+						NAME=$(echo $SERVICE | cut -f 1 -d:);
+						if [ -f "/etc/init.d/$NAME" ]; then
+							echo $NAME;
+						fi
 					done;
 				else
 					echo -7;
