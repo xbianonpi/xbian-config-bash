@@ -170,6 +170,8 @@ function createTableFn() {
 	
 	if [ $TYPE == "radio" ]; then
 		HEADER="  "${OLDHEADER[0]};
+	elif [ $TYPE == "check" ]; then
+		HEADER=" "${OLDHEADER[0]};
 	else
 		HEADER=${OLDHEADER[0]};
 	fi
@@ -193,10 +195,10 @@ function createTableFn() {
 			CENTERED[$c]=0;
 		fi
 		ENDOFCOLUMN="true";
-		if [ $TYPE != "radio" ] && [ $c -gt 0 ] && [ $c -lt $NRCOLUMNS ]; then
+		if [ $TYPE != "radio" ] && [ $TYPE != "check" ] && [ $c -gt 0 ] && [ $c -lt $NRCOLUMNS ]; then
 			ENDOFCOLUMN="false"
 		fi
-		if [ $TYPE == "radio" ] && [ $c -gt 0 ] && [ $c -lt $(($NRCOLUMNS-1)) ]; then
+		if [[ $TYPE == "radio" || $TYPE == "check" ]] && [ $c -gt 0 ] && [ $c -lt $(($NRCOLUMNS-1)) ]; then
 			ENDOFCOLUMN="false"
 		fi
 		if [ $ENDOFCOLUMN == "false" ]; then
@@ -220,10 +222,10 @@ function createTableFn() {
 		for (( d=0; d<$NRCOLUMNS; d++ )); do
 			LENGTH=$((${WORDLENGTH[$d]}-${#OLDROW[$d]}));
 			ENDOFCOLUMN="true";
-			if [ $TYPE != "radio" ] && [ $d -gt 0 ] && [ $d -lt $NRCOLUMNS ]; then
+			if [ $TYPE != "radio" ] && [ $TYPE != "check" ] && [ $d -gt 0 ] && [ $d -lt $NRCOLUMNS ]; then
 				ENDOFCOLUMN="false"
 			fi
-			if [ $TYPE == "radio" ] && [ $d -gt 0 ] && [ $d -lt $(($NRCOLUMNS-1)) ]; then
+			if [[ $TYPE == "radio" || $TYPE == "check" ]] && [ $d -gt 0 ] && [ $d -lt $(($NRCOLUMNS-1)) ]; then
 				ENDOFCOLUMN="false"
 			fi
 			if [ $ENDOFCOLUMN == "false" ]; then
@@ -251,9 +253,9 @@ function createTableFn() {
 				fi
 				ROWS+="\Zn ]";
 			else
-				if [ $d -gt 0 ] && [ $TYPE == "radio" ]; then
+				if [ $d -gt 0 ] && [[ $TYPE == "radio" || $TYPE == "check" ]]; then
 					ROWS+="$DEFAULTDELIMITER"${OLDROW[$d]}"$DEFAULTDELIMITER";
-				elif [ $c -gt 0 ] && [ $TYPE != "radio" ]; then
+				elif [ $c -gt 0 ] && [ $TYPE != "radio" ] && [ $TYPE != "check" ]; then
 					ROWS+="$DEFAULTDELIMITER"${OLDROW[$d]}"$DEFAULTDELIMITER";
 				else
 					ROWS+=${OLDROW[$d]}"$DEFAULTDELIMITER";

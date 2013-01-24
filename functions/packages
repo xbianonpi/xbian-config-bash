@@ -36,108 +36,63 @@ function isPKGInstalledFn() {
 	return 1;
 }
 
-# # Set Raspberry PI config variable
-# # ToDo: Save backup of $3 with history
-# #  $1 key
-# #  $2 value
-# #  $3 file
-# set_config_var() {
-	# sed -i "/$1/d" $3
-	# echo "$1=$2" >> $3
-	# sed -i '/^$/d' $3
-# }
+function updateAptMirrorsFn() {
+	if [ $(wget --spider http://apt.xbian.org/mirror.txt >/dev/null 1>/dev/null 2>/dev/null; echo $?) -eq 0 ]; then
+		URL=$APTBASE"mirror.txt"
+		wget -O - "$URL" > $BASEPATH/config/aptmirror 2>/dev/null
+		return 1;
+	else
+		return 0;
+	fi
+	
+}
 
-# # Remove Raspberry PI config variable
-# # $1 key
-# # $2 file
-# remove_config_var() {
-	# sed -i "/$1/d" /boot/config.txt
-# }
+function localPackageDBOutdatedFn() {
+	if [ -f "/var/lib/apt/periodic/update-success-stamp" ] && [ $(find /var/lib/apt/periodic/update-success-stamp -mtime +7 | grep xbian | wc -l) -gt 0 ]; then
+		if [ -f "$BASEPATH/config/pkglist" ] && [ -f "/var/lib/apt/lists/apt.xbian.org*Packages" ]; then
+			if [ "$(md5sum /var/lib/apt/lists/apt.xbian.org*Packages | awk '{print $1}')" == "$(md5sum $BASEPATH/config/pkglist | awk '{print $1}')" ]; then
+				return 0;
+			else
+				return 1;
+			fi
+		else
+			return 1;
+		fi
+	fi
+	if [ $(find /var/lib/apt/periodic/update-success-stamp -mtime +7 | grep -v xbian | wc -l) -gt 0 ]; then
+		return 1;
+	fi
+}
 
-# # Check if root is valid for SSH-login
-# # return boolean
-# check_rootssh_status() {
-	# if [ -f "/etc/ssh/sshd_config" ]; then
-		# STATUS=$(cat /etc/ssh/sshd_config | grep PermitRootLogin | grep "yes" | wc -l)
-		# if [ $STATUS -eq 1 ]; then
-			# DISABLE_ROOTSSH=1;
-		# else
-			# DISABLE_ROOTSSH=0;
-		# fi
-	# fi
-# } 
+function downloadPackageListFn() {
+	RETURN=0;
+	if [ -f "$BASEPATH/config/aptmirror" ]; then
+		IFS=$'\n';
+		MIRRORS=($(cat $BASEPATH/config/aptmirror));
+		for MIRROR in ${MIRRORS[@]}; do
+			URL=$MIRROR"/dists/wheezy/main/binary-armhf/Packages"
+			if [ $(wget --spider $URL >/dev/null 1>/dev/null 2>/dev/null; echo $?) -eq 0 ]; then
+				wget -O - $URL > $BASEPATH/config/pkglist 2>/dev/null
+				RETURN=1;
+				break;
+			fi
+		done
+		IFS=$ORIGINALIFS;
+	fi
+	return $RETURN;
+}
 
+#Retrieves the package version
+# $1: Full name of the package
+function getPackageVersionFn() {
+	dpkg-query -W -f='${Version}\n' "$1" 2>/dev/null
+}
 
-# # Sets the RPi overclock
-# #  $1 Preset name
-# #  $2 arm_freq
-# #  $3 core_freq
-# #  $4 sdram_freq
-# #  $5 over_voltage
-# set_overclock() {
-	# if [ $DEBUG -eq 0 ]; then
-		# ASKFORREBOOT=1
-		# set_config_var arm_freq $2 /boot/config.txt >/dev/null
-		# set_config_var core_freq $3 /boot/config.txt >/dev/null
-		# set_config_var sdram_freq $4 /boot/config.txt >/dev/null 
-		# set_config_var over_voltage $5 /boot/config.txt >/dev/null
-	# fi
-	# showdialog 	"Config > Settings > Overclocking" \
-			# "Ok" \
-			# "\n         Overlock set to preset '$1'"
-# }
-
-# # Check which version of a package that is installed
-# #  $1 package name
-# function pkg_version() {
-	# pkg_installed $1
-	# if [ $? -eq 1 ]; then
-		# dpkg-query -W -f='${Version}\n' "$1" 2>/dev/null
-	# fi
-# }
-
-# function updateapt() {
-	# if [ $PACKAGEDBUPDATED -eq 0 ]; then
-		# showinfo " $1 > $(basename $2) " "\n\n         Updating package database..."
-		# apt-get update > /dev/null 2>&1
-		# PACKAGEDBUPDATED=1
-	# fi
-# }
-
-# # Download updated package-lists if needed
-# #   $1 Window title for status screen
-# function download_pkg_list() {
-        # if [ ! -f /tmp/xbiancache/Packages ]; then
-                # if [ ! -d /tmp/xbiancache ]; then
-                        # mkdir /tmp/xbiancache;
-                # fi
-		# showinfo "$1" "\n\n            Updating package list..."
-                # wget -P /tmp/xbiancache/ ${APTBASE}Packages.gz 2>/dev/null >/dev/null;
-                # gunzip -c /tmp/xbiancache/Packages.gz > /tmp/xbiancache/Packages;
-        # fi
-# }
-
-# # Check if a package of a specific version is available in apt cache
-# #  $1           Package name
-# #  $2           Package version
-# #  @return      0 for not available, 1 for available
-# function check_version_cache() {
-        # RES_APT_CACHE=$(apt-cache showpkg $1 | grep "$2 (")
-        # if [ -z $RES_APT_CACHE ]; then
-                # # Not available, try apt-get update and check again
-                # showinfo "$1" "\n\n     Updating package database, please wait ..."
-                # apt-get update > /dev/null
-                # RES_APT_CACHE=$(apt-cache showpkg $1 | grep "$2 (")
-                # if [ -z $RES_APT_CACHE ]; then
-                        # # Still not available, this package doesnt exist
-                        # return 0;
-                # else
-                        # # Now it's available, apt-get update did the trick!
-                        # return 1;
-                # fi
-        # else
-                # # Was available without updateing apt repos, great!
-                # return 1;
-        # fi
-        # # We should never get here
-# }
+function updateAptFn() {
+	apt-get update &>/tmp/aptstatus
+	if [ $? -eq 0 ]; then
+		return 1;
+	else
+		return 0;
+	fi
+}
