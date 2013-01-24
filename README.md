@@ -14,4 +14,5 @@ cp -R lang /usr/local/include/xbian-config/
 cp -R modules /usr/local/include/xbian-config/
 cp -R prereqs /usr/local/include/xbian-config/
 cp -R struct /usr/local/include/xbian-config/
+cp -R config /usr/local/include/xbian-config/
 ```
