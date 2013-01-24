@@ -216,9 +216,10 @@ function showCMDFn() {
 		select)
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/services" ]; then
-					if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					SERVLIST=($SERVICES);
+					if [ $(echo ${SERVLIST[@]} | grep -o $2 | wc -l) -ge 1 ]; then
 						getServiceIDFn $2;
-						echo $(echo ${SERVICES[$KEY]} | cut -f 2 -d':' | sed 's/,/ /g');
+						echo $(echo ${SERVLIST[$KEY]} | cut -f 2 -d':' | sed 's/,/ /g');
 					else
 						echo -2;
 					fi
