@@ -174,9 +174,11 @@ function getServiceConfFn() {
 
 function updateServiceConfFn() {
 	DATA=($2);
-	eval "sed -i '/${DATA[0]}:/d' $BASEPATH/config/services";
+	if [ -f "$BASEPATH/config/services" ]; then
+		eval "sed -i '/${DATA[0]}:/d' $BASEPATH/config/services";
+	fi
 	echo "${DATA[0]}:${DATA[1]}" >> $BASEPATH/config/services;
-	if [ $(cat $BASEPATH/config/services | grep "${DATA[0]}:${DATA[1]}" | wc -l) -eq 1 ]; then
+	if [ -f "$BASEPATH/config/services" ] && [ $(cat $BASEPATH/config/services | grep "${DATA[0]}:${DATA[1]}" | wc -l) -eq 1 ]; then
 		return 1;
 	else
 		return 0;
@@ -185,8 +187,10 @@ function updateServiceConfFn() {
 
 function deleteServiceFn() {
 	DATA=($2);
-	eval "sed -i '/${DATA[0]}:/d' $BASEPATH/config/services";
-	if [ $(cat $BASEPATH/config/services | grep "${DATA[0]}:" | wc -l) -eq 0 ]; then
+	if [ -f "$BASEPATH/config/services" ]; then
+		eval "sed -i '/${DATA[0]}:/d' $BASEPATH/config/services";
+	fi
+	if [ -f "$BASEPATH/config/services" ] && [ $(cat $BASEPATH/config/services | grep "${DATA[0]}:" | wc -l) -eq 0 ]; then
 		return 1;
 	else
 		return 0;

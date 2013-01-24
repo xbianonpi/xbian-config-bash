@@ -17,49 +17,6 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-# Executes the GUI version of this module
-function updateAptMirrorsFn() {
-	if [ $(wget --spider http://apt.xbian.org/mirror.txt >/dev/null 1>/dev/null 2>/dev/null; echo $?) -eq 0 ]; then
-		URL=$APTBASE"mirror.txt"
-		wget -O - "$URL" > $BASEPATH/config/aptmirror 2>/dev/null
-		return 1;
-	else
-		return 0;
-	fi
-	
-}
-
-function localPackageDBOutdatedFn() {
-	if [ $(find /var/lib/apt/periodic/update-success-stamp -mtime +7 | grep xbian | wc -l) -gt 0 ]; then
-		if [ "$(md5sum /var/lib/apt/lists/apt.xbian.org*Packages | awk '{print $1}')" == "$(md5sum $BASEPATH/config/pkglist | awk '{print $1}')" ]; then
-			return 0;
-		else
-			return 1;
-		fi
-	fi
-	if [ $(find /var/lib/apt/periodic/update-success-stamp -mtime +7 | grep -v xbian | wc -l) -gt 0 ]; then
-		return 1;
-	fi
-}
-
-function downloadPackageListFn() {
-	RETURN=0;
-	if [ -f "$BASEPATH/config/aptmirror" ]; then
-		IFS=$'\n';
-		MIRRORS=($(cat $BASEPATH/config/aptmirror));
-		for MIRROR in ${MIRRORS[@]}; do
-			URL=$MIRROR"/dists/wheezy/main/binary-armhf/Packages"
-			if [ $(wget --spider $URL >/dev/null 1>/dev/null 2>/dev/null; echo $?) -eq 0 ]; then
-				wget -O - $URL > $BASEPATH/config/pkglist 2>/dev/null
-				RETURN=1;
-				break;
-			fi
-		done
-		IFS=$ORIGINALIFS;
-	fi
-	return $RETURN;
-}
-
 function getPackageCategoryListFn() {
 	if [ -f "$BASEPATH/config/pkglist" ]; then
 		CATEGORIES=($(echo -e "$CONTENT" | grep "Section:" | grep -v "update" | cut -f 2 -d: | sort | uniq | sed 's/^\ //;s/\ $//'));
@@ -72,7 +29,6 @@ function getAllPackagesFn() {
 	IFS=$ORIGINALIFS;
 }
 
-	
 function getPackagesFromCategoryFn() {
 	IFS=$'\n';
 	PACKAGES=($(echo -e "$CONTENT" | grep -v "xbian-update" | awk -vRS='' "/Section: $1/"'{print $0"\n"}' | grep "Package:" | sed -ne 's/\(Package:[A-Za-z\ -]\{1,\}\)-\([a-z]\{1,\}\)/\2/p' | uniq | sort));
@@ -86,12 +42,6 @@ function getPackageStatusFn() {
 		return 0;
 	fi
 }
-
-#Retrieves the package version
-# $1: Full name of the package
-function getPackageVersionFn() {
-	dpkg-query -W -f='${Version}\n' "$1" 2>/dev/null
-} 
 
 function updateAllPackagesListFn() {
 	ALLPKGLST=$(dpkg --get-selections "xbian*");
@@ -133,6 +83,7 @@ function installPackageFn() {
 	else
 		if [ $1 -eq 1 ]; then
 			apt-get install -s $2 &>/tmp/aptstatus
+			#Check required disk space
 			CODE=$?;
 			if [ $CODE -eq 0 ]; then
 				if [ $(cat /tmp/aptstatus | grep "already the newest version" | wc -l) -eq 1 ]; then
@@ -189,15 +140,6 @@ function removePackageFn() {
 	fi
 }
 
-function updateAptFn() {
-	apt-get update &>/tmp/aptstatus
-	if [ $? -eq 0 ]; then
-		return 1;
-	else
-		return 0;
-	fi
-}
-
 # sed -i 's/\r/\n/g' /tmp/aptstatus
 # #Packages new
 # cat /tmp/aptstatus | sed -ne 's/\([0-9]\{1,\}[a-z\, ]\{1,\} \)\([0-9]\{1,3\}\)\( .*\)/\2/p'
@@ -209,7 +151,7 @@ function updateAptFn() {
 # cat /tmp/aptstatus | grep '[A-Za-z]\{1,\}:[0-9]\{1,\} [a-z]\{4,5\}:' | tail -n 1 | sed -ne 's/\([A-Za-z]\{1,\}:\)\([0-9]\{1,\}\).*/\2/p'
 # #Package name
 # cat /tmp/aptstatus | grep '[A-Za-z]\{1,\}:[0-9]\{1,\} [a-z]\{4,5\}:' | awk '{print $4}'
-# #Download klaar
+# #Download done
 # cat /tmp/aptstatus | grep "Preconfiguring packages ..."
 # #Reading database percentages
 # cat /tmp/aptstatus | sed -ne 's/\(.*\)\([A-Za-z]\{1,\}\)\( ... \)\([0-9]\{1,3\}\)%/\4/p'

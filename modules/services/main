@@ -23,7 +23,11 @@
 
 # The arguments this module accepts
 ARGUMENTS=(list status start restart stop autostart insert update delete);
-SERVICES=$(cat $BASEPATH/config/services | sort);
+if [ -f "$BASEPATH/config/services" ]; then
+	SERVICES=$(cat $BASEPATH/config/services | sort);
+else
+	SERVICES="";
+fi
 PROCESSES=$(ps -A);
 
 #|------------------------------------|
@@ -193,64 +197,87 @@ function showGUIFn() {
 # - -4: Service already stopped
 # - -5: Autostart already enabled
 # - -6: Autostart already disabled
+# - -7: Service file does not exists
 function showCMDFn() {
 	case $1 in
 		list)
-			for SERVICE in ${SERVICES[@]}; do
-				echo $SERVICE | cut -f 1 -d:
-			done;
+			if [ $# -eq 1 ]; then
+				if [ -f "$BASEPATH/config/services" ]; then
+					for SERVICE in ${SERVICES[@]}; do
+						echo $SERVICE | cut -f 1 -d:
+					done;
+				else
+					echo -7;
+				fi
+			else
+				echo -1;
+			fi
 		;;
 		status)
 			if [ $# -eq 2 ]; then
-				if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
-					RUNNING=$(getServiceRunningStatusFn $2; echo $?);
-					AUTOSTART=$(getServiceAutoStartStatusFn $2; echo $?);
-					if [ $RUNNING -eq 0 ] && [ $AUTOSTART -eq 0 ]; then
-						echo $2 2;
-					elif [ $RUNNING -eq 0 ] && [ $AUTOSTART -eq 1 ]; then
-						echo $2 3;
-					elif [ $RUNNING -eq 1 ] && [ $AUTOSTART -eq 0 ]; then
-						echo $2 4;
-					elif [ $RUNNING -eq 1 ] && [ $AUTOSTART -eq 1 ]; then
-						echo $2 5;
+				if [ -f "$BASEPATH/config/services" ]; then
+					if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+						RUNNING=$(getServiceRunningStatusFn $2; echo $?);
+						AUTOSTART=$(getServiceAutoStartStatusFn $2; echo $?);
+						if [ $RUNNING -eq 0 ] && [ $AUTOSTART -eq 0 ]; then
+							echo $2 2;
+						elif [ $RUNNING -eq 0 ] && [ $AUTOSTART -eq 1 ]; then
+							echo $2 3;
+						elif [ $RUNNING -eq 1 ] && [ $AUTOSTART -eq 0 ]; then
+							echo $2 4;
+						elif [ $RUNNING -eq 1 ] && [ $AUTOSTART -eq 1 ]; then
+							echo $2 5;
+						fi
+					else
+						echo -2;
 					fi
 				else
-					echo -2;
+					echo -7;
+				fi
+			elif [ $# -eq 1 ]; then
+				if [ -f "$BASEPATH/config/services" ]; then
+					for SERVICE in ${SERVICES[@]}; do
+						NAME=$(echo $SERVICE | cut -f 1 -d:);
+						RUNNING=$(getServiceRunningStatusFn $NAME; echo $?);
+						AUTOSTART=$(getServiceAutoStartStatusFn $NAME; echo $?);
+						if [ $RUNNING -eq 0 ] && [ $AUTOSTART -eq 0 ]; then
+							echo $NAME 2;
+						elif [ $RUNNING -eq 0 ] && [ $AUTOSTART -eq 1 ]; then
+							echo $NAME 3;
+						elif [ $RUNNING -eq 1 ] && [ $AUTOSTART -eq 0 ]; then
+							echo $NAME 4;
+						elif [ $RUNNING -eq 1 ] && [ $AUTOSTART -eq 1 ]; then
+							echo $NAME 5;
+						fi
+					done;
+				else
+					echo -7;
 				fi
 			else
-				for SERVICE in ${SERVICES[@]}; do
-					NAME=$(echo $SERVICE | cut -f 1 -d:);
-					RUNNING=$(getServiceRunningStatusFn $NAME; echo $?);
-					AUTOSTART=$(getServiceAutoStartStatusFn $NAME; echo $?);
-					if [ $RUNNING -eq 0 ] && [ $AUTOSTART -eq 0 ]; then
-						echo $NAME 2;
-					elif [ $RUNNING -eq 0 ] && [ $AUTOSTART -eq 1 ]; then
-						echo $NAME 3;
-					elif [ $RUNNING -eq 1 ] && [ $AUTOSTART -eq 0 ]; then
-						echo $NAME 4;
-					elif [ $RUNNING -eq 1 ] && [ $AUTOSTART -eq 1 ]; then
-						echo $NAME 5;
-					fi
-				done;
+				echo -1;
 			fi
 		;;
 		start)
 			if [ $# -eq 2 ]; then
-				if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
-					if [ $(getServiceRunningStatusFn $2; echo $?) -eq 0 ]; then
-						ID=$(getServiceIDFn $2; echo $?);
-						startServiceFn $ID;
-						RETURN=$?;
-						if [ $RETURN -gt 0 ]; then
-							echo 0;
+				if [ -f "$BASEPATH/config/services" ]; then
+					if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+						if [ $(getServiceRunningStatusFn $2; echo $?) -eq 0 ]; then
+							ID=$(getServiceIDFn $2; echo $?);
+							startServiceFn $ID;
+							RETURN=$?;
+							if [ $RETURN -gt 0 ]; then
+								echo 0;
+							else
+								echo 1;
+							fi;
 						else
-							echo 1;
-						fi;
+							echo -3
+						fi
 					else
-						echo -3
+						echo -2
 					fi
 				else
-					echo -2
+					echo -7;
 				fi
 			else
 				echo -1;
@@ -258,43 +285,51 @@ function showCMDFn() {
 		;;
 		stop)
 			if [ $# -eq 2 ]; then		
-				if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
-					if [ $(getServiceRunningStatusFn $2; echo $?) -eq 1 ]; then
-						ID=$(getServiceIDFn $2; echo $?);
-						stopServiceFn $ID;
-						RETURN=$?;
-						if [ $RETURN -gt 0 ]; then
-							echo 0;
+				if [ -f "$BASEPATH/config/services" ]; then
+					if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+						if [ $(getServiceRunningStatusFn $2; echo $?) -eq 1 ]; then
+							ID=$(getServiceIDFn $2; echo $?);
+							stopServiceFn $ID;
+							RETURN=$?;
+							if [ $RETURN -gt 0 ]; then
+								echo 0;
+							else
+								echo 1;
+							fi;
 						else
-							echo 1;
-						fi;
+							echo -4
+						fi
 					else
-						echo -4
+						echo -2
 					fi
 				else
-					echo -2
+					echo -7;
 				fi
 			else
 				echo -1;
 			fi
 		;;
 		restart)
-			if [ $# -eq 2 ]; then		
-				if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
-					if [ $(getServiceRunningStatusFn $2; echo $?) -eq 0 ]; then
-						ID=$(getServiceIDFn $2; echo $?);
-						restartServiceFn $ID;
-						RETURN=$?;
-						if [ $RETURN -gt 0 ]; then
-							echo 0;
+			if [ $# -eq 2 ]; then	
+				if [ -f "$BASEPATH/config/services" ]; then	
+					if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+						if [ $(getServiceRunningStatusFn $2; echo $?) -eq 0 ]; then
+							ID=$(getServiceIDFn $2; echo $?);
+							restartServiceFn $ID;
+							RETURN=$?;
+							if [ $RETURN -gt 0 ]; then
+								echo 0;
+							else
+								echo 1;
+							fi;
 						else
-							echo 1;
-						fi;
+							echo -4
+						fi
 					else
-						echo -4
+						echo -2
 					fi
 				else
-					echo -2
+					echo -7;
 				fi
 			else
 				echo -1;
@@ -302,38 +337,42 @@ function showCMDFn() {
 		;;
 		autostart)
 			if [ $# -eq 3 ]; then
-				if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
-					if [ $3 == "disable" ]; then
-						if [ $(getServiceAutoStartStatusFn $2; echo $?) -eq 1 ]; then
-							ID=$(getServiceIDFn $2; echo $?);
-							disableAutoStartFn $ID;
-							RETURN=$?;
-							if [ $RETURN -gt 0 ]; then
-								echo 0;
+				if [ -f "$BASEPATH/config/services" ]; then
+					if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+						if [ $3 == "disable" ]; then
+							if [ $(getServiceAutoStartStatusFn $2; echo $?) -eq 1 ]; then
+								ID=$(getServiceIDFn $2; echo $?);
+								disableAutoStartFn $ID;
+								RETURN=$?;
+								if [ $RETURN -gt 0 ]; then
+									echo 0;
+								else
+									echo 1;
+								fi
 							else
-								echo 1;
+								echo -5;
+							fi
+						elif [ $3 == "enable" ]; then
+							if [ $(getServiceAutoStartStatusFn $2; echo $?) -eq 0 ]; then
+								ID=$(getServiceIDFn $2; echo $?);
+								enableAutoStartFn $ID;
+								RETURN=$?;
+								if [ $RETURN -gt 0 ]; then
+									echo 0;
+								else
+									echo 1;
+								fi
+							else
+								echo -6;
 							fi
 						else
-							echo -5;
-						fi
-					elif [ $3 == "enable" ]; then
-						if [ $(getServiceAutoStartStatusFn $2; echo $?) -eq 0 ]; then
-							ID=$(getServiceIDFn $2; echo $?);
-							enableAutoStartFn $ID;
-							RETURN=$?;
-							if [ $RETURN -gt 0 ]; then
-								echo 0;
-							else
-								echo 1;
-							fi
-						else
-							echo -6;
+							echo -1;
 						fi
 					else
-						echo -1;
+						echo -2
 					fi
 				else
-					echo -2
+					echo -7;
 				fi
 			else
 				echo -1;
