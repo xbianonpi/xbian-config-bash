@@ -96,3 +96,7 @@ function updateAptFn() {
 		return 0;
 	fi
 }
+
+function getAllPackagesForInstallFn() {
+	ALLPACKAGES=$(cat /tmp/aptstatus | awk '/upgraded:/ {flag=1;next} /upgraded/{flag=0} flag{print}' | sed 's/ *$//g' | sed 's/^ *//g' | sed ':a;N;$!ba;s/\n/ /g');
+}

@@ -17,65 +17,167 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-function showPackageListDownloadDlg() {
-	wrapTxtFn "$_DOWNLOADPL" $(($DEFAULTWIDTH-4));
+function showUpdateAptDBDlg() {
+	wrapTxtFn "$_UPDATINGAPTDB" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showInfoDlg "$ALIGNEDTXT"
+	showInfoDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
 }
 
-function showPackageListErrorDlg() {
-	wrapTxtFn "$_PLERROR" $(($DEFAULTWIDTH-4));
+function showUpdateAptDBFailedDlg() {
+	wrapTxtFn "$_UPDATEAPTDBFAILED" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showMsgDlg "$ALIGNEDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
 }
 
-function showCheckingForUpdatesDlg() {
-	wrapTxtFn "$_CHECKINGFORUD" $(($DEFAULTWIDTH-4));
+function showDownloadPackageListDlg() {
+	wrapTxtFn "$_DOWNLOADINGPACKAGELIST" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showInfoDlg "$ALIGNEDTXT"
+	showInfoDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
 }
 
-function showUpdatesUpToDateDlg() {
-	wrapTxtFn "$_UPTODATE" $(($DEFAULTWIDTH-4));
+function showUpdateDowngradeDlg() {
+	wrapTxtFn "$_UPDATEDOWNGRADE" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showMsgDlg "$ALIGNEDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
 }
 
-function showUpdateErrorDlg() {
-	wrapTxtFn "$_ERRORCHECKUPDATE" $(($DEFAULTWIDTH-4));
+function showFailedToRetrieveAptMirrosDlg() {
+	wrapTxtFn "$_FAILEDTORETRIEVEAPTMIRRORS" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showMsgDlg "$ALIGNEDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
 }
 
-function showUpdateAvailableDlg() {
-	wrapTxtFn "$_ANUPDATE ($1) $_ISAVAILABLE" $(($DEFAULTWIDTH-4));
+function showRetrievingUpdateListDlg() {
+	wrapTxtFn "$_UPDATEDOWNLOADLIST" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showConfirmDlg "$ALIGNEDTXT" $HEIGHT;
+	showInfoDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
 }
 
-function showInstallingUpdateDlg() {
-	wrapTxtFn "$_INSTALLINGUPDATE" $(($DEFAULTWIDTH-4));
+function showUpdateAlreadyInstalledDlg() {
+	wrapTxtFn "$_UPDATEALREADYINSTALLED" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showInfoDlg "$ALIGNEDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
 }
 
-function showSystemUpdatedDlg() {
-	wrapTxtFn "$_UPDATEDTO $1" $(($DEFAULTWIDTH-4));
+function showUpdateVersionNotExistDlg() {
+	wrapTxtFn "$_UPDATEVERSIONNOTEXISTS" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showMsgDlg "$ALIGNEDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
 }
 
-function showUpdateErrorOccurredDlg() {
-	wrapTxtFn "$_ERRORUPDATE" $(($DEFAULTWIDTH-4));
+function showUpdateNotExistsDlg() {
+	wrapTxtFn "$_UPDATENOTEXISTS" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showMsgDlg "$ALIGNEDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
+}
+
+function showAskForLogDlg() {
+	wrapTxtFn "$_UPDATEASKFORLOG" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showConfirmDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
+}
+
+function showUpdateAdvErrorDlg() {
+	wrapTxtFn "$_UPDATEADVERROR" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
+}
+
+function showInstallUpdatesDlg() {
+	wrapTxtFn "$_UPDATEINSTALLS" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showInfoDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
+}
+
+function showUpToDateDlg() {
+	wrapTxtFn "$_UPDATETODATE" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
+}
+
+function showSystemUpdateConfirmDlg() {
+	wrapTxtFn "$_ASKFORSYSTEMUPDATE" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showConfirmDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
+}
+
+function showUpgradeSystemDlg() {
+	wrapTxtFn "$_UPGRADESYSTEM" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showInfoDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
+}
+
+function showSystemUpdateRebootDlg() {
+	wrapTxtFn "$_UPDATESYSTEMREBOOT" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
+}
+
+function showUpdateLogDlg() {
+	sed -i 's/\r/\n/g' /tmp/aptstatus
+	showTextDlg "/tmp/aptstatus" 15 $(($DEFAULTWIDTH+11));
+}
+
+function showSystemUpdateLogDlg() {
+	showTextDlg "/home/xbian/update" 15 $(($DEFAULTWIDTH+11));
+}
+
+function showAvailableUpdatesDlg() {
+	IFS=" ";
+	ARRAY=($1);
+	MENU=();
+	I=0;
+	for VALUE in ${ARRAY[@]}; do
+		IFS=";";
+		VALUE=($VALUE);
+		I=$(($I+1));
+		NAME=$(echo ${VALUE[0]} | rev | cut -f1 -d"-" | rev);
+		if ! [[ "${VALUE[0]}" =~ "xbian-update" ]]; then
+			MENU+=($I,"\Zb"$NAME",\Zb"${VALUE[1]}" ("${VALUE[2]}"),Off");
+		fi
+	done;
+	IFS=$ORIGINALIFS;
+	TBLCOLUMNCENTER=0;
+	createTableFn "check" \
+	" #,\Zb"$_UPDATES",\Zb"$_UPDATEVERSION \
+	"${MENU[@]}";
+	TBLCOLUMNCENTER=1;
+	if [ $((${#HEADER}%2)) -eq 1 ]; then
+		centerTxtFn "$HEADER" $(($DEFAULTWIDTH+9));
+	else
+		centerTxtFn "$HEADER" $(($DEFAULTWIDTH+11));
+	fi
+	showChecklistDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+9)) 
 }

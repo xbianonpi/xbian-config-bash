@@ -46,7 +46,7 @@ function showFailedToRetrieveAptMirrosDlg() {
 	wrapTxtFn "$_FAILEDTORETRIEVEAPTMIRRORS" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showInfoDlg "$ALIGNEDTXT" $HEIGHT
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 	return $?;
 }
 
@@ -142,7 +142,7 @@ function showPackageAdvErrorDlg() {
 	wrapTxtFn "$_PACKAGEADVERROR" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showConfirmDlg "$ALIGNEDTXT" $HEIGHT
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 	return $?;
 }
 
