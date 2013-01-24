@@ -19,7 +19,6 @@
 
 _NAME="Network"
 _DESC="Configure network interfaces"
-
 _LOADINGINTERFACES="Interfaces loading, please wait ..."
 _NOINTERFACES="No network interfaces available or they are not connected"
 _SELECTINTERFACE="Select interface to configure"

@@ -19,7 +19,6 @@
 
 _NAME="Netwerk"
 _DESC="Configureer netwerk adapters"
-
 _LOADINGINTERFACES="Adapter aan het laden, een ogenblik geduld aub..."
 _NOINTERFACES="Geen netwerk adapters beschikbaar en ze zijn niet verbonden"
 _SELECTINTERFACE="Selecteer de adapter die u wilt configureren"

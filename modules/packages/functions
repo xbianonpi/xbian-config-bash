@@ -102,6 +102,8 @@ function installPackageFn() {
 					return 5;
 				elif [ $(cat /tmp/aptstatus | grep -i "returned an error code" | wc -l) -eq 1 ]; then
 					return 6;
+				elif [ $(cat /tmp/aptstatus | grep "was not found" | wc -l) -eq 1 ]; then
+					return 2;
 				fi
 			fi
 		elif [ $1 -eq 0 ]; then

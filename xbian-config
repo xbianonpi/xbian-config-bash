@@ -42,6 +42,7 @@ ASKFORREBOOT=0;
 # Check if the package database needs to be updates
 LOCALPKGDBUPDATED=0;
 REMOTEPKGDBUPDATED=0;
+APTUPDATELISTUPDATED=0;
 
 # Standard delimiter
 ORIGINALIFS=$IFS;

@@ -22,7 +22,7 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(check update);
+ARGUMENTS=(list progress updatedb installtest);
 
 #|------------------------------------|
 #|          Include files             |
@@ -30,6 +30,7 @@ ARGUMENTS=(check update);
 
 source $BASEPATH/modules/updates/functions
 source $BASEPATH/modules/updates/dialogs
+source $BASEPATH/functions/packages
 
 #|------------------------------------|
 #|           Main program             |
@@ -37,76 +38,288 @@ source $BASEPATH/modules/updates/dialogs
 
 # Executes the GUI version of this module
 function showGUIFn() {
-	showPackageListDownloadDlg
-	downloadPackageListFn
-	if [ $? -eq 0 ]; then
-		showPackageListErrorDlg
-	else
-		showCheckingForUpdatesDlg
-		TOINSTALL=$(checkForUpdatesFn)
-		if [ ! -z "$TOINSTALL" ]; then
-			if [ "$TOINSTALL" = "0" ]; then
-				# No new updates
-				showUpdatesUpToDateDlg
-			elif [ "$TOINSTALL" = "-1" ]; then
-				# An error occurred
-				showUpdateErrorDlg
-			else
-				# Update is available
-				showUpdateAvailableDlg "$TOINSTALL"
-				if [ $? -eq 0 ]; then
-					showInstallingUpdateDlg
-					installUpdateFn "$TOINSTALL"
-					if [ $? -eq 1 ]; then
-						# System updated
-						showSystemUpdatedDlg "$TOINSTALL"
-					else
-						# An error occurred
-						showUpdateErrorOccurredDlg
-					fi
+	if [ $REMOTEPKGDBUPDATED -eq 0 ]; then
+		showDownloadPackageListDlg;
+		updateAptMirrorsFn;
+		if [ $? -eq 0 ]; then
+			showFailedToRetrieveAptMirrosDlg;
+		else
+			downloadPackageListFn;
+			REMOTEPKGDBUPDATED=$?
+		fi;
+	fi
+	if [ $LOCALPKGDBUPDATED -eq 0 ]; then
+		if [ $REMOTEPKGDBUPDATED -eq 1 ]; then
+			localPackageDBOutdatedFn;
+			if [ $? -eq 1 ]; then
+				showUpdateAptDBDlg;
+				updateAptFn;
+				if [ $? -eq 1 ]; then
+					LOCALPKGDBUPDATED=1;
+				else
+					showUpdateAptDBFailedDlg;
 				fi
 			fi
 		fi
 	fi
+	if [ $APTUPDATELISTUPDATED -eq 0 ] || [ ! -f "/tmp/aptupdates" ]; then
+		showRetrievingUpdateListDlg;
+		retrieveUpdateListFn;
+		APTUPDATELISTUPDATED=1;
+	fi
+	getAllUpdatesLisFn;
+	getAllPackagesLisFn
+	SYSTEMUPDATE=0;
 
+	if [ ${#UPDATES[@]} -ge 1 ]; then
+
+		showSystemUpdateConfirmDlg;
+		if [ $? -eq 0 ]; then
+			showUpgradeSystemDlg;
+			updateSystemFn 1 "${UPDATES[*]}";
+			STATUS=$?;
+			LOG=0;
+			if [ $STATUS -eq 1 ]; then
+				showUpdateAlreadyInstalledDlg;
+			elif [ $STATUS -eq 2 ]; then
+				showUpdateVersionNotExistDlg;
+			elif [ $STATUS -eq 3 ]; then
+				showUpdateNotExistsDlg;
+			elif [ $STATUS -eq 4 ]; then
+				showUpdateDowngradeDlg;
+			elif [ $STATUS -ge 5 ]; then
+				showUpdateAdvErrorDlg;
+			elif [ $STATUS -eq 0 ]; then
+				updateSystemFn 0 "${UPDATES[*]}";
+				showAskForLogDlg;
+				if [ $? -eq 0 ]; then
+					if [ -f "/home/xbian/update" ]; then
+						showSystemUpdateLogDlg;
+					else
+						showUpdateLogDlg;
+					fi
+				fi
+				LOG=1;
+				showSystemUpdateRebootDlg;
+				sudo reboot;
+			fi
+			if [ $LOG -eq 0 ]; then
+				showAskForLogDlg;
+				if [ $? -eq 0 ]; then
+					showUpdateLogDlg;
+				fi
+			fi
+			SYSTEMUPDATE=1;
+		fi
+	fi
+	if [ $SYSTEMUPDATE -eq 0 ]; then
+		if [ ${#PACKAGES[@]} -eq 0 ]; then
+			showUpToDateDlg;
+		else
+			showAvailableUpdatesDlg "${PACKAGES[*]}";
+			if [ $? -eq 0 ]; then
+				IFS=" ";
+				SELECTION=($RETURN);
+				showInstallUpdatesDlg;
+				updatePackagesFn 1 "${SELECTION[*]}";
+				STATUS=$?;
+				if [ $STATUS -eq 1 ]; then
+					showUpdateAlreadyInstalledDlg;
+				elif [ $STATUS -eq 2 ]; then
+					showUpdateVersionNotExistDlg;
+				elif [ $STATUS -eq 3 ]; then
+					showUpdateNotExistsDlg;
+				elif [ $STATUS -eq 4 ]; then
+					showUpdateDowngradeDlg;
+				elif [ $STATUS -ge 5 ]; then
+					showUpdateAdvErrorDlg;
+				elif [ $STATUS -eq 0 ]; then
+					updatePackagesFn 0 "${SELECTION[*]}";
+				fi
+				showAskForLogDlg;
+				if [ $? -eq 0 ]; then
+					showUpdateLogDlg;
+				fi
+				showGUIFn; 
+			fi
+		fi
+	fi
 }
 
 # Executes the command line version of this module
 #  $1 Argument [String]
+# list | installtest | install
+#  $2 Type [String] packages | upgrades
+# install | installtest
+#  $@ Index of upgradeable packages
 # Returns
-#  *Check [String]
-#  - Latest version
-#  *Update [Integer]
-#  - 1: Success
-#  - 0: Failed
+# list | installtest | install
+#  -  1: Success
+#  -  0: Failed
+#  - -1: Wrong number of arguments
+#  - -3: You need to run an updatedb first
+#  *list
+#  -  [index];[package name];[install version];[available version]
+#  *installtest | install - (Simulates an) apt-get install
+#  -  1: Package can be installed without problems
+#  -  2: This package is already installed
+#  -  3: Package not found in apt repository
+#  -  4: A newer version of this package is already installed
+#  -  5: There is a size mismatch for the remote package
+#  -  6: The package itself got an internal error
+#  *progress
+#  -  1: Apt is still running
+#  -  0: Apt is not running
+#  *updatedb - Updates local and remote apt library (when needed)
 function showCMDFn() {
 	case $1 in
-		"check")
-			downloadPackageListFn
-			if [ $? -eq 0 ]; then
-				echo 0;
-			else
-				TO_INSTALL=$(checkForUpdatesFn)
-				if [ ! -z "$TO_INSTALL" ]; then
-					if [ "$TO_INSTALL" = "0" ]; then
-						echo "0"
-					elif [ "$TO_INSTALL" = "-1" ]; then
-						echo "-1"
+		list)
+			if [ $# -eq 2 ]; then
+				if [ -f "$BASEPATH/config/pkglist" ] && [ -f "$BASEPATH/config/aptmirror" ]; then
+					retrieveUpdateListFn;
+					if [ "$2" == "packages" ]; then
+						getAllPackagesLisFn;
+						if [ ${#PACKAGES[@]} -ge 1 ]; then
+							for KEY in ${!PACKAGES[@]}; do
+								echo $(($KEY+1))";"${PACKAGES[$KEY]};
+							done
+						else
+							echo -2;
+						fi
+					elif [ "$2" == "upgrades" ]; then
+						getAllUpdatesLisFn;
+						if [ ${#UPDATES[@]} -ge 1 ]; then
+							for KEY in ${!UPDATES[@]}; do
+								echo $(($KEY+1))";"${UPDATES[$KEY]};
+							done
+						else
+							echo -2;
+						fi
 					else
-						echo "$TO_INSTALL"
+						echo -1;
 					fi
 				else
-					echo "0"
+					echo -3;
 				fi
+			else
+				echo -1;
 			fi
 		;;
-		"update")
-			installUpdateFn "$2"
-			if [ $? -eq 1 ]; then
+		installtest)
+			if [ $# -ge 3 ]; then
+				if [ -f "$BASEPATH/config/pkglist" ] && [ -f "$BASEPATH/config/aptmirror" ]; then
+					shift;
+					if [ "$1" == "packages" ]; then
+						shift;
+						getAllPackagesLisFn;
+						SELECTION=($@);
+						updatePackagesFn 1 "${SELECTION[*]}";
+						RETURN=$?;
+						case $RETURN in
+							0)
+								echo 1;
+							;;
+							*)
+								echo $(($RETURN+1));
+							;;
+						esac
+					elif [ "$1" == "upgrades" ]; then
+						shift;
+						getAllUpdatesLisFn;
+						SELECTION=($@);
+						updateSystemFn 1 "${SELECTION[*]}";
+						RETURN=$?;
+						case $RETURN in
+							0)
+								echo 1;
+							;;
+							*)
+								echo $(($RETURN+1));
+							;;
+						esac
+					else
+						echo -1;
+					fi
+				else
+					echo -3;
+				fi
+			else
+				echo -1;
+			fi
+		;;
+		install)
+			if [ $# -ge 3 ]; then
+				if [ -f "$BASEPATH/config/pkglist" ] && [ -f "$BASEPATH/config/aptmirror" ]; then
+					shift;
+					if [ "$1" == "packages" ]; then
+						shift;
+						getAllPackagesLisFn;
+						SELECTION=($@);
+						updatePackagesFn 2 "${SELECTION[*]}";
+						RETURN=$?;
+						case $RETURN in
+							0)
+								echo 1;
+							;;
+							*)
+								echo $(($RETURN+1));
+							;;
+						esac
+					elif [ "$1" == "upgrades" ]; then
+						shift;
+						getAllUpdatesLisFn;
+						SELECTION=($@);
+						updateSystemFn 2 "${SELECTION[*]}";
+						RETURN=$?;
+						case $RETURN in
+							0)
+								echo 1;
+							;;
+							*)
+								echo $(($RETURN+1));
+							;;
+						esac
+					else
+						echo -1;
+					fi
+				else
+					echo -3;
+				fi
+			else
+				echo -1;
+			fi
+		;;		
+		progress)
+			if [ $(kill -0 $(pgrep apt-get) 2>/dev/null; echo $?) -eq 0 ]; then
 				echo 1;
 			else
 				echo 0;
 			fi
+		;;
+		updatedb)
+			STATUS=0;
+			updateAptMirrorsFn;
+			if [ $? -eq 1 ]; then
+				downloadPackageListFn;
+				if [ $? -eq 1 ]; then
+					localPackageDBOutdatedFn;
+					if [ $? -eq 1 ]; then
+						updateAptFn;
+						if [ $? -eq 1 ]; then
+							STATUS=1;
+						else
+							STATUS=0;
+						fi
+					else
+						STATUS=1;
+					fi
+				else
+					STATUS=1;
+				fi
+			else
+				STATUS=0;
+			fi
+			echo $STATUS;
 		;;
 	esac
 }
