@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#Copyright 2012 Hexagon <development@xbian.org>
+#Copyright 2012 CurlyMo <development@xbian.org>
 #
 #This file is part of XBian - XBMC on the Raspberry Pi.
 #
@@ -22,7 +22,7 @@
 #|------------------------------------|
 
 # The arguments this module accepts
-ARGUMENTS=(list progress updatedb installtest);
+ARGUMENTS=(list progress updatedb install installtest);
 
 #|------------------------------------|
 #|          Include files             |
