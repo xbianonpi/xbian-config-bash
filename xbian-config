@@ -140,7 +140,11 @@ function showMainMenuDlg() {
 
 		# Include the module we want to execute
 		source $BASEPATH/modules/$MODULE/main
-		source $BASEPATH/modules/$MODULE/lang/$LANGUAGE
+		if [ -f "$BASEPATH/modules/$MODULE/lang/$LANGUAGE" ]; then
+			source $BASEPATH/modules/$MODULE/lang/$LANGUAGE
+		else
+			source $BASEPATH/modules/$MODULE/lang/en
+		fi
 		
 		# Change the dialog title to reflect the right module
 		TITLE="[${CPATH% > *} > $_NAME]"
@@ -178,10 +182,11 @@ function showMainMenuDlg() {
 			wait $! 2>/dev/null
 		fi
 		# Show the main menu
+
 		if [ $1 -eq 0 ]; then
-			showMenuDlg "" "$MENU" 6 11 $(($DEFAULTWIDTH+15)) $_SELECT $_EXIT
+			showMenuDlg "" "$MENU" 7 11 $(($DEFAULTWIDTH+15)) $_SELECT $_EXIT
 		else
-			showMenuDlg "" "$MENU" 6 
+			showMenuDlg "" "$MENU" 7
 		fi
 			
 		# What there a button pressed?
@@ -243,7 +248,11 @@ if [[ $# -eq 0 ]]; then
 	#|------------------------------------|
 
 	# Main language
-	source $BASEPATH/lang/$LANGUAGE
+	if [ -f "$BASEPATH/lang/$LANGUAGE" ]; then
+		source $BASEPATH/lang/$LANGUAGE
+	else
+		source $BASEPATH/lang/en;
+	fi
 
 	# Common xbian-config functions
 	source $BASEPATH/functions/packages
