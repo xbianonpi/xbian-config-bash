@@ -24,7 +24,7 @@
 #  - 0: Disable ssh root login
 function enableDisableSSHRootLoginDlg() {
 	wrapTxtFn "$_SSHROOTENABLE" $(($DEFAULTWIDTH-4));
-	centerTxtFn "$WRAPPEDTXT $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showConfirmDlg "$ALIGNEDTXT" $HEIGHT 55 "$_ENABLE" "$_DISABLE"
 	return $?;
