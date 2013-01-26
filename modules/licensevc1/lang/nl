@@ -23,3 +23,4 @@ _VC1LICENSE="VC1 Licentie"
 _VC1INSERTED="VC1 licentie succesvol ingevoegd";
 _VC1DELETED="VC1 licentie succesvol verwijderd";
 _VC1UPDATED="VC1 licentie succesvol bijgewerkt";
+_VC1LICENSEINVALID="De VC1 licentie die u heeft ingevoerd heeft een incorrect formaat"
