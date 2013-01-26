@@ -45,9 +45,8 @@ function showLicenseVC1UpdatedDlg() {
 	return $?;
 }
 
-#Shows the license successfulle removed dialog
-function showLicenseVC1DeletedDlg() {
-	wrapTxtFn "$_VC1DELETED" $(($DEFAULTWIDTH-4));
+function showInvalidLicenseFormatDlg() {
+	wrapTxtFn "$_VC1LICENSEINVALID" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT"

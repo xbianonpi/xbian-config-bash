@@ -23,3 +23,4 @@ _VC1LICENSE="VC1 License"
 _VC1INSERTED="VC1 license successfully inserted";
 _VC1DELETED="VC1 license successfully removed";
 _VC1UPDATED="VC1 license successfully updated";
+_VC1LICENSEINVALID="The VC1 license you entered is of an incorrect format"

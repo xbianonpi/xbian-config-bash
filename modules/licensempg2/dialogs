@@ -53,3 +53,11 @@ function showLicenseMPG2DeletedDlg() {
 	showMsgDlg "$ALIGNEDTXT"
 	return $?;
 }
+
+function showInvalidLicenseFormatDlg() {
+	wrapTxtFn "$_MPG2LICENSEINVALID" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT"
+	return $?;
+}
