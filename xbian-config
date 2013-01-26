@@ -25,7 +25,6 @@ fi
 
 trap '' 2 20
 
-
 #|------------------------------------|
 #|          Global variables          |
 #|------------------------------------|
@@ -53,17 +52,8 @@ APTBASE="http://apt.xbian.org/"
 # Location of the xbian-config script files
 BASEPATH="/usr/local/include/xbian-config"
 
-# XBMC language array
-# declare -A LANGARRAY
-# LANGARRAY[Dutch]=nl
-# LANGARRAY[English]=en
-
-# Get XBMC language setting
-# XBMCLANG=$(cat /home/xbian/.xbmc/userdata/guisettings.xml | sed '/<language>/!d;s//\n/;s/[^\n]*\n//;:a;$!{/<\/language/!N;//!ba};y/\n/ /;s/<\/language>/\n/;P;D')
-
-# Prefered language of xbian-config
-# LANGUAGE=${LANGARRAY[$XBMCLANG]};
-LANGUAGE="en";
+#Set GUI language
+LANGUAGE="en"
 
 #|------------------------------------|
 #|           Main program             |
@@ -92,9 +82,9 @@ function showMainCloseDlg() {
 		clrFSCacheFn;
 	fi
 	clrMemCacheFn;
-	#if [ $DOREBOOT -eq 1 ]; then
-	#	reboot
-	#fi;
+	if [ $DOREBOOT -eq 1 ]; then
+		reboot
+	fi;
 	exit 0
 }
 
@@ -124,7 +114,7 @@ function showMainMenuDlg() {
 	IFS=$'\n';
 	
 	# Get all sub-items that corresponding to the level we are currently
-	ITEMS=$(cat $BASEPATH/struct | grep ^$(echo $LEVEL$ADD[0-9])*: | cut -f 2 -d:);
+	ITEMS=$(grep "^$LEVEL$ADD[0-9]*:" $BASEPATH/struct | cut -f 2 -d:);
 
 	# Clear caches need by previous function
 	clrMemCacheFn;
@@ -135,8 +125,8 @@ function showMainMenuDlg() {
 	if [ -z "$ITEMS" ]; then
 		
 		# Grab the system name of the module we want to execute
-		SPECIFICLEVEL=$(echo $LEVEL | awk '{print substr($0,0,length)}');
-		MODULE=$(cat $BASEPATH/struct | grep ^$SPECIFICLEVEL: | cut -f2 -d:);
+		SPECIFICLEVEL=${LEVEL:0:-1};
+		MODULE=$(grep ^$SPECIFICLEVEL: $BASEPATH/struct | cut -f2 -d:);
 
 		# Include the module we want to execute
 		source $BASEPATH/modules/$MODULE/main
@@ -154,7 +144,7 @@ function showMainMenuDlg() {
 		
 		# When we're done, show the main menu again
 		IFS=$'\n';
-		showMainMenuDlg $(($1-1)) $(echo $LEVEL | awk '{print substr($0,0,length-1)}') ${CPATH% > *};
+		showMainMenuDlg $(($1-1)) ${LEVEL:0:-2} ${CPATH% > *};
 	else
 		MENU="";
 		I=1;
@@ -167,8 +157,8 @@ function showMainMenuDlg() {
 				fi
 				MENU+="$I%$_NAME!-!\"$_DESC\"%";
 			else
-				_NAME=$(echo "_ITEM"$ITEM"NAME" | tr "[:lower:]" "[:upper:]");
-				_DESC=$(echo "_ITEM"$ITEM"DESC" | tr "[:lower:]" "[:upper:]");
+				_NAME="_ITEM"${ITEM^^}"NAME";
+				_DESC="_ITEM"${ITEM^^}"DESC";
 				MENU+="$I%${!_NAME}!-!\"${!_DESC}\"%";
 			fi
 			I=$(($I+1));
@@ -201,11 +191,11 @@ function showMainMenuDlg() {
 				showMainCloseDlg;
 			else
 				IFS=$'\n';
-				showMainMenuDlg $(($1-1)) $(echo $LEVEL | awk '{print substr($0,0,length-1)}') ${CPATH% > *};
+				showMainMenuDlg $(($1-1)) ${LEVEL:0:-2} ${CPATH% > *};
 			fi
 		elif [ $CODE -eq 0 ]; then 
 			IFS=$'\n';
-			MODULE=$(cat $BASEPATH/struct | grep ^$(echo $LEVEL$RETURN)*: | cut -f 2 -d:)
+			MODULE=$(grep "^$LEVEL$RETURN*:" $BASEPATH/struct | cut -f 2 -d:)
 			
 			if [ -d $BASEPATH/modules/$MODULE ]; then
 				if [ -f $BASEPATH/modules/$MODULE/lang/$LANGUAGE ]; then
@@ -215,8 +205,8 @@ function showMainMenuDlg() {
 				fi
 				showMainMenuDlg $(($1+1)) $LEVEL$RETURN$ADD  "$CPATH > $_NAME";
 			else
-				_NAME=$(echo "_ITEM"$MODULE"NAME" | tr "[:lower:]" "[:upper:]");
-				_DESC=$(echo "_ITEM"$MODULE"DESC" | tr "[:lower:]" "[:upper:]");
+				_NAME="_ITEM"${MODULE^^}"NAME";
+				_DESC="_ITEM"${MODULE^^}"DESC";
 				showMainMenuDlg $(($1+1)) $LEVEL$RETURN$ADD  "$CPATH > ${!_NAME}";
 			fi
 			
@@ -269,12 +259,18 @@ if [[ $# -eq 0 ]]; then
 	# System functions
 	source $BASEPATH/functions/system
 
+	# Language functions
+	source $BASEPATH/functions/language
+	
 	#|------------------------------------|
 	#|          Global variables          |
 	#|------------------------------------|
 
 	# Current dialog title
 	TITLE="[$_TITLE]"
+
+	# Retrieve user set language
+	getLanguageFn;
 
 	#Run script inside screen, so it's doesn't fill the whole terminal history
 	#SCREEN=$(screen -r | grep "Attached" | wc -l);

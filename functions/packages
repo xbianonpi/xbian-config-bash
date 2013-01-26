@@ -18,24 +18,6 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 #
 
-# Check if a package is installed on the system
-#  $1 package name
-# Returns
-#  * [Integer]
-#  - 0: Not installed
-#  - 1: Installed
-function isPKGInstalledFn() {
-	RES=$(dpkg-query -W -f='${Status}\n' "$1" 2>/dev/null)
-	DEINST=$(echo $RES | grep 'deinstall ok' | wc -l)
-	if [ -z "$RES" ]; then
-		return 0;
-	fi
-	if [ $DEINST -eq 1 ]; then
-		return 0;
-	fi
-	return 1;
-}
-
 function updateAptMirrorsFn() {
 	if [ $(wget --spider http://apt.xbian.org/mirror.txt >/dev/null 1>/dev/null 2>/dev/null; echo $?) -eq 0 ]; then
 		URL=$APTBASE"mirror.txt"

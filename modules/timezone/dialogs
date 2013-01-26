@@ -58,11 +58,11 @@ function showTZCategoryDlg() {
 		fi
 		MENU+=($X,"\Zn"$TZCATEGORY","$STATUS);
 	done;
-	
+	TBLCOLUMNCENTER=0;
 	createTableFn "radio" \
 	"#,\Zb$_TIMEZONE" \
 	"${MENU[@]}"
-	
+	TBLCOLUMNCENTER=1;
 	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+5)); 
 	showRadioDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} 15;
 }
@@ -91,10 +91,11 @@ function showTZLocationDlg() {
 	else
 		NRSIGN="#";
 	fi
-	
+	TBLCOLUMNCENTER=0;
 	createTableFn "radio" \
 	"$NRSIGN,\Zb$_TZLOCATION" \
 	"${MENU[@]}"
+	TBLCOLUMNCENTER=1;
 	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+5));  
 	showRadioDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} 15;
 }
