@@ -17,6 +17,11 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
+# Sets the GUI resolution of XBMC
+#  $1 Resolution [String] One of the available resolutions
+# Returns
+# - 0: Failed
+# - 1: Success
 function setXBMCGUIResFn() {
 	NEWRES=$1;
 	OLDRES=$(cat /home/xbian/.xbmc/userdata/advancedsettings.xml | sed -ne 's/\(.*<guires>\)\([0-9]\{1,4\}\)\(<\/guires>\)/\2/p');
@@ -36,6 +41,10 @@ function setXBMCGUIResFn() {
 	fi
 }
 
+# Gets the GUI resolution of XBMC
+# Returns
+# - 0: Failed
+# - @: Resolution
 function getXBMCGUIResFn() {
 	CURRES=$(cat /home/xbian/.xbmc/userdata/advancedsettings.xml | sed -ne 's/\(.*<guires>\)\([0-9]\{1,4\}\)\(<\/guires>\)/\2/p');
 	if [ -z "$CURRES" ]; then
@@ -45,6 +54,11 @@ function getXBMCGUIResFn() {
 	fi
 }
 
+# Sets the webserver setting XBMC
+#  $1: [Integer] 1 or 0
+# Returns
+# - 0: Failed
+# - 1: Success
 function setXBMCWebserverFn() {
 	if [ $1 -eq 0 ]; then
 		NEWSET="false";
@@ -68,6 +82,10 @@ function setXBMCWebserverFn() {
 	fi
 }
 
+# Gets the webserver setting XBMC
+# Returns
+# - 0: Disabled
+# - 1: Enabled
 function getXBMCWebserverFn() {
 	CURSET=$(cat /home/xbian/.xbmc/userdata/advancedsettings.xml | sed -ne 's/\(.*<webserver>\)\([a-z]\{1,5\}\)\(<\/webserver>\)/\2/p');
 	if [ -z "$CURSET" ] || [ "$CURSET" == "false" ]; then
