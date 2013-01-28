@@ -68,7 +68,17 @@ function getServiceNameFn() {
 	IFS=$'\n';
 	SERVCONF=($(echo -e "$SERVICES"));
 	IFS=$ORIGINALIFS;
-	SERV=$(echo ${SERVCONF[$1]} | cut -f 1 -d:);
+	I=0;
+	for SERVRAW in ${SERVCONF[@]}; do
+		SERV=$(echo $SERVRAW | cut -f 1 -d:);
+		FOUND=$(ls /etc/init.d/ | grep -i "$SERV*");
+		if [ ! -z "$FOUND" ]; then
+			if [ $I -eq $1 ]; then
+				break;
+			fi
+			I=$(($I+1));
+		fi 
+	done
 	NAME=$(ls -Al /etc/init.d/ | grep -m1 "$SERV" | awk '{print $9}');
 }
 
@@ -94,21 +104,25 @@ function checkServiceExistsFn() {
 
 function restartServiceFn() {
 	getServiceNameFn $1;
-	/etc/init.d/$NAME restart 2>/dev/null 1>/dev/null >/dev/null;
-	RETURN=$?;
-	X=0;
-	while [ $(getServiceRunningStatusFn $NAME; echo $?) -eq 0 ] || [ $X -lt 10 ]; do
-		sleep 1;
-		PROCESSES=$(ps -A);
-		X=$(($X+1));
-	done;
-	return $RETURN;
+	if [ -f "/etc/init.d/$NAME" ]; then
+		/etc/init.d/$NAME restart &>/dev/null
+		RETURN=$?;
+		X=0;
+		while [ $(getServiceRunningStatusFn $NAME; echo $?) -eq 0 ] || [ $X -lt 10 ]; do
+			sleep 1;
+			PROCESSES=$(ps -A);
+			X=$(($X+1));
+		done;
+		return $RETURN;
+	else
+		return -1;
+	fi
 }
 
 function startServiceFn() {
 	getServiceNameFn $1;
 	if [ -f "/etc/init.d/$NAME" ]; then
-		/etc/init.d/$NAME start 2>/dev/null 1>/dev/null >/dev/null;
+		/etc/init.d/$NAME start &>/dev/null
 		RETURN=$?;
 		X=0;
 		while [ $(getServiceRunningStatusFn $NAME; echo $?) -eq 0 ] && [ $X -lt 10 ]; do
@@ -125,7 +139,7 @@ function startServiceFn() {
 function stopServiceFn() {
 	getServiceNameFn $1;
 	if [ -f "/etc/init.d/$NAME" ]; then
-		/etc/init.d/$NAME stop 2>/dev/null 1>/dev/null >/dev/null;
+		/etc/init.d/$NAME stop &>/dev/null
 		RETURN=$?;
 		X=0;
 		while [ $(getServiceRunningStatusFn $NAME; echo $?) -eq 1 ] && [ $X -lt 10 ]; do
@@ -142,7 +156,7 @@ function stopServiceFn() {
 function disableAutoStartFn() {
 	getServiceNameFn $1;
 	if [ -f "/etc/init.d/$NAME" ]; then	
-		update-rc.d $NAME remove 2>/dev/null 1>/dev/null >/dev/null;
+		update-rc.d $NAME remove &>/dev/null
 		RETURN=$?;
 		X=0;
 		while [ $(getServiceAutoStartStatusFn $NAME; echo $?) -eq 1 ] && [ $X -lt 10 ]; do
@@ -161,7 +175,7 @@ function disableAutoStartFn() {
 function enableAutoStartFn() {
 	getServiceNameFn $1;
 	if [ -f "/etc/init.d/$NAME" ]; then
-		update-rc.d $NAME defaults 2>/dev/null 1>/dev/null >/dev/null;
+		update-rc.d $NAME defaults &>/dev/null
 		RETURN=$?;
 		X=0;
 		while [ $(getServiceAutoStartStatusFn $NAME; echo $?) -eq 0 ] && [ $X -lt 10 ]; do

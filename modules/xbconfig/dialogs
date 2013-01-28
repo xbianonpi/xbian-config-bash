@@ -42,12 +42,7 @@ function showXBConfigLanguageDlg() {
 	"#,\Zb"$_XBLANGUAGE\
 	"${MENU[@]}";
 	
-	if [ $((${#HEADER}%2)) -ge 17 ]; then
-		centerTxtFn "$HEADER" $(($DEFAULTWIDTH+11))
-	else
-		centerTxtFn "$HEADER" $(($DEFAULTWIDTH+9))
-	fi
-	
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+11))
 	showMenuDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} 14
 }
 
