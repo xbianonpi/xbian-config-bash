@@ -19,7 +19,7 @@
 
 _NAME="Packages"
 _DESC="Install or remove packages"
-_UPDATINGAPTDB="Update local package database..."
+_UPDATINGAPTDB="Updating local package database..."
 _UPDATEAPTDBFAILED="An error occured while updating the package database"
 _DOWNLOADINGPACKAGELIST="Downloading remote package database..."
 _FAILEDTORETRIEVEAPTMIRRORS="Failed to retrieve download mirrors, therefore a local (possibly outdated) list will be used"
@@ -52,3 +52,4 @@ _PACKAGEDOWNLOADSIZE="Download size:"
 _PACKAGEDESCRIPTION="Description:"
 _PACKAGEDEPENDENCIES="Dependencies:"
 _PACKAGEACTIONS="Actions"
+_PACKAGEINSTALLRETRY="Please retry to install this packages"

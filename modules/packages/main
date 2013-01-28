@@ -29,6 +29,7 @@ else
 	CONTENT="";
 fi
 ALLPKGLST=$(dpkg --get-selections);
+PKGNOTFOUND=0;
 
 #|------------------------------------|
 #|          Include files             |
@@ -61,7 +62,19 @@ function showPackageActionsFn() {
 				elif [ $STATUS -eq 2 ]; then
 					showPackageVersionNotExistDlg;
 				elif [ $STATUS -eq 3 ]; then
-					showPackageNotExistsDlg;
+					if [ $PKGNOTFOUND -eq 0 ]; then
+						showPackageNotExistsDlg;
+						showUpdateAptDBDlg;
+						updateAptFn;
+						if [ $? -eq 1 ]; then
+							LOCALPKGDBUPDATED=1;
+							showPacakgeInstallRetryDlg;
+						else
+							showUpdateAptDBFailedDlg;
+						fi
+					else
+						showErrorDlg;
+					fi
 				elif [ $STATUS -eq 4 ]; then
 					showPackageDowngradeDlg;
 				elif [ $STATUS -ge 5 ]; then

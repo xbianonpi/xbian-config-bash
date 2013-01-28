@@ -170,6 +170,22 @@ function showRemovingPackageDlg() {
 	return $?;
 }
 
+function showPackageNotExistsDlg() {
+	wrapTxtFn "$_PACKAGENOTEXISTS" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
+}
+
+function showPacakgeInstallRetryDlg() {
+	wrapTxtFn "$_PACKAGEINSTALLRETRY" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+	return $?;
+}
+
 function showInstallLogDlg() {
 	sed -i 's/\r/\n/g' /tmp/aptstatus
 	showTextDlg "/tmp/aptstatus" 15 $(($DEFAULTWIDTH+11));
