@@ -72,10 +72,10 @@ function showCMDFn() {
 				if [ $? -eq 1 ]; then
 					echo 1;
 				else
-					echo -2;
+					echo -1;
 				fi
 			else
-				echo -1;
+				echo -2;
 			fi
 		;;
 		resize)
@@ -85,10 +85,10 @@ function showCMDFn() {
 					resizeSDFn;
 					echo $?;
 				else
-					echo -2;
+					echo -1;
 				fi
 			else
-				echo -1;
+				echo -2;
 			fi
 		;;
 	esac;
