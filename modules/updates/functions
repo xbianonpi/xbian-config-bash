@@ -18,7 +18,8 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 function retrieveUpdateListFn() {
-	apt-get upgrade -s @>/tmp/aptupdates 2>/dev/null;
+	#apt-get dist-upgrade -s &>/tmp/aptupdates 2>/dev/null;
+	echo;
 }
 
 function getAllPackagesLisFn() {
@@ -54,36 +55,17 @@ function updatePackagesFn() {
 	done;
 
 	if [ $1 -eq 1 ]; then
-		echo "apt-get install -s $LIST"
 		apt-get install -s $LIST &>/tmp/aptstatus
-		CODE=$?;
-		if [ $CODE -eq 0 ]; then
-			if [ $(cat /tmp/aptstatus | grep "already the newest version" | wc -l) -eq 1 ]; then
-				return 1;
-			elif [ $(cat /tmp/aptstatus | grep "was not found" | wc -l) -eq 1 ]; then
-				return 2;
-			elif [ $(cat /tmp/aptstatus | grep "Unable to locate package" | wc -l) -eq 1 ]; then
-				return 3;
-			elif [ $(cat /tmp/aptstatus | grep "DOWNGRADED" | wc -l) -eq 1 ]; then
-				return 4;
-			else
-				return 0;
-			fi
-		elif [ $CODE -eq 100 ]; then
-			if [ $(cat /tmp/aptstatus | grep -i "size mismatch" | wc -l) -eq 1 ]; then
-				return 5;
-			elif [ $(cat /tmp/aptstatus | grep -i "returned an error code" | wc -l) -eq 1 ]; then
-				return 6;
-			elif [ $(cat /tmp/aptstatus | grep "was not found" | wc -l) -eq 1 ]; then
-				return 2;
-			fi
-		fi 
 	elif [ $1 -eq 0 ]; then
-		apt-get install $LIST &>/tmp/aptstatus
+		apt-get install -y $LIST
 	elif [ $1 -eq 2 ]; then
-		nohup apt-get install $LIST &>/tmp/aptstatus &
+		nohup apt-get install -y $LIST &>/tmp/aptstatus &
 	fi
+	getErrorCodeFn;
+	return $?;
 }
+
+
 
 function findNextUpdateVersionFn() {
 	CMAJVERSION=$1;
@@ -163,38 +145,18 @@ function updateSystemFn() {
 	CMINVERSION=$(echo $CVERSION | cut -f2 -d"-");
 	
 	findNextUpdateVersionFn "$CMAJVERSION" "$CMINVERSION";
-
+	NEXTVERSION="1.0-0.5";
 	if [ -z "$NEXTVERSION" ]; then
 		return 2;
 	else 
 		if [ $1 -eq 1 ]; then
 			apt-get install -s ${VERSIONS[0]}"="$NEXTVERSION &>/tmp/aptstatus
-			CODE=$?;
-			if [ $CODE -eq 0 ]; then
-				if [ $(cat /tmp/aptstatus | grep "already the newest version" | wc -l) -eq 1 ]; then
-					return 1;
-				elif [ $(cat /tmp/aptstatus | grep "was not found" | wc -l) -eq 1 ]; then
-					return 2;
-				elif [ $(cat /tmp/aptstatus | grep "Unable to locate package" | wc -l) -eq 1 ]; then
-					return 3;
-				elif [ $(cat /tmp/aptstatus | grep "DOWNGRADED" | wc -l) -eq 1 ]; then
-					return 4;
-				else
-					return 0;
-				fi
-			elif [ $CODE -eq 100 ]; then
-				if [ $(cat /tmp/aptstatus | grep -i "size mismatch" | wc -l) -eq 1 ]; then
-					return 5;
-				elif [ $(cat /tmp/aptstatus | grep -i "returned an error code" | wc -l) -eq 1 ]; then
-					return 6;
-				elif [ $(cat /tmp/aptstatus | grep "was not found" | wc -l) -eq 1 ]; then
-					return 2;
-				fi
-			fi 
 		elif [ $1 -eq 0 ]; then
-			apt-get install ${VERSIONS[0]}"="$NEXTVERSION &>/tmp/aptstatus
-		elif [ $1 -eq 0 ]; then
-			nohup apt-get install ${VERSIONS[0]}"="$NEXTVERSION &>/tmp/aptstatus &
+			apt-get install -y ${VERSIONS[0]}"="$NEXTVERSION
+		elif [ $1 -eq 2 ]; then
+			nohup apt-get install -y ${VERSIONS[0]}"="$NEXTVERSION &>/tmp/aptstatus &
 		fi
+		getAptErrorCodeFn;
+		return $?
 	fi
 }

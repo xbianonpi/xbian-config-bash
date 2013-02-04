@@ -73,7 +73,7 @@ function showGUIFn() {
 			showCustomOCDlg "${SETTINGS[@]}";
 			if [ $? -eq 0 ]; then
 				NEWSETTINGS=($(echo $VALUES | sed 's/Mhz //g'));
-				if [ "${NEWSETTINGS[*]}" ==  "${SETTINGS[*]}" ]; then
+				if [ "${NEWSETTINGS[0]} ${NEWSETTINGS[2]} ${NEWSETTINGS[4]} ${NEWSETTINGS[6]}" ==  "${SETTINGS[*]}" ]; then
 					showNoOCChangeDlg;
 				elif [ ${#NEWSETTINGS[@]} -eq 4 ]; then
 					updateCustomOCSettingsFn "${NEWSETTINGS[*]}";

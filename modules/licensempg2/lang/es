@@ -23,3 +23,4 @@ _MPG2LICENSE="Licencia MPG2"
 _MPG2INSERTED="Licencia de MPG2 insertada con exito";
 _MPG2DELETED="Licencia de MPG2 eliminada con exito";
 _MPG2UPDATED="Licencia de MPG2 actualizada con exito";
+_MPG2LICENSEINVALID="La licencia de MPG2, que has introducido, presenta un formato incorrecto"

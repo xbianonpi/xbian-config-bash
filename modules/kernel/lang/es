@@ -18,7 +18,7 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 _NAME="Kernel"
-_DESC="Seleccione uno de los kernels instalados"
+_DESC="Seleccione uno de los kernels"
 _KERNELVERSION="Version"
 _KERNELSWITCHSUCCESS="Eleccion del kernel completada con exito"
 _KERNELALREADYRUNNING="Ya estas usando esta version del kernel"

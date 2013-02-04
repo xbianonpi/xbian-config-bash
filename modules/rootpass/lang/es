@@ -17,9 +17,9 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-_NAME="Palavra-chave XBian"
-_DESC="Alterar palavra-chave para o utilizador xbian"
-_XBIANPASSCHANGED="Palavra-chave XBian alterada com sucesso"
-_XBIANPASS="Palavra-chave:";
-_XBIANPASSEMPTYFIELDS="Tens que introduzir uma nova palavra-chave e a confirmação"
-_XBIANPASSNOMATCH="Palavras-chave não coincidem"
+_NAME="Contraseña root"
+_DESC="Cambiar la contraseña de root"
+_ROOTPASSCHANGED="La contraseña de root ha sido cambiada"
+_ROOTPASS="Password:";
+_ROOTPASSEMPTYFIELDS="Debes introducir tu contraseña dos veces"
+_ROOTPASSNOMATCH="Las contraseñas introducidas no coinciden"

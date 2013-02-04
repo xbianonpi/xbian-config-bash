@@ -60,11 +60,9 @@ function showInterfacesSelectGUIFn() {
 			MODE=$(echo -e "$IFACE_DATA" | grep 'mode ' | cut -f 2 -d" ")
 			
 			showIPModeConfigGUIFn;
-			return 0;
 		fi
 	else
 		showNoInterfacesAvailableDlg
-		return 0;
 	fi
 }
 
@@ -91,11 +89,7 @@ function showIPModeConfigGUIFn() {
 		else
 			# Configuration done
 			showGUIFn
-			return 0;
 		fi
-	else
-		showGUIFn;
-		return 0;
 	fi
 }
 
@@ -127,16 +121,13 @@ function showInterfaceStaticGUIFn() {
 			else
 				showInterfaceStaticErrorDlg
 				showInterfaceStaticGUIFn "$1" "$2"
-				return 0;
 			fi
 		else
 			showInterfaceStaticErrorDlg
 			showInterfaceStaticGUIFn "$1" "$2"
-			return 0;
 		fi
 	else
 		showIPModeConfigGUIFn
-		return 0;
 	fi
 }
 
@@ -180,16 +171,13 @@ function showWlanScanGUIFn() {
 					showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
 				else
 					showWlanScanGUIFn $1 $2
-					return 0;
 				fi
 			else
 				showWlanScanGUIFn $1 $2
-				return 0;
 			fi
 		fi
 	else
 		showIPModeConfigGUIFn;
-		return 0;
 	fi
 }
 
@@ -231,22 +219,17 @@ function showWlanProtectionGUIFn() {
 				showWlanRestartGUIFn $1 $SSID
 				if [ $STATUS -eq 3 ]; then
 					showGUIFn;
-					return 0;
 				elif [ $STATUS -eq 2 ]; then
 					showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
-					return 0;
 				fi
 			else
 				showInterfaceCredentialsErrorDlg
 				showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
-				return 0;
 			fi
 		elif [ $CUSTOM -eq 1 ]; then
 			showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
-			return 0;
 		else
 			showWlanScanGUIFn "$1" "$2"
-			return 0;
 		fi
 	else
 		showInterfaceSSIDDlg "$SSID"
@@ -257,19 +240,15 @@ function showWlanProtectionGUIFn() {
 				showWlanRestartGUIFn $1 $SSID
 				if [ $STATUS -eq 3 ]; then
 					showGUIFn;
-					return 0;
 				elif [ $STATUS -eq 2 ]; then
 					showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
-					return 0;
 				fi
 			else
 				showInterfaceCredentialsErrorDlg
 				showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
-				return 0;
 			fi
 		else
 			showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
-			return 0;
 		fi
 	fi
 }

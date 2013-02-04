@@ -157,6 +157,13 @@ function showMainMenuDlg() {
 				fi
 				MENU+="$I%$_NAME!-!\"$_DESC\"%";
 			else
+				if [ -f $BASEPATH/lang/$LANGUAGE ]; then
+					source $BASEPATH/lang/$LANGUAGE
+				else
+					source $BASEPATH/lang/en
+				fi
+			
+			
 				_NAME="_ITEM"${ITEM^^}"NAME";
 				_DESC="_ITEM"${ITEM^^}"DESC";
 				MENU+="$I%${!_NAME}!-!\"${!_DESC}\"%";
@@ -207,6 +214,7 @@ function showMainMenuDlg() {
 			else
 				_NAME="_ITEM"${MODULE^^}"NAME";
 				_DESC="_ITEM"${MODULE^^}"DESC";
+				
 				showMainMenuDlg $(($1+1)) $LEVEL$RETURN$ADD  "$CPATH > ${!_NAME}";
 			fi
 			
@@ -291,7 +299,7 @@ else
 
 	# System functions
 	source $BASEPATH/functions/system
-
+	clrMemCacheFn;
 	# Check xbian-config was opened using arguments
 	MODULE=$1;
 	if [ $MODULE == "reboot" ]; then

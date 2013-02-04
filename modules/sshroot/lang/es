@@ -17,8 +17,8 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-_NAME="Acceder como superusuario mediante SSH"
-_DESC="Activar/Desactivar el acceso como superusuario mediante SSH"
+_NAME="Superusuario SSH"
+_DESC="(Des)activar acceso superusuario SSH"
 _SSHROOTENABLE="Quieres activar o desactivar el acceso al superusuario mediante SSH"
 _NOSSHROOTPASS="La contraseña de superusuario esta vacia, sin contraseña no se puede acceder como superusuario mediante SSH, por favor corrigalo."
 _SSHROOTENABLED="Acceso como superusuario mediante SSH activado con exito"

@@ -76,7 +76,7 @@ function updateLicenseVC1Fn() {
 #  - 1: Success
 #  - 0: Failed
 function deleteLicenseVC1Fn() {
-	sed -i '/decode_WVC1=$1/d" /boot/config.txt;
+	sed -i "/decode_WVC1=$1/d" /boot/config.txt;
 	if [ $(cat /boot/config.txt | grep $1 | wc -l) -eq 0 ]; then
 		return 1;
 	else
