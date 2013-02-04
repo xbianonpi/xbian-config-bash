@@ -203,6 +203,9 @@ function showAvailableWLANDlg() {
 		VALUES=($WNETWORK);
 
 		NAME=$(echo "${VALUES[0]}" | awk '{print substr($0,2,length-2)}');
+		if [ ${#NAME} -gt 13 ]; then
+			NAME=${NAME:0:10}"...";
+		fi
 		SECURITY=${VALUES[2]};
 		if [ "$SECURITY" == "on" ]; then
 			SECURITY="$_YES"
@@ -221,7 +224,7 @@ function showAvailableWLANDlg() {
 			SIGNAL="***";
 		elif [ ${VALUES[3]} -gt 40 ]; then
 			SIGNAL="**";
-		elif [ ${VALUES[3]} -gt 20 ]; then
+		else
 			SIGNAL="*";
 		fi
 		MENU+=($X",\Zn"$NAME",\Zn"$SECURITY",\Zn"${VALUES[1]}",\Zn"$SIGNAL","$SELECTED);
