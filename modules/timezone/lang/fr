@@ -17,12 +17,12 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-_NAME="Fuso Horário"
-_DESC="Alterar o fuso horário do seu RPi"
-_TZLOADINGCURRENT="Identificando o seu fuso horário atual..."
-_TIMEZONE="Fuso Horário"
-_TZLOCATION="Localização"
-_TZOLDANDNEW="A data/hora antiga e nova:"
-_TZNOCATEGORYSELECTED="Não selecionou um Fuso Horário"
-_TZNOLOCATIONSELECTED="Não selecionou uma localização"
-_TZLOADINGLOCATIONS="Carregando localizações..."
+_NAME="Timezone"
+_DESC="Modifier le timezone du RPi"
+_TZLOADINGCURRENT="Récupération du timezone actuel..."
+_TIMEZONE="Timezone"
+_TZLOCATION="région"
+_TZOLDANDNEW="L'ancienne et nouvelle date/heure:"
+_TZNOCATEGORYSELECTED="Vous n'avez pas sélectionné un timezone"
+_TZNOLOCATIONSELECTED="Vous n'avez pas sélectionné une région"
+_TZLOADINGLOCATIONS="Chargements des régions"

@@ -277,8 +277,8 @@ function showCMDFn() {
 					if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
 						getPackageInformationFn $2;
 						echo "name "${PKGINFO[0]} 
-						echo "versionl "${PKGINFO[1]};
-						echo "versioni "$(getPackageVersionFn ${PKGINFO[0]});
+						echo "versionl "$(getPackageVersionFn ${PKGINFO[0]});
+						echo "versionr "${PKGINFO[1]};
 						echo "sized " ${PKGINFO[3]};
 						echo "sizei " ${PKGINFO[2]};
 						echo "desc" ${PKGINFO[4]};

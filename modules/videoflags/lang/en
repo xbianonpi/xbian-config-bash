@@ -19,7 +19,7 @@
 
 _NAME="Video output"
 _DESC="Change HDMI, CEC and overscan settings"
-_VIDEOFLAGS="Video Flags"
+_VIDEOFLAGS="Video flags"
 _VIDEOFLAGSSUCCESS="Video flags successfully updated"
 _HDMIFORCEHOTPLUG="HDMI force hotplug"
 _HDMIIGNOREHOTPLUG="HDMI ignore hotplug"

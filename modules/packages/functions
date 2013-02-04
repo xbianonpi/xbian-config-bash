@@ -83,36 +83,13 @@ function installPackageFn() {
 	else
 		if [ $1 -eq 1 ]; then
 			apt-get install -s $2 &>/tmp/aptstatus
-			#Check required disk space
-			CODE=$?;
-			if [ $CODE -eq 0 ]; then
-				if [ $(cat /tmp/aptstatus | grep "already the newest version" | wc -l) -eq 1 ]; then
-					return 1;
-				elif [ $(cat /tmp/aptstatus | grep "was not found" | wc -l) -eq 1 ]; then
-					return 2;
-				elif [ $(cat /tmp/aptstatus | grep "Unable to locate package" | wc -l) -eq 1 ]; then
-					return 3;
-				elif [ $(cat /tmp/aptstatus | grep "DOWNGRADED" | wc -l) -eq 1 ]; then
-					return 4;
-				else
-					return 0;
-				fi
-			elif [ $CODE -eq 100 ]; then
-				if [ $(cat /tmp/aptstatus | grep -i "size mismatch" | wc -l) -eq 1 ]; then
-					return 5;
-				elif [ $(cat /tmp/aptstatus | grep -i "returned an error code" | wc -l) -eq 1 ]; then
-					return 6;
-				elif [ $(cat /tmp/aptstatus | grep "Unable to locate package" | wc -l) -eq 1 ]; then
-					return 3;
-				elif [ $(cat /tmp/aptstatus | grep "was not found" | wc -l) -eq 1 ]; then
-					return 2;
-				fi
-			fi
 		elif [ $1 -eq 0 ]; then
 			apt-get install -y $2 &>/tmp/aptstatus
 		elif [ $1 -eq 2 ]; then
 			nohup apt-get install -y $2 &>/tmp/aptstatus &
 		fi
+		getAptErrorCodeFn;
+		return $?;
 	fi
 }
 

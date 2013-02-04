@@ -24,8 +24,8 @@ function showInterfacesSelectDlg() {
 	IFACES="$1"
 	I=1
 	for IFACE in ${IFACES[@]}; do
-		IPADDR=($(ifconfig $IFACE | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'))
-		NETMASK=($(ifconfig $IFACE | grep 'inet addr:' | cut -d: -f4 | awk '{ print $1}'))
+		IPADDR=$(ifconfig $IFACE | grep 'inet' | cut -d: -f2 | awk '{print $1}')
+		NETMASK=$(ifconfig $IFACE | grep 'inet' | cut -d: -f4 | awk '{print $1}')
 		MENU+=($I",\Zn"$IFACE",\Zn"$IPADDR",\Zn"$NETMASK)
 		I=$(($I+1))
 	done

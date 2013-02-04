@@ -27,6 +27,7 @@ LANGARRAY[French]=fr
 LANGARRAY[Portuguese]=pt
 LANGARRAY[Slovak]=sk
 LANGARRAY[Spanish]=es
+LANGARRAY[German]=de
 
 # Language translations
 _DUTCH="Nederlands"
@@ -36,11 +37,12 @@ _FRENCH="Français"
 _PORTUGUESE="Português"
 _SLOVAK="Slovenčina"
 _SPANISH="Español"
+_GERMAN="Deutsch"
 
 function getLanguageFn() {
 	# Get XBMC language setting
 	USERLANG=$(cat $BASEPATH"/config/xbconfig" | grep language | cut -f2 -d":");
-	XBMCLANG=$(cat /home/xbian/.xbmc/userdata/guisettings.xml | sed '/<language>/!d;s//\n/;s/[^\n]*\n//;:a;$!{/<\/language/!N;//!ba};y/\n/ /;s/<\/language>/\n/;P;D')
+	XBMCLANG=$(cat /home/xbian/.xbmc/userdata/guisettings.xml | sed '/<language>/!d;s//\n/;s/[^\n]*\n//;:a;$!{/<\/language/!N;//!ba};y/\n/ /;s/<\/language>/\n/;P;D' | sed -ne 's/\([A-Za-z]\{1,\}\)\([\ ](.*\|.*\)/\1/p')
 
 	# Prefered language of xbian-config
 	if [ -z $USERLANG ]; then

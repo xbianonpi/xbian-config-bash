@@ -23,3 +23,4 @@ _VC1LICENSE="VC1 Licencia"
 _VC1INSERTED="VC1 licencia úspešne zadaná";
 _VC1DELETED="VC1 licencia úspešne odstránená";
 _VC1UPDATED="VC1 licencia úspešne aktualizovaná";
+_VC1LICENSEINVALID="Zadaná VC1 licencia nemá správny tvar"

@@ -23,3 +23,4 @@ _VC1LICENSE="VC1 License"
 _VC1INSERTED="License VC1 installée ";
 _VC1DELETED="License VC1 supprimée";
 _VC1UPDATED="License VC1 mise à jour";
+_VC1LICENSEINVALID="La license VC1 n'a pas le bon format"

@@ -9,3 +9,5 @@ sickbeard:
 nzbgetd:
 couchpotato:
 sabnzbdplus:
+sysklogd:syslogd
+klogd:

@@ -70,7 +70,7 @@ function showGUIFn() {
 	getAllUpdatesLisFn;
 	getAllPackagesLisFn
 	SYSTEMUPDATE=0;
-
+echo ${UPDATES[@]};
 	if [ ${#UPDATES[@]} -ge 1 ]; then
 
 		showSystemUpdateConfirmDlg;
@@ -91,17 +91,23 @@ function showGUIFn() {
 				showUpdateAdvErrorDlg;
 			elif [ $STATUS -eq 0 ]; then
 				updateSystemFn 0 "${UPDATES[*]}";
-				showAskForLogDlg;
 				if [ $? -eq 0 ]; then
-					if [ -f "/home/xbian/update" ]; then
-						showSystemUpdateLogDlg;
-					else
-						showUpdateLogDlg;
+					if [ -f "/tmp/aptstatus" ] || [ -f "/home/xbian/update" ]; then
+						showAskForLogDlg;
+						if [ $? -eq 0 ]; then
+							if [ -f "/home/xbian/update" ]; then
+								showSystemUpdateLogDlg;
+							elif [ -f "/tmp/aptstatus" ]; then
+								showUpdateLogDlg;
+							fi
+						fi
 					fi
+					LOG=1;
+					showSystemUpdateRebootDlg;
+					sudo reboot;
+				else
+					showUpdateAdvErrorDlg;
 				fi
-				LOG=1;
-				showSystemUpdateRebootDlg;
-				sudo reboot;
 			fi
 			if [ $LOG -eq 0 ]; then
 				showAskForLogDlg;
@@ -136,9 +142,11 @@ function showGUIFn() {
 				elif [ $STATUS -eq 0 ]; then
 					updatePackagesFn 0 "${SELECTION[*]}";
 				fi
-				showAskForLogDlg;
-				if [ $? -eq 0 ]; then
-					showUpdateLogDlg;
+				if [ -f "/tmp/aptstatus" ]; then
+					showAskForLogDlg;
+					if [ $? -eq 0 ]; then
+						showUpdateLogDlg;
+					fi
 				fi
 				showGUIFn; 
 			fi
