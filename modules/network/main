@@ -74,22 +74,29 @@ function showIPModeConfigGUIFn() {
 		if [ $RETURN -eq 1 ]; then
 			# DHCP Selected
 			setInterfaceDhcpFn "$IFACE"
+			STATUS=$?;
 			#showInterfaceDhcpSuccessDlg
 			MODE="dhcp"
 		else
 			# Static IP Selected
 			showInterfaceStaticGUIFn "$IFACE" "$IFACE_DATA"
+			STATUS=$?;
 			MODE="static"
 		fi
-		
-		# If needed, ask for wireless credentials
-		ISWLAN=$(echo -e "$IFACE" | grep wlan)
-		if [ ! -z "$ISWLAN" ]; then
-			showWlanScanGUIFn "$IFACE" "$IFACE_DATA"
-		else
-			# Configuration done
-			showGUIFn
+
+		if [ $STATUS -eq 1 ]; then
+			# If needed, ask for wireless credentials
+			ISWLAN=$(echo -e "$IFACE" | grep wlan)
+			if [ ! -z "$ISWLAN" ]; then
+				showWlanScanGUIFn "$IFACE" "$IFACE_DATA"
+			else
+				# Configuration done
+				showGUIFn
+			fi
 		fi
+	else
+		# Configuration done
+		showGUIFn
 	fi
 }
 
@@ -138,14 +145,14 @@ function showWlanScanGUIFn() {
 	PROTECTION=$(echo "$2" | grep protection | cut -f 2 -d" ")
 
 	showScanForWLANDlg;
-
+	
 	if [ $? -eq 0 ]; then
 		if [ $RETURN -eq 2 ]; then
 			CUSTOM=1;
 		else
 			CUSTOM=0;
 		fi
-		if [ $CUSTOM -eq 1 ]; then
+		if [ $CUSTOM -eq 1 ]; then	
 			showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
 		else
 			showScanningForNetworksDlg;
@@ -155,10 +162,9 @@ function showWlanScanGUIFn() {
 				if [ ! -z $RETURN ]; then
 					IFS=",";
 					WNETWORK=(${WNETWORKS[$(($RETURN-1))]});
-					
-					if [ "${WNETWORK[1]}" == "off" ] || [ "${WNETWORK[2]}" == "Open" ]; then
+					if [ "${WNETWORK[2]}" == "off" ] || [ "${WNETWORK[1]}" == "Open" ]; then
 						PROTECTION="Open";
-					elif [ "${WNETWORK[2]}" == "WPA" ] || [ "${WNETWORK[2]}" == "WPA2" ]; then
+					elif [ "${WNETWORK[1]}" == "WPA" ] || [ "${WNETWORK[1]}" == "WPA2" ]; then
 						PROTECTION="WPA"
 					else
 						PROTECTION="WEP";
@@ -259,6 +265,7 @@ function showWlanRestartGUIFn() {
 	LASTSTATUS=-1;
 	while [ $(kill -0 $PROCESSID 2>/dev/null >/dev/null; echo $?) -eq 0 ]; do
 		getWLANConnectStatusFn;
+		echo $STATUS;
 		if [ $LASTSTATUS -ne $STATUS ]; then
 			LASTSTATUS=$STATUS;
 			if [ $STATUS -eq 1 ]; then
@@ -269,9 +276,12 @@ function showWlanRestartGUIFn() {
 				showWLANConnectionSuccessDlg $2
 			fi
 		fi
+		sleep 1;
 	done;
 	
 	getWLANConnectStatusFn;
+	
+	echo $STATUS;
 	if [ $LASTSTATUS -ne $STATUS ]; then
 		LASTSTATUS=$STATUS;
 		if [ $STATUS -eq 1 ]; then
@@ -401,11 +411,29 @@ function showCMDFn() {
 					fi
 
 					# Validation of arguments is done inside this function
-					RESULT=$(setInterfaceStaticFn "$2" "$3" "$4" "$5" "$NAMESERVER1" "$NAMESERVER2")
-
+					RESULT=$(setInterfaceStaticFn "$2" "$3" "$4" "$5" "$NAMESERVER1" "$NAMESERVER2"; echo $?)
+					case $RETULT in
+						6)
+							echo -6;
+						;;
+						7)
+							echo -7;
+						;;
+						8)
+							echo -8;
+						;;
+						9)
+							echo -9;
+						;;
+						1)
+							echo 1;
+						;;
+						3)
+							echo -3;
+						;;
+					esac;
 					# Return status of setInterfaceModeFn
-					echo "$RESULT"
-					return $?;
+					return $RESULT;
 				else
 					# Invalid interface
 					echo "-2"
@@ -433,8 +461,18 @@ function showCMDFn() {
 						WLANKEY="$5"
 					fi
 
-					RETURN=$(setInterfaceWlanCredentials "$2" "$3" "$4" "$WLANKEY")
-					echo "$RETURN"
+					RETURN=$(setInterfaceWlanCredentials "$2" "$3" "$4" "$WLANKEY"; echo $?)
+					case $RETURN in
+						2)
+							echo -10;
+						;;
+						1)
+							echo 1;
+						;;
+						3)
+							echo 3;
+						;;
+					esac
 					return $?;
 				else
 					# Invalid interface
