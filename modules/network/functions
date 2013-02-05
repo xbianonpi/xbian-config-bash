@@ -47,8 +47,7 @@ setInterfaceWlanCredentials() {
 				WLANBUFFER+="\nwireless-mode managed\nwireless-essid $3"
 			;;
 			*)
-				echo "-10"
-				return 0
+				return 2
 			;;
 		esac
 
@@ -77,21 +76,18 @@ setInterfaceWlanCredentials() {
 			# Re-add subsequent interfaces
 			echo -e "$MORE" >> /etc/network/interfaces
 
-			echo "1";
 			return 1;
 		else
 			# Interface not present, add it to the end
 			echo -e "iface $1 inet dhcp" >> /etc/network/interfaces
 			echo -e "$WLANBUFFER\n" >> /etc/network/interfaces
 
-			echo "1"
 			return 1;
 		fi
 
 
 	else
-		echo "-3"
-		return 0;
+		return 3;
 	fi
 }
 
@@ -130,7 +126,6 @@ setInterfaceDhcpFn() {
 			return 1;
 		fi
 	else
-		echo "-3"
 		return 0;
 	fi
 }
@@ -163,30 +158,26 @@ setInterfaceStaticFn() {
 		# Validate input & preparation of configuration buffers
 		checkValidIpNumberFn "$2"
 		if [ ! $? -eq 1 ]; then
-			echo "-6"
-			return 0;
+			return 6;
 		else
 			BUFFERIFACES+="address $2"
 		fi
 		checkValidIpNetmaskFn "$3"
 		if [ ! $? -eq 1 ]; then
-			echo "-7"
-			return 0;
+			return 7;
 		else
 			BUFFERIFACES+="\nnetmask $3"
 		fi
 		checkValidIpNumberFn "$4"
 		if [ ! $? -eq 1 ]; then
-			echo "-8"
-			return 0;
+			return 8;
 		else
 			BUFFERIFACES+="\ngateway $4"
 		fi
 		if [ $# -gt 4 ] && [ ! -z "$5" ]; then
 			checkValidIpNumberFn "$5"
 			if [ ! $? -eq 1 ]; then
-				echo "-9"
-				return 0;
+				return 9;
 			else
 				BUFFERRESOLV+="nameserver $5"
 			fi
@@ -194,8 +185,7 @@ setInterfaceStaticFn() {
 		if [ $# -gt 5 ] && [ ! -z "$6" ]; then
 			checkValidIpNumberFn "$6"
 			if [ ! $? -eq 1 ]; then
-				echo "-9"
-				return 0;
+				return 9;
 			else
 				BUFFERRESOLV+="\nnameserver $6"
 			fi
@@ -233,10 +223,8 @@ setInterfaceStaticFn() {
 		sed -i "/nameserver/d" /etc/resolv.conf
 		echo -e "$BUFFERRESOLV" >> /etc/resolv.conf
 
-		echo "1"
 		return 1;
 	else
-		echo "-3"
 		return 0;
 	fi
 }
@@ -254,7 +242,6 @@ function listNetworkInterfacesFn() {
 		echo -e "$IFACES"
 		return 1
 	else
-		echo "-3"
 		return 0
 	fi
 }
@@ -379,7 +366,6 @@ function readNetworkConfigurationFn() {
 		fi
 		return 1;
 	else
-		echo "-1"
 		return 0;
 	fi
 }
