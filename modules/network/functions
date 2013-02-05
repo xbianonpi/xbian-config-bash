@@ -52,13 +52,13 @@ setInterfaceWlanCredentials() {
 			;;
 		esac
 
-	        if [ $(cat /etc/network/interfaces | grep "^iface $1" | wc -l) -gt 0 ]; then
+	        if [ $(grep "^iface $1" /etc/network/interfaces | wc -l) -gt 0 ]; then
 
 			# Interface already present, store it + any subsequent ifaces in an buffer
-			IFACEBUFFER=$(cat /etc/network/interfaces | grep -A100 "^iface $1" | sed '1d');
+			IFACEBUFFER=$(grep -A100 "^iface $1" /etc/network/interfaces | sed '1d');
 
 			# Extract DHCP or Static
-			MODE=$(cat /etc/network/interfaces | grep "iface $1" | cut -f 4 -d " ");
+			MODE=$(grep "iface $1" /etc/network/interfaces | cut -f 4 -d " ");
 
 			# Remove what's now in the buffer from the file
 			sed -i "/^iface $1/,+100d" /etc/network/interfaces
@@ -101,10 +101,10 @@ setInterfaceWlanCredentials() {
 setInterfaceDhcpFn() {
         isValidInterfaceFn "$1"
 	if [ $? -eq 1 ]; then
-	        if [ $(cat /etc/network/interfaces | grep "^iface $1" | wc -l) -gt 0 ]; then
+	        if [ $(grep "^iface $1" /etc/network/interfaces | wc -l) -gt 0 ]; then
 
 			# Interface already present, store it + any subsequent ifaces in an buffer
-			IFACEBUFFER=$(cat /etc/network/interfaces | grep -A100 "^iface $1" | sed '1d');
+			IFACEBUFFER=$(grep -A100 "^iface $1" /etc/network/interfaces | sed '1d');
 
 			# Remove what's now in the buffer from the file
 			sed -i "/^iface $1/,+100d" /etc/network/interfaces
@@ -202,10 +202,10 @@ setInterfaceStaticFn() {
 		fi
 
 		# Process /etc/network/interfaces
-	        if [ $(cat /etc/network/interfaces | grep "^iface $1" | wc -l) -gt 0 ]; then
+	        if [ $(grep "^iface $1" /etc/network/interfaces | wc -l) -gt 0 ]; then
 
 			# Interface already present, store it + any subsequent ifaces in an buffer
-			IFACETMP=$(cat /etc/network/interfaces | grep -A100 "^iface $1" | sed '1d');
+			IFACETMP=$(grep -A100 "^iface $1" /etc/network/interfaces | sed '1d');
 
 			# Remove what's now in the buffer from the file
 			sed -i "/^iface $1/,+100d" /etc/network/interfaces
@@ -355,8 +355,8 @@ function readNetworkConfigurationFn() {
 	        # Read nameservers from /etc/resolv.conf
 	        NS1="";
 	        NS2="";
-	        if [ $(cat /etc/resolv.conf | grep nameserver | wc -l) -gt 0 ]; then
-	           NS=($(cat /etc/resolv.conf | grep nameserver | sed 's/nameserver //g' ))
+	        if [ $(grep nameserver /etc/resolv.conf | wc -l) -gt 0 ]; then
+	           NS=($(grep nameserver /etc/resolv.conf | sed 's/nameserver //g' ))
 	           if [ ${#NS[@]} -gt 0 ]; then
 	              NS1=$(echo -e "${NS[0]}");
 	           fi
@@ -516,17 +516,14 @@ function restartWLANAdapterFn() {
 function getWLANConnectStatusFn() {
 	STATUS=0;
 	if [ -f /tmp/wlanstatus ]; then
-		if [ $(cat /tmp/wlanstatus | grep "DHCPDISCOVER" | wc -l) -gt 0 ]; then
-			STATUS=1;
-		fi;
-		if [ $(cat /tmp/wlanstatus | grep 'DHCPOFFERS\|Terminated' | wc -l) -gt 0 ]; then
+		if [ $(grep "bound" /tmp/wlanstatus | wc -l) -gt 0 ]; then
+			STATUS=3;
+		elif [ $(grep 'RTNETLINK' /tmp/wlanstatus | wc -l) -gt 0 ]; then
+			STATUS=3;
+		elif [ $(grep 'DHCPOFFERS\|Terminated' /tmp/wlanstatus | wc -l) -gt 0 ]; then
 			STATUS=2;
-		fi;
-		if [ $(cat /tmp/wlanstatus | grep 'RTNETLINK' | wc -l) -gt 0 ]; then
-			STATUS=3;
-		fi;
-		if [ $(cat /tmp/wlanstatus | grep "bound" | wc -l) -gt 0 ]; then
-			STATUS=3;
+		elif [ $(grep "DHCPDISCOVER" /tmp/wlanstatus | wc -l) -gt 0 ]; then
+			STATUS=1;
 		fi;
 	fi
 	
