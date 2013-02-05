@@ -499,8 +499,8 @@ function scanWLANNetworksFn() {
 function restartWLANAdapterFn() {
 	if [ $(kill -0 $(pgrep ifup) 2>/dev/null >/dev/null; echo $?) -eq 1 ]; then
 		ifdown $1 2>/dev/null 1>/dev/null 3>/dev/null;
-		nohup ifup $1 2>/tmp/wlanstatus 1>/dev/null >/dev/null 3>/dev/null &
-		PROCESSID=$!;
+		(nohup ifup $1 2>/tmp/wlanstatus 1>/dev/null >/dev/null 3>/dev/null &) 
+		PROCESSID=$(pgrep ifup);
 	else
 		PROCESSID="0";
 	fi
