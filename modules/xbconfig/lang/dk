@@ -17,7 +17,7 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-_NAME="XBian-konfiguration"
+_NAME="XBian-konfig"
 _DESC="Konfigurer XBian-indstillinger"
 _XBLANGUAGE="Sprog"
 _XBAUTOSTART="Autostart"
