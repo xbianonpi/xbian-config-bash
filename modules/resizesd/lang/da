@@ -17,9 +17,9 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-_NAME="Kernel"
-_DESC="Switch between installed kernels"
-_KERNELVERSION="Version"
-_KERNELSWITCHSUCCESS="Successfully switched kernel versions"
-_KERNELALREADYRUNNING="You're already running this kernel version"
-_SINGLEKERNELINSTALLED="There is only one kernel installed"
+_NAME="Tilpas SD"
+_DESC="Forøg root paritionen og udfyld SD-kortet"
+_SDCONFIRM="Ønsker du virkelig at udfylde dit SD-kort?"
+_SDRESIZENOTNEEDED="Dette SD-kort er allerede udfyldt. Afbryder."
+_SDREBOOT="Root-partitionen er blevet forøget. Filsystemet forøges efter næste genstart."
+_SDERROR="En fejl opstod. Det er muligt at systemet ikke kan genstarte. Foretag en sikkerhedskopiering af dine filer inden genstart."
