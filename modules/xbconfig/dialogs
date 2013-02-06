@@ -21,10 +21,11 @@ function showXBConfigSettingsDlg() {
 	MENU=();
 	MENU+=(1,"\Zn"$_XBLANGUAGE);
 	MENU+=(2,"\Zn"$_XBAUTOSTART);
+	TBLCOLUMNCENTER=0; 
 	createTableFn "menu"\
 	"#,\Zb"$_XBACTIONS\
 	"${MENU[@]}";
-
+	TBLCOLUMNCENTER=1; 
 	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+11))
 	showMenuDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} 10
 }
