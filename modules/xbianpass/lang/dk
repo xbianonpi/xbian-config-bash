@@ -17,6 +17,9 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-_NAME="Oplysninger"
-_DESC="Oplysninger om denne distribution"
-_INFORMATION="XBian er en fri, Open Source medie center distribution for Raspberry Pi, som kan hentes fra http://www.xbian.org. Vores slogan er “XBMC on Raspberry Pi, bleeding edge” da vores primære fokus ligger på levering af den hurtigste mediecenter løsning til Raspberry Pi. Vi er overbeviste om at alle kan bidrage til at gøre XBian bedre. Besøg venligst vores hjemmeside for få hjælp eller komme med forslag, ønsker eller bidrag, del endelig disse med os!"
+_NAME="XBian adgangskode"
+_DESC="Skift kode for brugeren xbian"
+_XBIANPASSCHANGED="Ændring af adgangskode lykkedes"
+_XBIANPASS="Adgangskode:";
+_XBIANPASSEMPTYFIELDS="Indtast både ny adgangskode og bekræftelse"
+_XBIANPASSNOMATCH="Adgangskoderne stemmer ikke overens"
