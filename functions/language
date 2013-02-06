@@ -28,6 +28,7 @@ LANGARRAY[Portuguese]=pt
 LANGARRAY[Slovak]=sk
 LANGARRAY[Spanish]=es
 LANGARRAY[German]=de
+LANGARRAY[Danish]=dk
 
 # Language translations
 _DUTCH="Nederlands"
@@ -38,6 +39,7 @@ _PORTUGUESE="Português"
 _SLOVAK="Slovenčina"
 _SPANISH="Español"
 _GERMAN="Deutsch"
+_DANISH="Dansk"
 
 function getLanguageFn() {
 	# Get XBMC language setting

@@ -17,9 +17,12 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-_NAME="Root-adgang"
-_DESC="Skift adgangskode for root-bruger"
-_ROOTPASSCHANGED="root-adgangskode blev ændret"
-_ROOTPASS="Adgangskode:";
-_ROOTPASSEMPTYFIELDS="Angiv både ny adgangskode og bekræftelse"
-_ROOTPASSNOMATCH="Adgangskoderne er ikke ens"
+_NAME="XBian-konfiguration"
+_DESC="Konfigurer XBian-indstillinger"
+_XBLANGUAGE="Sprog"
+_XBAUTOSTART="Autostart"
+_XBACTIONS="Handlinger"
+_XBAUTOMATIC="Automatisk"
+_XBCONFIGAUTOSTARTENABLEDISABLE="Vil du starte xbian-config automatisk når du logger ind som brugeren xbian?"
+_XBSUCCESSDISABLEAUTOSTART="Deaktivering af xbian-config autostart lykkedes"
+_XBSUCCESSENABLEAUTOSTART="Aktivering af xbian-config autostart lykkedes"
