@@ -28,6 +28,7 @@
 #  - 2 SDRAM Frequency
 #  - 3 Over voltage
 function getCurrentOCSettingsFn() {
+	OCOLDSETTINGS=();
 	selectConfigVarFn "arm_freq"
 	OCOLDSETTINGS[0]=$RETURN;
 	selectConfigVarFn "core_freq"
@@ -36,7 +37,6 @@ function getCurrentOCSettingsFn() {
 	OCOLDSETTINGS[2]=$RETURN;
 	selectConfigVarFn "over_voltage"
 	OCOLDSETTINGS[3]=$RETURN;
-
 	CURRENTOC=-1;
 	NREMPTY=0;
 	for KEY in ${!OCSETTINGS[@]}; do

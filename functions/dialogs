@@ -336,9 +336,10 @@ function showInputDlg() {
 #  $5 (optional) Change Label
 #  $6 (optional) Cancel Label
 function showPassDlg() {
-	VALUE=$2;
 	WIDTH=$DEFAULTWIDTH;
-	HEIGHT=$(($DEFAULTHEIGHT+1))
+	HEIGHT=$(($DEFAULTHEIGHT+2))
+	CHANGELABEL=$_CHANGE
+	CANCELLABEL=$_CANCEL
 	
 	if [ $# -gt 2 ]; then
 		HEIGHT=$3
@@ -355,11 +356,11 @@ function showPassDlg() {
 
 	VALUES=$(dialog \
 			--ok-label "$CHANGELABEL" \
-			--cancel-label $CANCELLABEL \
+			--cancel-label "$CANCELLABEL" \
 			--backtitle "$BACKTITLE" \
 			--title "$TITLE" \
 			--insecure \
-			--passwordform "" \
+			--passwordform "$1" \
 			$HEIGHT $WIDTH 0 \
 			"$_PASSWORD" 1 3 "" 1 15 15 0 \
 			"$_CONFIRM"  2 3 "" 2 15 15 0 \

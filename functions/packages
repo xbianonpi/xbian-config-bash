@@ -30,18 +30,21 @@ function updateAptMirrorsFn() {
 }
 
 function localPackageDBOutdatedFn() {
-	if [ -f "/var/lib/apt/periodic/update-success-stamp" ] && [ $(find /var/lib/apt/periodic/update-success-stamp -mtime +7 | grep xbian | wc -l) -gt 0 ]; then
-		if [ -f "$BASEPATH/config/pkglist" ] && [ -f "/var/lib/apt/lists/apt.xbian.org*Packages" ]; then
-			if [ "$(md5sum /var/lib/apt/lists/apt.xbian.org*Packages | awk '{print $1}')" == "$(md5sum $BASEPATH/config/pkglist | awk '{print $1}')" ]; then
-				return 0;
+	if [ -f "/var/lib/apt/periodic/update-success-stamp" ]; then
+		if [ $(find /var/lib/apt/periodic/update-success-stamp -mtime +7 | grep xbian | wc -l) -gt 0 ]; then
+			if [ -f "$BASEPATH/config/pkglist" ] && [ -f "/var/lib/apt/lists/apt.xbian.org*Packages" ]; then
+				if [ "$(md5sum /var/lib/apt/lists/apt.xbian.org*Packages | awk '{print $1}')" == "$(md5sum $BASEPATH/config/pkglist | awk '{print $1}')" ]; then
+					return 0;
+				else
+					return 1;
+				fi
 			else
 				return 1;
 			fi
 		else
 			return 1;
 		fi
-	fi
-	if [ $(find /var/lib/apt/periodic/update-success-stamp -mtime +7 | grep -v xbian | wc -l) -gt 0 ]; then
+	else
 		return 1;
 	fi
 }

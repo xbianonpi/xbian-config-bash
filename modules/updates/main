@@ -70,7 +70,7 @@ function showGUIFn() {
 	getAllUpdatesLisFn;
 	getAllPackagesLisFn
 	SYSTEMUPDATE=0;
-echo ${UPDATES[@]};
+
 	if [ ${#UPDATES[@]} -ge 1 ]; then
 
 		showSystemUpdateConfirmDlg;
@@ -95,7 +95,7 @@ echo ${UPDATES[@]};
 					if [ -f "/tmp/aptstatus" ] || [ -f "/home/xbian/update" ]; then
 						showAskForLogDlg;
 						if [ $? -eq 0 ]; then
-							if [ -f "/home/xbian/update" ]; then
+							if [ -f "/home/xbian/update.log" ]; then
 								showSystemUpdateLogDlg;
 							elif [ -f "/tmp/aptstatus" ]; then
 								showUpdateLogDlg;
