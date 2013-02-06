@@ -17,9 +17,9 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-_NAME="Kernel"
-_DESC="Switch between installed kernels"
-_KERNELVERSION="Version"
-_KERNELSWITCHSUCCESS="Successfully switched kernel versions"
-_KERNELALREADYRUNNING="You're already running this kernel version"
-_SINGLEKERNELINSTALLED="There is only one kernel installed"
+_NAME="SSH root adgang"
+_DESC="De-/aktiver SSH root adgang"
+_SSHROOTENABLE="Vil du de-/aktivere root ssh adgang?"
+_NOSSHROOTPASS="Brugeren root har ingen adgangskode, uden en adgangskode kan brugeren root ikke få adgang via SSH, så angiv venligst denne først."
+_SSHROOTENABLED="Aktivering af SSH root adgang lykkedes"
+_SSHROOTDISABLED="Deaktivering af SSH root adgang lykkedes"
