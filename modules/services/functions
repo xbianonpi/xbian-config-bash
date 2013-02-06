@@ -23,7 +23,7 @@ function getInstalledServicesFn() {
 	SERVLIST=($SERVICES);
 	for SERVRAW in ${SERVLIST[@]}; do
 		NAME=$(echo $SERVRAW | cut -f 1 -d:);
-		FOUND=$(ls /etc/init.d/ | grep -i "$NAME*");
+		FOUND=$(ls /etc/init.d/ | grep -io "^$NAME*");
 		if [ ! -z "$FOUND" ]; then
 			INSTSERV+=($NAME);
 		fi
@@ -32,7 +32,7 @@ function getInstalledServicesFn() {
 
 function getServiceAutoStartStatusFn() {
 	if [ ! -z "$1" ]; then
-		return $(ls /etc/rc2.d/ | grep $1 | wc -l);
+		return $(ls /etc/rc2.d/ | grep -io "S[0-9]\{1,\}$1" | wc -l);
 	else
 		return 0;
 	fi
@@ -40,10 +40,11 @@ function getServiceAutoStartStatusFn() {
 
 function getServiceRunningStatusFn() {
 	SERVICE=$1;
-	SERVCONF=$(echo -e "$SERVICES" | grep "$SERVICE*");
+	SERVCONF=$(echo -e "$SERVICES" | grep "^$SERVICE*");
 	IFS=" ";
 	DAEMONS=($(echo $SERVCONF | cut -f 2 -d: | sed -e 's/,/ /g'));
 	RUNNING=0;
+
 	if [ ${#DAEMONS} -eq 0 ]; then
 		if [ $(echo $PROCESSES | grep $SERVICE | wc -l) -ge 1 ]; then
 			RUNNING=1;

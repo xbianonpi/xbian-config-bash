@@ -18,8 +18,7 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 function retrieveUpdateListFn() {
-	#apt-get dist-upgrade -s &>/tmp/aptupdates 2>/dev/null;
-	echo;
+	apt-get dist-upgrade -s &>/tmp/aptupdates 2>/dev/null;
 }
 
 function getAllPackagesLisFn() {
@@ -152,7 +151,7 @@ function updateSystemFn() {
 		if [ $1 -eq 1 ]; then
 			apt-get install -s ${VERSIONS[0]}"="$NEXTVERSION &>/tmp/aptstatus
 		elif [ $1 -eq 0 ]; then
-			apt-get install -y ${VERSIONS[0]}"="$NEXTVERSION
+			apt-get install -y ${VERSIONS[0]}"="$NEXTVERSION &>/tmp/aptstatus
 		elif [ $1 -eq 2 ]; then
 			nohup apt-get install -y ${VERSIONS[0]}"="$NEXTVERSION &>/tmp/aptstatus &
 		fi

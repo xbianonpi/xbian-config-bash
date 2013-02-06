@@ -306,7 +306,7 @@ function showCMDFn() {
 		stop)
 			if [ $# -eq 2 ]; then		
 				if [ -f "$BASEPATH/config/services" ]; then
-					if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ] && [ -f "/etc/init.d/$2" ]; then
+					if [ $(echo ${SERVICES[*]} | grep -o " $2:" | wc -l) -eq 1 ] && [ -f "/etc/init.d/$2" ]; then
 						if [ $(getServiceRunningStatusFn $2; echo $?) -eq 1 ]; then
 							ID=$(getServiceIDFn $2; echo $?);
 							stopServiceFn $ID;

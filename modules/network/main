@@ -265,7 +265,7 @@ function showWlanRestartGUIFn() {
 	LASTSTATUS=-1;
 	while [ $(kill -0 $PROCESSID 2>/dev/null >/dev/null; echo $?) -eq 0 ]; do
 		getWLANConnectStatusFn;
-		echo $STATUS;
+
 		if [ $LASTSTATUS -ne $STATUS ]; then
 			LASTSTATUS=$STATUS;
 			if [ $STATUS -eq 1 ]; then
@@ -281,7 +281,6 @@ function showWlanRestartGUIFn() {
 	
 	getWLANConnectStatusFn;
 	
-	echo $STATUS;
 	if [ $LASTSTATUS -ne $STATUS ]; then
 		LASTSTATUS=$STATUS;
 		if [ $STATUS -eq 1 ]; then
