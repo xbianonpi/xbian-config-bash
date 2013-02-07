@@ -101,9 +101,9 @@ function showCMDFn() {
 				getCurrentLicenseVC1Fn
 				updateLicenseVC1Fn $1 $LICENSE;
 				RETURN=$?;
-				if [ $? -eq 1 ]; then
+				if [ $RETURN -eq 1 ]; then
 					echo 1;
-				elif [ $? -eq 2 ]; then
+				elif [ $RETURN -eq 2 ]; then
 					echo -1;
 				else
 					echo 0;
@@ -117,9 +117,9 @@ function showCMDFn() {
 			if [ $# -eq 1 ]; then
 				insertLicenseVC1Fn $1;
 				RETURN=$?;
-				if [ $? -eq 1 ]; then
+				if [ $RETURN -eq 1 ]; then
 					echo 1;
-				elif [ $? -eq 2 ]; then
+				elif [ $RETURN -eq 2 ]; then
 					echo -1;
 				else
 					echo 0;
