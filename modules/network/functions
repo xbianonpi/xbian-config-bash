@@ -517,10 +517,9 @@ function getWLANConnectStatusFn() {
 }
 
 function clearWLANStatusFn() {
-	#if [ -f /tmp/wlanstatus ]; then
-	#	rm /tmp/wlanstatus
-	#fi
-	echo;
+	if [ -f /tmp/wlanstatus ]; then
+		rm /tmp/wlanstatus
+	fi
 }
 
 function getAdapterTypeFn() {
