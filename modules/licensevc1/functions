@@ -55,7 +55,6 @@ function insertLicenseVC1Fn() {
 #  - 0: Failed
 function updateLicenseVC1Fn() {
 	NEWLICENSE=$1;
-	echo ${NEWLICENSE:0:2} ${NEWLICENSE:2:8} ${#NEWLICENSE};
 	if [ "${NEWLICENSE:0:2}" == "0x" ] && [[ "${NEWLICENSE:2:8}" =~ ^[0-9a-f]{1,8}$ ]] && [ ${#NEWLICENSE} -le 10 ] && [ ${#NEWLICENSE} -ge 9 ]; then
 		sed -i "s/decode_WVC1=$2/decode_WVC1=$1/g" /boot/config.txt;
 		if [ $(cat /boot/config.txt | grep $1 | wc -l) -eq 1 ]; then
