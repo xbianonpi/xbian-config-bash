@@ -252,11 +252,16 @@ function showCMDFn() {
 		status)
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/pkglist" ] && [ -f "$BASEPATH/config/aptmirror" ]; then
-					updateAllPackagesListFn;
-					if [ $(echo ${ALLPKGLST[*]} | grep -o $2 | wc -l) -eq 1 ]; then
-						getPackageStatusFn $2;
-						if [ $? -eq 1 ]; then
-							echo 1;
+					getAllPackagesFn;
+					if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+						updateAllPackagesListFn;
+						if [ $(echo ${ALLPKGLST[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+							getPackageStatusFn $2;
+							if [ $? -eq 1 ]; then
+								echo 1;
+							else
+								echo 0;
+							fi
 						else
 							echo 0;
 						fi
