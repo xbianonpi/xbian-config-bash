@@ -219,10 +219,11 @@ function showCMDFn() {
 		select)
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/services" ]; then
-					SERVLIST=($SERVICES);
-					if [ $(echo ${SERVLIST[@]} | grep -o " $2:" | wc -l) -ge 1 ]; then
+					if [ $(echo -e "${SERVICES[@]}" | grep -o "^$2" | wc -l) -ge 1 ]; then
 						getServiceIDFn $2;
-						echo $(echo ${SERVLIST[$KEY]} | cut -f 2 -d':' | sed 's/,/ /g');
+						KEY=$?;
+						getServiceConfFn $KEY;
+						echo ${DATA[1]/,/ };
 					else
 						echo -2;
 					fi
@@ -236,7 +237,7 @@ function showCMDFn() {
 		status)
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/services" ]; then
-					if [ $(echo ${SERVICES[*]} | grep -o " $2:" | wc -l) -eq 1 ]; then
+					if [ $(echo -e "${SERVICES[@]}" | grep -o "^$2" | wc -l) -ge 1 ]; then
 						RUNNING=$(getServiceRunningStatusFn $2; echo $?);
 						AUTOSTART=$(getServiceAutoStartStatusFn $2; echo $?);
 						if [ $RUNNING -eq 0 ] && [ $AUTOSTART -eq 0 ]; then
@@ -280,7 +281,7 @@ function showCMDFn() {
 		start)
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/services" ]; then
-					if [ $(echo ${SERVICES[*]} | grep -o " $2:" | wc -l) -eq 1 ] && [ -f "/etc/init.d/$2" ]; then
+					if [ $(echo -e "${SERVICES[@]}" | grep -o "^$2" | wc -l) -ge 1 ] && [ -f "/etc/init.d/$2" ]; then
 						if [ $(getServiceRunningStatusFn $2; echo $?) -eq 0 ]; then
 							ID=$(getServiceIDFn $2; echo $?);
 							startServiceFn $ID;
@@ -306,7 +307,7 @@ function showCMDFn() {
 		stop)
 			if [ $# -eq 2 ]; then		
 				if [ -f "$BASEPATH/config/services" ]; then
-					if [ $(echo ${SERVICES[*]} | grep -o " $2:" | wc -l) -eq 1 ] && [ -f "/etc/init.d/$2" ]; then
+					if [ $(echo -e "${SERVICES[@]}" | grep -o "^$2" | wc -l) -ge 1 ] && [ -f "/etc/init.d/$2" ]; then
 						if [ $(getServiceRunningStatusFn $2; echo $?) -eq 1 ]; then
 							ID=$(getServiceIDFn $2; echo $?);
 							stopServiceFn $ID;
@@ -332,7 +333,7 @@ function showCMDFn() {
 		restart)
 			if [ $# -eq 2 ]; then	
 				if [ -f "$BASEPATH/config/services" ]; then	
-					if [ $(echo ${SERVICES[*]} | grep -o " $2:" | wc -l) -eq 1 ] && [ -f "/etc/init.d/$2" ]; then
+					if [ $(echo -e "${SERVICES[@]}" | grep -o "^$2" | wc -l) -ge 1 ] && [ -f "/etc/init.d/$2" ]; then
 						if [ $(getServiceRunningStatusFn $2; echo $?) -eq 1 ]; then
 							ID=$(getServiceIDFn $2; echo $?);
 							restartServiceFn $ID;
@@ -358,7 +359,7 @@ function showCMDFn() {
 		autostart)
 			if [ $# -eq 3 ]; then
 				if [ -f "$BASEPATH/config/services" ]; then
-					if [ $(echo ${SERVICES[*]} | grep -o " $2:" | wc -l) -eq 1 ] && [ -f "/etc/init.d/$2" ]; then
+					if [ $(echo -e "${SERVICES[@]}" | grep -o "^$2" | wc -l) -ge 1 ] && [ -f "/etc/init.d/$2" ]; then
 						if [ $3 == "disable" ]; then
 							if [ $(getServiceAutoStartStatusFn $2; echo $?) -eq 1 ]; then
 								ID=$(getServiceIDFn $2; echo $?);
@@ -429,7 +430,7 @@ function showCMDFn() {
 		if [ $# -eq 2 ]; then
 			DATA=($2)
 			shift;
-			if [ $(echo ${SERVICES[*]} | grep -o $1 | wc -l) -eq 1 ]; then
+			if [ $(echo -e "${SERVICES[@]}" | grep -o "^$1" | wc -l) -ge 1 ]; then
 				ID=$(getServiceIDFn $2; echo $?);
 				deleteServiceFn $ID "${DATA[*]}"
 				if [ $? -eq 1 ]; then
