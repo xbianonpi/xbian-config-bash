@@ -118,7 +118,7 @@ function showGUIFn() {
 					fi
 				elif [ $RETURN -eq 3 ]; then
 					getServiceConfFn $SERVICE;
-					if [ $(getServiceRunningStatusFn ${DATA[0]}; echo $?) -eq 1 ]; then
+					if [ $(getServiceRunningStatusFn $SERVICE; echo $?) -eq 1 ]; then
 						showStopServiceDlg;
 						stopServiceFn $SERVICE;
 						RETURN=$?;
@@ -220,7 +220,7 @@ function showCMDFn() {
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/services" ]; then
 					SERVLIST=($SERVICES);
-					if [ $(echo ${SERVLIST[@]} | grep -o $2 | wc -l) -ge 1 ]; then
+					if [ $(echo ${SERVLIST[@]} | grep -o " $2:" | wc -l) -ge 1 ]; then
 						getServiceIDFn $2;
 						echo $(echo ${SERVLIST[$KEY]} | cut -f 2 -d':' | sed 's/,/ /g');
 					else
@@ -236,7 +236,7 @@ function showCMDFn() {
 		status)
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/services" ]; then
-					if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					if [ $(echo ${SERVICES[*]} | grep -o " $2:" | wc -l) -eq 1 ]; then
 						RUNNING=$(getServiceRunningStatusFn $2; echo $?);
 						AUTOSTART=$(getServiceAutoStartStatusFn $2; echo $?);
 						if [ $RUNNING -eq 0 ] && [ $AUTOSTART -eq 0 ]; then
@@ -280,7 +280,7 @@ function showCMDFn() {
 		start)
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/services" ]; then
-					if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ] && [ -f "/etc/init.d/$2" ]; then
+					if [ $(echo ${SERVICES[*]} | grep -o " $2:" | wc -l) -eq 1 ] && [ -f "/etc/init.d/$2" ]; then
 						if [ $(getServiceRunningStatusFn $2; echo $?) -eq 0 ]; then
 							ID=$(getServiceIDFn $2; echo $?);
 							startServiceFn $ID;
@@ -332,8 +332,8 @@ function showCMDFn() {
 		restart)
 			if [ $# -eq 2 ]; then	
 				if [ -f "$BASEPATH/config/services" ]; then	
-					if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ] && [ -f "/etc/init.d/$2" ]; then
-						if [ $(getServiceRunningStatusFn $2; echo $?) -eq 0 ]; then
+					if [ $(echo ${SERVICES[*]} | grep -o " $2:" | wc -l) -eq 1 ] && [ -f "/etc/init.d/$2" ]; then
+						if [ $(getServiceRunningStatusFn $2; echo $?) -eq 1 ]; then
 							ID=$(getServiceIDFn $2; echo $?);
 							restartServiceFn $ID;
 							RETURN=$?;
@@ -358,7 +358,7 @@ function showCMDFn() {
 		autostart)
 			if [ $# -eq 3 ]; then
 				if [ -f "$BASEPATH/config/services" ]; then
-					if [ $(echo ${SERVICES[*]} | grep -o $2 | wc -l) -eq 1 ] && [ -f "/etc/init.d/$2" ]; then
+					if [ $(echo ${SERVICES[*]} | grep -o " $2:" | wc -l) -eq 1 ] && [ -f "/etc/init.d/$2" ]; then
 						if [ $3 == "disable" ]; then
 							if [ $(getServiceAutoStartStatusFn $2; echo $?) -eq 1 ]; then
 								ID=$(getServiceIDFn $2; echo $?);
