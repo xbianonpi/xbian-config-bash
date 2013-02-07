@@ -60,7 +60,7 @@ function updatePackagesFn() {
 	elif [ $1 -eq 2 ]; then
 		nohup apt-get install -y $LIST &>/tmp/aptstatus &
 	fi
-	getErrorCodeFn;
+	getAptErrorCodeFn;
 	return $?;
 }
 
