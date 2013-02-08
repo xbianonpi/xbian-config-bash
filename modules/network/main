@@ -524,17 +524,22 @@ function showCMDFn() {
 			fi
 		;;
 		progress)
-			getWLANConnectStatusFn;
-			if [ $STATUS -eq 0 ]; then
-				echo -12;
-			elif [ $STATUS -eq 1 ]; then
-				echo 2;
-			elif [ $STATUS -eq 2 ]; then
+			if [ $(kill -0 $(pgrep ifup) 2>/dev/null >/dev/null; echo $?) -eq 0 ]; then
+				getWLANConnectStatusFn;
+				if [ $STATUS -eq 0 ]; then
+					echo -12;
+				elif [ $STATUS -eq 1 ]; then
+					echo 2;
+				elif [ $STATUS -eq 2 ]; then
+					echo 0;
+					clearWLANStatusFn;
+				elif [ $STATUS -eq 3 ]; then
+					echo 1;
+					clearWLANStatusFn;
+				fi
+			else
 				echo 0;
-				clearWLANStatusFn;
-			elif [ $STATUS -eq 3 ]; then
-				echo 1;
-				clearWLANStatusFn;
+				clearWLANStatusFn
 			fi
 		;;
 		type)
