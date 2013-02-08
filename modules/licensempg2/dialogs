@@ -27,7 +27,7 @@ function showLicenseMPG2InputDlg() {
 	showInputDlg "$_MPG2LICENSE:" $1
 }
 
-#Shows the license successfulle inserted dialog
+#Shows the license successfully inserted dialog
 function showLicenseMPG2InsertedDlg() {
 	wrapTxtFn "$_MPG2INSERTED" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
@@ -36,7 +36,7 @@ function showLicenseMPG2InsertedDlg() {
 	return $?;
 }
 
-#Shows the license successfulle updated dialog
+#Shows the license successfully updated dialog
 function showLicenseMPG2UpdatedDlg() {
 	wrapTxtFn "$_MPG2UPDATED" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
@@ -45,7 +45,7 @@ function showLicenseMPG2UpdatedDlg() {
 	return $?;
 }
 
-#Shows the license successfulle removed dialog
+#Shows the license successfully removed dialog
 function showLicenseMPG2DeletedDlg() {
 	wrapTxtFn "$_MPG2DELETED" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
