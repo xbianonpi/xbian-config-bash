@@ -6,8 +6,8 @@ ssh:
 transmission:
 headphones:
 sickbeard:
-nzbgetd:
+nzbget:
 couchpotato:
-sabnzbdplus:
+sabnzbd:
 sysklogd:syslogd
 klogd:

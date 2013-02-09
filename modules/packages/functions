@@ -25,13 +25,13 @@ function getPackageCategoryListFn() {
 
 function getAllPackagesFn() {
 	IFS=$'\n';
-	PACKAGES=($(echo -e "$CONTENT" | grep "Package:" | grep -v "xbian-update" | sed -ne 's/\(Package:[A-Za-z\ -]\{1,\}\)-\([a-z]\{1,\}\)/\2/p' | uniq | sort));
+	PACKAGES=($(echo -e "$CONTENT" | grep "Package:" | grep -v "xbian-update" | sed -ne 's/\(Package: xbian-package-\)\([a-z-]\{1,\}\)/\2/p' | sort | uniq));
 	IFS=$ORIGINALIFS;
 }
 
 function getPackagesFromCategoryFn() {
 	IFS=$'\n';
-	PACKAGES=($(echo -e "$CONTENT" | grep -v "xbian-update" | awk -vRS='' "/Section: $1/"'{print $0"\n"}' | grep "Package:" | sed -ne 's/\(Package:[A-Za-z\ -]\{1,\}\)-\([a-z]\{1,\}\)/\2/p' | uniq | sort));
+	PACKAGES=($(echo -e "$CONTENT" | grep -v "xbian-update" | awk -vRS='' "/Section: $1/"'{print $0"\n"}' | grep "Package:" | sed -ne 's/\(Package: xbian-package-\)\([a-z-]\{1,\}\)/\2/p' | sort | uniq));
 	IFS=$ORIGINALIFS;
 }
 
@@ -77,7 +77,9 @@ function getPackageInformationFn() {
 # $1: Simulate or not
 # $2: Full package name
 function installPackageFn() {
-	NAME=$(echo $2 | rev | cut -f 1 -d"-" | rev);
+	NAME=$2;
+	NAME=${NAME/xbian-package-/}
+	NAME=$(echo $NAME | cut -f 1 -d"=");
 	if [ $(getPackageStatusFn $NAME; echo $?) -eq 1 ]; then
 		return 6;
 	else
@@ -97,7 +99,9 @@ function installPackageFn() {
 # $1: Simulate or not
 # $2: Full package name
 function removePackageFn() {
-	NAME=$(echo $2 | rev | cut -f 1 -d"-" | rev);
+	NAME=$2;
+	NAME=${NAME/xbian-package-/}
+	NAME=$(echo $NAME | cut -f 1 -d"=");
 	if [ $(getPackageStatusFn $NAME; echo $?) -eq 0 ]; then
 		return 1;
 	else
