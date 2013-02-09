@@ -64,8 +64,6 @@ function updatePackagesFn() {
 	return $?;
 }
 
-
-
 function findNextUpdateVersionFn() {
 	CMAJVERSION=$1;
 	CMINVERSION=$2;
@@ -144,7 +142,7 @@ function updateSystemFn() {
 	CMINVERSION=$(echo $CVERSION | cut -f2 -d"-");
 	
 	findNextUpdateVersionFn "$CMAJVERSION" "$CMINVERSION";
-	NEXTVERSION="1.0-0.5";
+
 	if [ -z "$NEXTVERSION" ]; then
 		return 2;
 	else 
