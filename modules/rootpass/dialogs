@@ -26,7 +26,7 @@ function showRootPassInputDlg() {
 	showPassDlg "$_ROOTPASS"
 }
 
-# Shows rootpass succesfully changed dialog
+# Shows rootpass successfully changed dialog
 function showRootPassSuccessDlg() {
 	wrapTxtFn "$_ROOTPASSCHANGED" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));

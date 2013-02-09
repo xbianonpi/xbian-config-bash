@@ -33,7 +33,7 @@ showMsgDlg() {
 	# Default width and height
 	HEIGHT=$DEFAULTHEIGHT
 	WIDTH=$DEFAULTWIDTH
-	# Overridden width and height
+	# Override width and height
 	if [ $# -gt 1 ]; then
 		HEIGHT=$2
 	fi
@@ -60,7 +60,7 @@ showInfoDlg() {
 	# Default width and height
 	HEIGHT=$DEFAULTHEIGHT
 	WIDTH=$DEFAULTWIDTH
-	# Overridden width and height
+	# Override width and height
 	if [ $# -gt 1 ]; then
 		HEIGHT=$2
 	fi
@@ -86,7 +86,7 @@ showTextDlg() {
 	# Default width and height
 	HEIGHT=$DEFAULTHEIGHT
 	WIDTH=$DEFAULTWIDTH
-	# Overridden width and height
+	# Override width and height
 	if [ $# -gt 1 ]; then
 		HEIGHT=$2
 	fi
@@ -119,7 +119,7 @@ showConfirmDlg() {
 	HEIGHT=$DEFAULTHEIGHT
 	WIDTH=$DEFAULTWIDTH
 	
-	# Overridden width and height
+	# Override width and height
 	if [ $# -gt 1 ]; then
 		HEIGHT=$2
 	fi

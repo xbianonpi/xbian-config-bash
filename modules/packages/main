@@ -140,6 +140,7 @@ function showGUIFn() {
 			downloadPackageListFn;
 			REMOTEPKGDBUPDATED=$?
 		fi;
+	CONTENT=$(cat $BASEPATH/config/pkglist);
 	fi
 	if [ $LOCALPKGDBUPDATED -eq 0 ]; then
 		if [ $REMOTEPKGDBUPDATED -eq 1 ]; then
@@ -157,9 +158,11 @@ function showGUIFn() {
 	fi
 	showGettingLocalPackageInfoDlg;
 	getPackageCategoryListFn;
-	showPackageCategoryListDlg "${CATEGORIES[*]}";
-	if [ $? -eq 0 ]; then
-		showPackageListFn $(($RETURN-1));
+	if [ ${#CATEGORIES[@]} -gt 0 ]; then
+		showPackageCategoryListDlg "${CATEGORIES[*]}";
+		if [ $? -eq 0 ]; then
+			showPackageListFn $(($RETURN-1));
+		fi
 	fi
 }
 

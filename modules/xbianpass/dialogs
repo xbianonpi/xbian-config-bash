@@ -26,7 +26,7 @@ function showXbianPassInputDlg() {
 	showPassDlg "$_XBIANPASS"
 }
 
-# Shows xbianpass succesfully changed dialog
+# Shows xbianpass successfully changed dialog
 function showXbianPassSuccessDlg() {
 	wrapTxtFn "$_XBIANPASSCHANGED" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));

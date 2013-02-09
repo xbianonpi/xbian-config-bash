@@ -18,9 +18,7 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 function getPackageCategoryListFn() {
-	if [ -f "$BASEPATH/config/pkglist" ]; then
-		CATEGORIES=($(echo -e "$CONTENT" | grep "Section:" | grep -v "update" | cut -f 2 -d: | sort | uniq | sed 's/^\ //;s/\ $//'));
-	fi
+	CATEGORIES=($(echo -e "$CONTENT" | grep "Section:" | grep -v "update" | cut -f 2 -d: | sort | uniq | sed 's/^\ //;s/\ $//'));
 }
 
 function getAllPackagesFn() {

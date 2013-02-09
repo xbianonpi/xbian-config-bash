@@ -27,7 +27,7 @@ function showHostnameInputDlg() {
 	showInputDlg "$_HOSTNAME:" $1
 }
 
-#Shows hostname succesfully changed dialog
+#Shows hostname successfully changed dialog
 function showHostnameSuccessDlg() {
 	wrapTxtFn "$_HOSTNAMECHANGED" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
