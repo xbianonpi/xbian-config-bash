@@ -18,8 +18,8 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 function setXBConfigLanguageFn() {
-	CURLANG=$(cat $BASEPATH'/config/xbconfig' | grep language | cut -f2 -d':')
 	if [ -f $BASEPATH"/config/xbconfig" ]; then
+		CURLANG=$(cat $BASEPATH'/config/xbconfig' | grep language | cut -f2 -d':')
 		sed -i "s/language:$CURLANG/language:$1/g" $BASEPATH"/config/xbconfig";
 	else
 		if [ -z "$1" ]; then
