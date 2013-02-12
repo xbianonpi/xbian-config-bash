@@ -68,8 +68,11 @@ function showCMDFn() {
 	case $1 in
 		check)
 			if [ $# -eq 1 ]; then
-				checkNeedToResizeFn;
-				if [ $? -eq 1 ]; then
+				checkNeedToResizeSDFn;
+				RESIZESD=$?;
+				checkNeedToResizePartFn;
+				RESIZEPART=$?;
+				if [ $RESIZESD -eq 1 ] || [ $RESIZEPART -eq 1 ]; then
 					echo 1;
 				else
 					echo -1;
@@ -80,10 +83,17 @@ function showCMDFn() {
 		;;
 		resize)
 			if [ $# -eq 1 ]; then
-				checkNeedToResizeFn;
-				if [ $? -eq 1 ]; then
+				checkNeedToResizeSDFn;
+				RESIZESD=$?;
+				checkNeedToResizePartFn;
+				RESIZEPART=$?;
+				if [ $RESIZESD -eq 1 ] || [ $RESIZEPART -eq 1 ]; then
 					resizeSDFn;
-					echo $?;
+					if [ $? -eq 0 ]; then
+						echo 1;
+					else
+						echo 0;
+					fi
 				else
 					echo -1;
 				fi
