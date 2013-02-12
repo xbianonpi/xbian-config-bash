@@ -140,23 +140,24 @@ EOF
 		if [ $ERROR -eq 0 ]; then
 			chmod +x /etc/init.d/resize2fs_once >/dev/null;
 			if [ $? -eq 0 ]; then
-				return 0;
+				ERROR=0;
 			else
-				return 1;
+				ERROR=1;
 			fi
 		else
-			return 1;
+			ERROR=1;
 		fi
 		if [ $ERROR -eq 0 ]; then
 			update-rc.d resize2fs_once defaults >/dev/null 2>/dev/null;
 			if [ $? -eq 0 ]; then
-				return 0;
+				ERROR=0;
 			else
-				return 1;
+				ERROR=1;
 			fi
 		else
-			return 1;
+			ERROR=1;
 		fi
+	return $ERROR;
 	else
 		return 1;
 	fi
