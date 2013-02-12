@@ -39,8 +39,11 @@ source $BASEPATH/modules/resizesd/dialogs
 function showGUIFn() {
 	showSDConfirmationDlg;
 	if [ $? -eq 0 ]; then
-		checkNeedToResizeFn;
-		if [ $? -eq 0 ]; then
+		checkNeedToResizeSDFn;
+		RESIZESD=$?;
+		checkNeedToResizePartFn;
+		RESIZEPART=$?;
+		if [ $RESIZESD -eq 0 ] && [ $RESIZEPART -eq 0 ]; then
 			showSDResizeNotNeededDlg;
 		else
 			resizeSDFn;
