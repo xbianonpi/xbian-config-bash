@@ -17,7 +17,7 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-function checkNeedToResizeFn() {
+function checkNeedToResizeSDFn() {
 	PART_START=$(fdisk -l | grep mmcblk0p2 | awk '{print $2}');
 	CPART_START=$PART_START;
 	CPART_END=$(fdisk -l | grep mmcblk0p2 | awk '{print $3}');
@@ -26,7 +26,7 @@ function checkNeedToResizeFn() {
 	SWAP=$(fdisk -l | grep 'mmcblk0p3' | awk '{print $5}');
 	
 	PART_END=$SDEND;
-	
+		
 	if [[ $PART_START -eq $CPART_START && $PART_END -eq $CPART_END ]]; then
 		return 0;
 	else
@@ -34,10 +34,24 @@ function checkNeedToResizeFn() {
 	fi
 }
 
+function checkNeedToResizePartFn() {
+	PARTSIZE=$(printf "%.0f" $(echo "$(df /root | awk '{print $2}' | tail -1)/1000/1000" | bc -l));
+	SDSIZE=$(printf "%.0f" $(echo "$(fdisk -l | sed -ne 's/\(Disk\)\(.*\)\(,\)\(.*\)\([\ ]\)\([0-9]\{1,\}\)\([\ ]bytes\)\(.*\)/\6/p')/1000/1000/1000" | bc -l));
+	if [[ $SDSIZE =~ [0-9]* ]] && [[ $PARTSIZE =~ [0-9]* ]]; then
+		if [ $SDSIZE -eq $PARTSIZE ]; then
+			return 0;
+		else
+			return 1;
+		fi
+	else
+		return 0;
+	fi
+}
+
 function resizeSDFn() {
 	ERROR=0;
 	
-	checkNeedToResizeFn;
+	checkNeedToResizeSDFn;
 	if [ $? == 1 ]; then
 		PART_START=$(fdisk -l | grep mmcblk0p2 | awk '{print $2}');
 		CPART_START=$PART_START;
@@ -51,7 +65,7 @@ function resizeSDFn() {
 		if [ ! -z $SWAP ] && [ $SWAP -eq 82 ]; then
 			swapoff -a
 			ERROR=$?;
-			if [ ERROR == 0 ]; then
+			if [ $ERROR -eq 0 ]; then
 fdisk /dev/mmcblk0 2>/dev/null >/dev/null <<EOF
 d
 2
@@ -66,11 +80,11 @@ w
 EOF
 				ERROR=$?;
 			else
-				return $ERROR;
+				return 1;
 			fi
-			sed -i '/swap/d' /etc/fstab
+			sed -i '/\/dev.*swap/d' /etc/fstab
 		else
-			if [ ERROR == 0 ]; then
+			if [ $ERROR -eq 0 ]; then
 fdisk /dev/mmcblk0 2>/dev/null >/dev/null <<EOF
 d
 2
@@ -83,10 +97,14 @@ w
 EOF
 				ERROR=$?;
 			else
-				return $ERROR;
+				return 1;
 			fi
 		fi
+	fi
 
+	checkNeedToResizePartFn;
+	if [ $? -eq 1 ]; then
+		if [ $ERROR -eq 0 ]; then
 		askForRebootFn;
 
 cat <<\EOF > /etc/init.d/resize2fs_once
@@ -117,21 +135,29 @@ case "$1" in
     ;;
 esac
 EOF
-		ERROR=$?;
-		if [ ERROR == 0 ]; then
+			ERROR=$?;
+		fi
+		if [ $ERROR -eq 0 ]; then
 			chmod +x /etc/init.d/resize2fs_once >/dev/null;
-			ERROR=$?;
+			if [ $? -eq 0 ]; then
+				return 0;
+			else
+				return 1;
+			fi
 		else
-			return $ERROR;
+			return 1;
 		fi
-		if [ ERROR == 0 ]; then
+		if [ $ERROR -eq 0 ]; then
 			update-rc.d resize2fs_once defaults >/dev/null 2>/dev/null;
-			ERROR=$?;
+			if [ $? -eq 0 ]; then
+				return 0;
+			else
+				return 1;
+			fi
 		else
-			return $ERROR;
+			return 1;
 		fi
-		return $ERROR
 	else
-		return 0;
+		return 1;
 	fi
 }
