@@ -39,11 +39,8 @@ source $BASEPATH/modules/resizesd/dialogs
 function showGUIFn() {
 	showSDConfirmationDlg;
 	if [ $? -eq 0 ]; then
-		checkNeedToResizeSDFn;
-		RESIZESD=$?;
-		checkNeedToResizePartFn;
-		RESIZEPART=$?;
-		if [ $RESIZESD -eq 0 ] && [ $RESIZEPART -eq 0 ]; then
+		checkNeedToResizeFn;
+		if [ $? -eq 0 ]; then
 			showSDResizeNotNeededDlg;
 		else
 			resizeSDFn;
@@ -71,11 +68,8 @@ function showCMDFn() {
 	case $1 in
 		check)
 			if [ $# -eq 1 ]; then
-				checkNeedToResizeSDFn;
-				RESIZESD=$?;
-				checkNeedToResizePartFn;
-				RESIZEPART=$?;
-				if [ $RESIZESD -eq 1 ] || [ $RESIZEPART -eq 1 ]; then
+				checkNeedToResizeFn;
+				if [ $? -eq 1 ]; then
 					echo 1;
 				else
 					echo -1;
@@ -86,11 +80,8 @@ function showCMDFn() {
 		;;
 		resize)
 			if [ $# -eq 1 ]; then
-				checkNeedToResizeSDFn;
-				RESIZESD=$?;
-				checkNeedToResizePartFn;
-				RESIZEPART=$?;
-				if [ $RESIZESD -eq 1 ] || [ $RESIZEPART -eq 1 ]; then
+				checkNeedToResizeFn;
+				if [ $? -eq 1 ]; then
 					resizeSDFn;
 					if [ $? -eq 0 ]; then
 						echo 1;
