@@ -32,30 +32,47 @@ function checkNeedToResizeSDFn() {
 }
 
 function checkNeedToResizePartFn() {
+	NEEDRESIZE=0;
 	IFS=".";
 	SDSIZE=($(echo "$(fdisk -l | sed -ne 's/\(Disk\)\(.*\)\(,\)\(.*\)\([\ ]\)\([0-9]\{1,\}\)\([\ ]bytes\)\(.*\)/\6/p')/1024/1024/1000" | bc -l));
 	if [[ ${SDSIZE[0]} =~ [0-9]{1,} ]] && [[ ${SDSIZE[1]} =~ [0-9]{1,} ]]; then
 		if [ $(($(echo "(${SDSIZE[1]}/100000000000000000000) > 0" | bc -l))) -gt 0 ]; then
-				SDSIZE=$((${SDSIZE[0]}+1));
+				SDSIZE1=$((${SDSIZE[0]}+1));
 		fi
 	fi
 
 	PARTSIZE=($(echo "$(df /root | awk '{print $2}' | tail -1)/1024/1000" | bc -l));
 	if [[ ${PARTSIZE[0]} =~ [0-9]{1,} ]] && [[ ${PARTSIZE[1]} =~ [0-9]{1,} ]]; then
 		if [ $(($(echo "(${PARTSIZE[1]}/100000000000000000000) > 0" | bc -l))) -gt 0 ]; then
-				PARTSIZE=$((${PARTSIZE[0]}+1));
+				PARTSIZE1=$((${PARTSIZE[0]}+1));
 		fi
 	fi
+	PARTSIZE2=$(printf "%.0f" $(echo "$(df /root | awk '{print $2}' | tail -1)/1024/1000" | bc -l))
+	SDSIZE2=$(printf "%.0f" $(echo "$(fdisk -l | sed -ne 's/\(Disk\)\(.*\)\(,\)\(.*\)\([\ ]\)\([0-9]\{1,\}\)\([\ ]bytes\)\(.*\)/\6/p')/1024/1024/1000" | bc -l));
+	
 	IFS=$ORIGINALIFS;
-	if [[ $SDSIZE =~ [0-9]{1,} ]] && [[ $PARTSIZE =~ [0-9]{1,} ]]; then
-		if [ $SDSIZE -eq $PARTSIZE ]; then
-			return 0;
+	if [[ $SDSIZE1 =~ [0-9]{1,} ]] && [[ $PARTSIZE1 =~ [0-9]{1,} ]]; then
+		if [ $SDSIZE1 -eq $PARTSIZE1 ]; then
+			NEEDRESIZE=0;
 		else
-			return 1;
+			NEEDRESIZE=1;
 		fi
 	else
-		return 0;
+		NEEDRESIZE=0;
 	fi
+	
+	if [ $NEEDRESIZE -eq 0 ]; then
+		if [[ $SDSIZE2 =~ [0-9]{1,} ]] && [[ $PARTSIZE2 =~ [0-9]{1,} ]]; then
+			if [ $SDSIZE2 -eq $PARTSIZE2 ]; then
+				NEEDRESIZE=0;
+			else
+				NEEDRESIZE=1;
+			fi
+		else
+			NEEDRESIZE=0;
+		fi
+	fi
+	return $NEEDRESIZE;
 }
 
 function resizeSDFn() {
