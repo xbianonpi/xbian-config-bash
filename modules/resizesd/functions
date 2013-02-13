@@ -46,6 +46,7 @@ function checkNeedToResizePartFn() {
 				PARTSIZE=$((${PARTSIZE[0]}+1));
 		fi
 	fi
+	IFS=$ORIGINALIFS;
 	if [[ $SDSIZE =~ [0-9]{1,} ]] && [[ $PARTSIZE =~ [0-9]{1,} ]]; then
 		if [ $SDSIZE -eq $PARTSIZE ]; then
 			return 0;
