@@ -19,15 +19,12 @@
 
 function checkNeedToResizeSDFn() {
 	PART_START=$(fdisk -l | grep mmcblk0p2 | awk '{print $2}');
-	CPART_START=$PART_START;
 	CPART_END=$(fdisk -l | grep mmcblk0p2 | awk '{print $3}');
 	SDEND=$(fdisk -l | sed -n '/mmcblk0/{n;p;}' | head -1 | awk '{print $8}');
 	SDEND=$(($SDEND-1));
 	SWAP=$(fdisk -l | grep 'mmcblk0p3' | awk '{print $5}');
-	
-	PART_END=$SDEND;
 		
-	if [[ $PART_START -eq $CPART_START && $PART_END -eq $CPART_END ]]; then
+	if [ $SDEND -eq $CPART_END ]; then
 		return 0;
 	else
 		return 1;
@@ -35,8 +32,20 @@ function checkNeedToResizeSDFn() {
 }
 
 function checkNeedToResizePartFn() {
-	PARTSIZE=$(printf "%.0f" $(echo "$(df /root | awk '{print $2}' | tail -1)/1024/1000" | bc -l));
-	SDSIZE=$(printf "%.0f" $(echo "$(fdisk -l | sed -ne 's/\(Disk\)\(.*\)\(,\)\(.*\)\([\ ]\)\([0-9]\{1,\}\)\([\ ]bytes\)\(.*\)/\6/p')/1024/1024/1000" | bc -l));
+	IFS=".";
+	SDSIZE=($(echo "$(fdisk -l | sed -ne 's/\(Disk\)\(.*\)\(,\)\(.*\)\([\ ]\)\([0-9]\{1,\}\)\([\ ]bytes\)\(.*\)/\6/p')/1024/1024/1000" | bc -l));
+	if [[ ${SDSIZE[0]} =~ [0-9]{1,} ]] && [[ ${SDSIZE[1]} =~ [0-9]{1,} ]]; then
+		if [ $(($(echo "(${SDSIZE[1]}/100000000000000000000) > 0" | bc -l))) -gt 0 ]; then
+				SDSIZE=$((${SDSIZE[0]}+1));
+		fi
+	fi
+
+	PARTSIZE=($(echo "$(df /root | awk '{print $2}' | tail -1)/1024/1000" | bc -l));
+	if [[ ${PARTSIZE[0]} =~ [0-9]{1,} ]] && [[ ${PARTSIZE[1]} =~ [0-9]{1,} ]]; then
+		if [ $(($(echo "(${PARTSIZE[1]}/100000000000000000000) > 0" | bc -l))) -gt 0 ]; then
+				PARTSIZE=$((${PARTSIZE[0]}+1));
+		fi
+	fi
 	if [[ $SDSIZE =~ [0-9]{1,} ]] && [[ $PARTSIZE =~ [0-9]{1,} ]]; then
 		if [ $SDSIZE -eq $PARTSIZE ]; then
 			return 0;
