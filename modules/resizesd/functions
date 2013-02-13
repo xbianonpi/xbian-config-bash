@@ -37,7 +37,7 @@ function checkNeedToResizeSDFn() {
 function checkNeedToResizePartFn() {
 	PARTSIZE=$(printf "%.0f" $(echo "$(df /root | awk '{print $2}' | tail -1)/1024/1000" | bc -l));
 	SDSIZE=$(printf "%.0f" $(echo "$(fdisk -l | sed -ne 's/\(Disk\)\(.*\)\(,\)\(.*\)\([\ ]\)\([0-9]\{1,\}\)\([\ ]bytes\)\(.*\)/\6/p')/1024/1024/1000" | bc -l));
-	if [[ $SDSIZE =~ [0-9]* ]] && [[ $PARTSIZE =~ [0-9]* ]]; then
+	if [[ $SDSIZE =~ [0-9]{1,\} ]] && [[ $PARTSIZE =~ [0-9]{1,\} ]]; then
 		if [ $SDSIZE -eq $PARTSIZE ]; then
 			return 0;
 		else
