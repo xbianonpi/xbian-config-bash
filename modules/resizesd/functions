@@ -17,7 +17,7 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-function checkNeedToResizeSDFn() {
+function checkNeedToResizeFn() {
 	PART_START=$(fdisk -l | grep mmcblk0p2 | awk '{print $2}');
 	CPART_END=$(fdisk -l | grep mmcblk0p2 | awk '{print $3}');
 	SDEND=$(fdisk -l | sed -n '/mmcblk0/{n;p;}' | head -1 | awk '{print $8}');
@@ -31,55 +31,10 @@ function checkNeedToResizeSDFn() {
 	fi
 }
 
-function checkNeedToResizePartFn() {
-	NEEDRESIZE=0;
-	IFS=".";
-	SDSIZE=($(echo "$(fdisk -l | sed -ne 's/\(Disk\)\(.*\)\(,\)\(.*\)\([\ ]\)\([0-9]\{1,\}\)\([\ ]bytes\)\(.*\)/\6/p')/1024/1024/1000" | bc -l));
-	if [[ ${SDSIZE[0]} =~ [0-9]{1,} ]] && [[ ${SDSIZE[1]} =~ [0-9]{1,} ]]; then
-		if [ $(($(echo "(${SDSIZE[1]}/100000000000000000000) > 0" | bc -l))) -gt 0 ]; then
-				SDSIZE2=$((${SDSIZE[0]}+1));
-		fi
-	fi
-
-	PARTSIZE=($(echo "$(df /root | awk '{print $2}' | tail -1)/1024/1000" | bc -l));
-	if [[ ${PARTSIZE[0]} =~ [0-9]{1,} ]] && [[ ${PARTSIZE[1]} =~ [0-9]{1,} ]]; then
-		if [ $(($(echo "(${PARTSIZE[1]}/100000000000000000000) > 0" | bc -l))) -gt 0 ]; then
-				PARTSIZE2=$((${PARTSIZE[0]}+1));
-		fi
-	fi
-	IFS=$ORIGINALIFS;
-	
-	PARTSIZE1=$(printf "%.0f" $(echo "$(df /root | awk '{print $2}' | tail -1)/1024/1000" | bc -l))
-	SDSIZE1=$(printf "%.0f" $(echo "$(fdisk -l | sed -ne 's/\(Disk\)\(.*\)\(,\)\(.*\)\([\ ]\)\([0-9]\{1,\}\)\([\ ]bytes\)\(.*\)/\6/p')/1024/1024/1000" | bc -l));
-
-	if [[ $SDSIZE1 =~ [0-9]{1,} ]] && [[ $PARTSIZE1 =~ [0-9]{1,} ]]; then
-		if [ $SDSIZE1 -eq $PARTSIZE1 ]; then
-			NEEDRESIZE=0;
-		else
-			NEEDRESIZE=1;
-		fi
-	else
-		NEEDRESIZE=0;
-	fi
-	
-	if [ $NEEDRESIZE -eq 0 ]; then
-		if [[ $SDSIZE2 =~ [0-9]{1,} ]] && [[ $PARTSIZE2 =~ [0-9]{1,} ]]; then
-			if [ $SDSIZE2 -eq $PARTSIZE2 ]; then
-				NEEDRESIZE=0;
-			else
-				NEEDRESIZE=1;
-			fi
-		else
-			NEEDRESIZE=0;
-		fi
-	fi
-	return $NEEDRESIZE;
-}
-
 function resizeSDFn() {
 	ERROR=0;
 	
-	checkNeedToResizeSDFn;
+	checkNeedToResizeFn;
 	if [ $? == 1 ]; then
 		PART_START=$(fdisk -l | grep mmcblk0p2 | awk '{print $2}');
 		CPART_START=$PART_START;
@@ -128,10 +83,7 @@ EOF
 				return 1;
 			fi
 		fi
-	fi
 
-	checkNeedToResizePartFn;
-	if [ $? -eq 1 ]; then
 		if [ $ERROR -eq 0 ]; then
 		askForRebootFn;
 
