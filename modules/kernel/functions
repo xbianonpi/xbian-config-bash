@@ -45,9 +45,13 @@ function getInstalledKernelVersionsFn() {
 function getCurrentKernelVersionFn() {
 	CKERNEL=$(ls -Al /boot/kernel.img | awk '{print $5}');
 	NKERNEL=$(ls -Al /boot/*.img | grep -w $CKERNEL | awk '{print $9}' | grep -iv kernel.img);
-	NKERNEL=${NKERNEL##*/};
-	NKERNEL=${NKERNEL%.*}; 
-	CURRENTKERNEL=$(echo $NKERNEL | sed -e 's/kernel//g' | sed -e 's/\_/./g');
+	if [ -z $NKERNEL ]; then
+		CURRENTKERNEL=$(uname -r | sed -e 's/+//g');
+	else
+		NKERNEL=${NKERNEL##*/};
+		NKERNEL=${NKERNEL%.*}; 
+		CURRENTKERNEL=$(echo $NKERNEL | sed -e 's/kernel//g' | sed -e 's/\_/./g');
+	fi
 }
 
 # Change the current kernel version
