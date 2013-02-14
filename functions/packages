@@ -99,6 +99,8 @@ function getAptErrorCodeFn() {
 		return 5;
 	elif [ $(cat /tmp/aptstatus | grep -i "returned an error code" | wc -l) -eq 1 ]; then
 		return 6;
+	elif [ $(cat /tmp/aptstatus | grep -i "impossible situation" | wc -l) -eq 1 ]; then
+		return 6;
 	else
 		return 0;
 	fi
