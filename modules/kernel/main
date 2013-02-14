@@ -110,9 +110,14 @@ function showCMDFn() {
 		"list")
 			shift;
 			getInstalledKernelVersionsFn;
-			for VALUE in ${KERNELV[@]}; do
-				echo $VALUE;
-			done
+			if [ ${#KERNELV[@]} -gt 0 ]; then
+				for VALUE in ${KERNELV[@]}; do
+					echo $VALUE;
+				done
+			else
+				getCurrentKernelVersionFn;
+				echo $CURRENTKERNEL;
+			fi
 		;;		
 	esac 
 }
