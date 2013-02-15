@@ -104,7 +104,7 @@ function removePackageFn() {
 		return 1;
 	else
 		if [ $1 -eq 1 ]; then
-			apt-get purge -s webtest &>/tmp/aptstatus
+			apt-get purge -s $2 &>/tmp/aptstatus
 
 			if [ $(cat /tmp/aptstatus | grep "is not installed, so not removed" | wc -l) -eq 1 ]; then
 				return 1;
