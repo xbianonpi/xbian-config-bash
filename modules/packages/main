@@ -28,7 +28,7 @@ if [ -f "$BASEPATH/config/pkglist" ]; then
 else
 	CONTENT="";
 fi
-ALLPKGLST=$(dpkg --get-selections);
+ALLPKGLST=$(dpkg --get-selections xbian*);
 PKGNOTFOUND=0;
 
 #|------------------------------------|
@@ -203,6 +203,7 @@ function showGUIFn() {
 #  -  1: Package can be removed without problems
 #  -  2: This package is not installed
 #  -  3: This is an essential pacakge and cannot be removed
+#  -  4: Package not found in apt repository
 #  *progress
 #  -  1: Apt is still running
 #  -  0: Apt is not running
@@ -366,7 +367,7 @@ function showCMDFn() {
 								echo 1;
 							;;
 							*)
-								echo $(($RETURN+6));
+								echo $(($RETURN+1));
 							;;
 						esac	
 					else
@@ -392,7 +393,7 @@ function showCMDFn() {
 								echo 1;
 							;;
 							*)
-								echo $(($RETURN+6));
+								echo $(($RETURN+1));
 							;;
 						esac
 					else

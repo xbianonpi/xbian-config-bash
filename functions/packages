@@ -92,15 +92,15 @@ function getAptErrorCodeFn() {
 	elif [ $(cat /tmp/aptstatus | grep "was not found" | wc -l) -eq 1 ]; then
 		return 2;
 	elif [ $(cat /tmp/aptstatus | grep "Unable to locate package" | wc -l) -eq 1 ]; then
-		return 3;
+		return 2;
 	elif [ $(cat /tmp/aptstatus | grep "DOWNGRADED" | wc -l) -eq 1 ]; then
-		return 4;
+		return 3;
 	elif [ $(cat /tmp/aptstatus | grep -i "size mismatch" | wc -l) -eq 1 ]; then
-		return 5;
+		return 4;
 	elif [ $(cat /tmp/aptstatus | grep -i "returned an error code" | wc -l) -eq 1 ]; then
-		return 6;
+		return 5;
 	elif [ $(cat /tmp/aptstatus | grep -i "impossible situation" | wc -l) -eq 1 ]; then
-		return 6;
+		return 5;
 	else
 		return 0;
 	fi

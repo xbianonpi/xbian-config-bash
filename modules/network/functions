@@ -418,32 +418,36 @@ function checkValidIpNetmaskFn() {
 function scanWLANNetworksFn() {
 	IFS=$'\n'
 	OUTPUT=($(iwlist $1 scan));
-	#IWLIST=($(iwlist $1 scan | sed -ne 's/\(ESSID:\)\([\"\ -_A-Za-z0-9]\{1,\}\)/1:\2/p' -ne 's/\(Encryption key:\)\([a-z]\{1,3\}\)/2:\2/p' -ne 's/\(IE:.*\)\(WPA2\|WPA\)/3:\2/gp' -ne 's/\(.*Signal level=\)\([0-9]\{1,3\}\)\(\/100\)/4:\2/gp' | sed 's/ Version.*//g' | sed 's/^[[:space:]]*\(.*\)[[:space:]]*$/\1/'));
 	
 	WNETWORKS=();
 	WLAN=();
 	NUMBERS=();
 	X=-1;
+	READ=0;
 	for LINE in ${OUTPUT[@]}; do
 		if [[ $LINE =~ "Cell" ]]; then
-			if [ $X -gt -1 ]; then
+			if [ $READ -eq 1 ]; then
+				if [ -z ${WLAN[1]} ]; then
+					WLAN[1]="Open";
+				fi
 				if [ "${WLAN[2]}" == "on" ] && [ "${WLAN[1]}" == "Open" ]; then
 					WLAN[1]="WEP";
 				fi
 				if [ ${#WLAN[0]} -gt 2 ]; then
+					X=$(($X+1));
 					WNETWORKS[$X]="${WLAN[0]},${WLAN[1]},${WLAN[2]},${WLAN[3]}";
 				fi
 				WLAN=();
 				WLAN[1]="Open";
 			fi
-			X=$(($X+1));
+			READ=1;
 		fi
 		if [[ $LINE =~ "ESSID" ]]; then
 			WLAN[0]=$(echo $LINE | cut -f2 -d":");
 		fi
 		if [ ${#WLAN[0]} -gt 2 ]; then
 			if [[ $LINE =~ "WPA" ]]; then
-				WLAN[1]=WPA
+				WLAN[1]="WPA"
 			fi
 			if [[ $LINE =~ "Encryption key" ]]; then
 				WLAN[2]=$(echo $LINE | cut -f2 -d":");
@@ -453,6 +457,7 @@ function scanWLANNetworksFn() {
 			fi
 		fi
 	done;
+	X=$(($X+1));
 	if [ ${#WLAN[0]} -gt 2 ]; then
 		WNETWORKS[$X]="${WLAN[0]},${WLAN[1]},${WLAN[2]},${WLAN[3]}";
 	fi
@@ -463,7 +468,7 @@ function scanWLANNetworksFn() {
 		for((C=0;C<=$X;C++)); do
 			VALUES=(${WNETWORKS[$C]});
 			VALUES1=(${WNETWORKS[$(($C+1))]});
-			if [ ! -z "${VALUES1[3]}" ] && [ ! -z "${VALUES[3]}" ]; then
+			if [[ "${VALUES1[3]}" =~ [0-9]{1,3} ]] && [[ "${VALUES[3]}" =~ [0-9]{1,3} ]]; then
 				if [ ${VALUES[3]} -lt ${VALUES1[3]} ]; then
 					TEMP=${WNETWORKS[$C]};
 					WNETWORKS[$C]=${WNETWORKS[$(($C+1))]};

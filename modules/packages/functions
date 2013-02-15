@@ -79,7 +79,7 @@ function installPackageFn() {
 	NAME=${NAME/xbian-package-/}
 	NAME=$(echo $NAME | cut -f 1 -d"=");
 	if [ $(getPackageStatusFn $NAME; echo $?) -eq 1 ]; then
-		return 6;
+		return 1;
 	else
 		if [ $1 -eq 1 ]; then
 			apt-get install -s $2 &>/tmp/aptstatus
@@ -104,16 +104,16 @@ function removePackageFn() {
 		return 1;
 	else
 		if [ $1 -eq 1 ]; then
-			apt-get purge -s $2 &>/tmp/aptstatus
-			if [ $? -eq 0 ]; then	
-				if [ $(cat /tmp/aptstatus | grep "is not installed, so not removed" | wc -l) -eq 1 ]; then
-					return 1;
-				elif [ $(cat /tmp/aptstatus | grep "essential package" | wc -l) -eq 1 ]; then
-					return 2;
-				else
-					
-					return 0;
-				fi
+			apt-get purge -s webtest &>/tmp/aptstatus
+
+			if [ $(cat /tmp/aptstatus | grep "is not installed, so not removed" | wc -l) -eq 1 ]; then
+				return 1;
+			elif [ $(cat /tmp/aptstatus | grep "essential package" | wc -l) -eq 1 ]; then
+				return 2;
+			elif [ $(cat /tmp/aptstatus | grep "Unable to locate" | wc -l) -eq 1 ]; then
+				return 3;
+			else
+				return 0;
 			fi
 		elif [ $1 -eq 0 ]; then
 			apt-get purge -y $2 &>/tmp/aptstatus
