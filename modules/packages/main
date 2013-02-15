@@ -100,6 +100,8 @@ function showPackageActionsFn() {
 					showPackageNotInstalledDlg;
 				elif [ $STATUS -eq 2 ]; then
 					showPackageEssentialDlg
+				elif [ $STATUS -eq 3 ]; then
+					showPackageNotExistsDlg;
 				elif [ $STATUS -eq 0 ]; then
 					showPackageRemovedSuccessDlg
 				fi
@@ -195,10 +197,11 @@ function showGUIFn() {
 #  *installtest | install - (Simulates an) apt-get install
 #  -  1: Package can be installed without problems
 #  -  2: This package is already installed
-#  -  3: Package not found in apt repository
-#  -  4: A newer version of this package is already installed
-#  -  5: There is a size mismatch for the remote package
-#  -  6: The package itself got an internal error
+#  -  3: Package version not found in apt repository
+#  -  4: Package not found in apt repository
+#  -  5: A newer version of this package is already installed
+#  -  6: There is a size mismatch for the remote package
+#  -  7: The package itself got an internal error
 #  *removetest | remove - (Simulates an) apt-get remove
 #  -  1: Package can be removed without problems
 #  -  2: This package is not installed
