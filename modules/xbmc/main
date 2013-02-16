@@ -55,11 +55,20 @@ function showGUIFn() {
 			fi
 		elif [ $RETURN -eq 2 ]; then
 			showXBMCWebserverDlg;
-			setXBMCWebserverFn $?;
+			STATE=$?;
+			setXBMCWebserverFn $STATE;
 			if [ $? -eq 1 ]; then
-				showXBMCWebserverSuccessDlg;
+				if [ $STATE -eq 0 ]; then
+					showXBMCWebserverSuccessEnabledDlg;
+				else
+					showXBMCWebserverSuccessDisabledDlg;
+				fi
 			else
-				showXBMCWebserverFailedDlg;
+				if [ $STATE -eq 0 ]; then
+					showXBMCWebserverFailedEnableDlg;
+				else
+					showXBMCWebserverFailedDisableDlg;
+				fi
 			fi
 			showGUIFn;
 		fi

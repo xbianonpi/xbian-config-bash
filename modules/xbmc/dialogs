@@ -52,21 +52,35 @@ function showXBMCWebserverDlg() {
 	return $?;
 }
 
-function showXBMCWebserverSuccessDlg() {
-	wrapTxtFn "$_XBMCWEBSERVERSUCCESS" $(($DEFAULTWIDTH-4));
+function showXBMCWebserverSuccessEnabledDlg() {
+	wrapTxtFn "$_XBMCWEBSERVERSUCCESSENABLED" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT;
 }
 
-function showXBMCWebserverFailedDlg() {
-	wrapTxtFn "$_XBMCWEBSERVERFAILED" $(($DEFAULTWIDTH-4));
+function showXBMCWebserverSuccessDisabledDlg() {
+	wrapTxtFn "$_XBMCWEBSERVERSUCCESSDISABLED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT;
+}
+
+function showXBMCWebserverFailedEnableDlg() {
+	wrapTxtFn "$_XBMCWEBSERVERFAILEDENABLED" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT;	
 }
 
-function showXBMCGUIResSuccessDlg() {
+function showXBMCWebserverFailedDisableDlg() {
+	wrapTxtFn "$_XBMCWEBSERVERFAILEDDISABLED" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT;	
+}
+
+function showXBMCGUIResSuccessDDlg() {
 	wrapTxtFn "$_XBMCGUIRESSUCCESS" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
