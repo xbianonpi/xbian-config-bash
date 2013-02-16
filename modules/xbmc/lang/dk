@@ -19,8 +19,10 @@
 
 _NAME="XBMC"
 _DESC="Skift XBMC-indstillinger"
-_XBMCWEBSERVERSUCCESS="Aktivering af XBMC webserver lykkedes"
-_XBMCWEBSERVERFAILED="Aktivering af XBMC webserver mislykkedes"
+_XBMCWEBSERVERSUCCESSENABLED="XBMC webserver er aktiveret"
+_XBMCWEBSERVERSUCCESSDISABLED="XBMC webserver er deaktiveret"
+_XBMCWEBSERVERFAILEDENABLE="Aktivering af XBMC webserver mislykkedes"
+_XBMCWEBSERVERFAILEDDISABLE="Deaktivering af XBMC webserver mislykkedes"
 _XBMCGUIRESSUCCESS="Ændring af opløsning for XBMC GUI lykkedes"
 _XBMCGUIRESFAILED="Ændring af opløsning for XBMC GUI mislykkedes"
 _XBMCGUIRES="GUI Opløsning"
