@@ -19,8 +19,10 @@
 
 _NAME="XBMC"
 _DESC="XBMC nadstavenia"
-_XBMCWEBSERVERSUCCESS="XBMC webserver úspešne aktivovaný"
-_XBMCWEBSERVERFAILED="Zlyhanie aktivácie XBMC webserveru"
+_XBMCWEBSERVERSUCCESSENABLED="XBMC webserver úspešne aktivovaný"
+_XBMCWEBSERVERSUCCESSDISABLED="XBMC webserver úspešne deaktivovaný"
+_XBMCWEBSERVERFAILEDENABLE="Zlyhanie aktivácie XBMC webserveru"
+_XBMCWEBSERVERFAILEDDISABLE="Deaktivovanie XBMC webserveru zlyhalo"
 _XBMCGUIRESSUCCESS="Rozlíšenie XBMC GUI úspešne zmenené"
 _XBMCGUIRESFAILED="Rozlíšenie XBMC GUI neprebehlo úspešne"
 _XBMCGUIRES="GUI Rozlíšenie"

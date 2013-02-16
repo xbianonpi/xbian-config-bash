@@ -19,8 +19,10 @@
 
 _NAME="XBMC"
 _DESC="Cambiar ajustes de XBMC"
-_XBMCWEBSERVERSUCCESS="Servidor web de XBMC añadido con éxito"
-_XBMCWEBSERVERFAILED="Fallo, al iniciar el servidor web de XBMC"
+_XBMCWEBSERVERSUCCESSENABLED="Servidor web de XBMC añadido con éxito"
+_XBMCWEBSERVERSUCCESSDISABLED="El servidor web de XBMC ha sido desactivado con éxito"
+_XBMCWEBSERVERFAILEDENABLE="Fallo, al iniciar el servidor web de XBMC"
+_XBMCWEBSERVERFAILEDDISABLE="La desactivación del servidor web de XBMC ha fallado" 
 _XBMCGUIRESSUCCESS="Resolución de la interfaz de XBMC cambiada con éxito"
 _XBMCGUIRESFAILED="Fallo, al cambiar la resolución de la interfaz de XBMC"
 _XBMCGUIRES="Resolución de la interfaz"
