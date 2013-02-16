@@ -19,8 +19,10 @@
 
 _NAME="XBMC"
 _DESC="Change XBMC settings"
-_XBMCWEBSERVERSUCCESS="XBMC webserver successfully enabled"
-_XBMCWEBSERVERFAILED="Failed to enabled XBMC webserver"
+_XBMCWEBSERVERSUCCESSENABLED="XBMC webserver successfully enabled"
+_XBMCWEBSERVERSUCCESSDISABLED="XBMC webserver successfully disabled"
+_XBMCWEBSERVERFAILEDENABLE="Failed to enable XBMC webserver"
+_XBMCWEBSERVERFAILEDDISABLE="Failed to disable XBMC webserver"
 _XBMCGUIRESSUCCESS="XBMC GUI resolution successfully changed"
 _XBMCGUIRESFAILED="Failed to change XBMC GUI resolution"
 _XBMCGUIRES="GUI Resolution"

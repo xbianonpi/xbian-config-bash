@@ -19,8 +19,10 @@
 
 _NAME="XBMC"
 _DESC="Verander XBMC instellingen"
-_XBMCWEBSERVERSUCCESS="XBMC webserver succesvol ingeschakeld"
-_XBMCWEBSERVERFAILED="XBMC webserver ingeschakelen is niet gelukt"
+_XBMCWEBSERVERSUCCESSENABLED="XBMC webserver succesvol ingeschakeld"
+_XBMCWEBSERVERSUCCESSDISABLED="XBMC webserver succesvol uitgeschakeld"
+_XBMCWEBSERVERFAILEDENABLE="XBMC webserver ingeschakelen is niet gelukt"
+_XBMCWEBSERVERFAILEDDISABLE="XBMC webserver uitgeschakelen is niet gelukt"
 _XBMCGUIRESSUCCESS="XBMC GUI resolutie succesvol veranderd"
 _XBMCGUIRESFAILED="XBMC GUI resolutie verandered is niet gelukt"
 _XBMCGUIRES="GUI Resolutie"
