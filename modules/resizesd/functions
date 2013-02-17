@@ -18,17 +18,28 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 function checkNeedToResizeFn() {
+	NEEDRESIZE=0;
 	PART_START=$(fdisk -l | grep mmcblk0p2 | awk '{print $2}');
 	CPART_END=$(fdisk -l | grep mmcblk0p2 | awk '{print $3}');
 	SDEND=$(fdisk -l | sed -n '/mmcblk0/{n;p;}' | head -1 | awk '{print $8}');
 	SDEND=$(($SDEND-1));
 	SWAP=$(fdisk -l | grep 'mmcblk0p3' | awk '{print $5}');
 		
-	if [ $SDEND -eq $CPART_END ]; then
-		return 0;
-	else
-		return 1;
+	FDISKBLOCKSIZE=$(sfdisk -d /dev/mmcblk0 | grep Id=83 | awk '{printf "%d", $6}');
+	FDISKBLOCKCOUNT=$(fdisk -l /dev/mmcblk0 | grep Units | sed -ne 's/\(.*= \)\([0-9]\{1,\}\)\( bytes\)/\2/p');
+	TUNE2FS=$(tune2fs -l /dev/mmcblk0p2);
+	TUNEBLOCKSIZE=$(echo -e "${TUNE2FS}" | grep "Block size" | awk '{printf "%d", $3}');
+	TUNEBLOCKCOUNT=$(echo -e "${TUNE2FS}" | grep "Block count" | awk '{printf "%d", $3}');
+	TUNETOTALBLOCKS=$(($(($TUNEBLOCKCOUNT*$TUNEBLOCKSIZE))/1024/1024));
+	FDISKTOTALBLOCKS=$(($(($FDISKBLOCKSIZE*$FDISKBLOCKCOUNT))/1024/1024));
+
+	# check if parition was actually resized, if not reboot
+	if [ $TUNETOTALBLOCKS -lt $FDISKTOTALBLOCKS ]; then		
+		NEEDRESIZE=1;
+	elif [ $SDEND -gt $CPART_END ]; then
+		NEEDRESIZE=1;
 	fi
+	return $NEEDRESIZE;
 }
 
 function resizeSDFn() {
