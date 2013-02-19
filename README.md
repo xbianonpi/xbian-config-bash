@@ -2,6 +2,25 @@ xbian-config-bash
 =================
 
 ```
+sudo su
+cd /home/xbian
+git clone --depth 5 https://github.com/xbianonpi/xbian-config-bash.git
+rm /usr/local/sbin/xbian-config
+rm -r /usr/local/include/xbian-config/*
+cd xbian-config-bash
+cp xbian-config /usr/local/sbin/
+cp -R functions /usr/local/include/xbian-config/
+cp -R lang /usr/local/include/xbian-config/
+cp -R modules /usr/local/include/xbian-config/
+cp -R prereqs /usr/local/include/xbian-config/
+cp -R struct /usr/local/include/xbian-config/
+cp -R config /usr/local/include/xbian-config/
+cp etc/bash_completion.d/* /etc/bash_completion.d/
+echo 'APT::Update::Post-Invoke-Success {"touch /var/lib/apt/periodic/update-success-stamp 2>/dev/null || true";};' > /etc/apt/apt.conf.d/15update-stamp
+```
+
+If you see wierd characters in xbian-config, followed the parts of these steps you didn't already do:
+```
 export LANG=C.UTF-8
 export LC_ALL=C.UTF-8
 export LANGUAGE=C.UTF-8
@@ -24,20 +43,4 @@ fi
 
 wget -O - https://github.com/xbianonpi/xbian/blob/master/usr/bin/dialog?raw=true > /usr/bin/dialog
 chmod +x /usr/bin/dialog
-
-sudo su
-cd /home/xbian
-git clone --depth 5 https://github.com/xbianonpi/xbian-config-bash.git
-rm /usr/local/sbin/xbian-config
-rm -r /usr/local/include/xbian-config/*
-cd xbian-config-bash
-cp xbian-config /usr/local/sbin/
-cp -R functions /usr/local/include/xbian-config/
-cp -R lang /usr/local/include/xbian-config/
-cp -R modules /usr/local/include/xbian-config/
-cp -R prereqs /usr/local/include/xbian-config/
-cp -R struct /usr/local/include/xbian-config/
-cp -R config /usr/local/include/xbian-config/
-cp etc/bash_completion.d/* /etc/bash_completion.d/
-echo 'APT::Update::Post-Invoke-Success {"touch /var/lib/apt/periodic/update-success-stamp 2>/dev/null || true";};' > /etc/apt/apt.conf.d/15update-stamp
 ```
