@@ -1,6 +1,7 @@
 xbian-config
-translations.ods
+*.ods
 .~lock.translations.ods#
 aptmirror
 pkglist
 junk
+python
