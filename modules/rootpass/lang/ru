@@ -17,7 +17,7 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-_NAME="Root password"
+_NAME="Пароль root"
 _DESC="Изменение пароля пользователя root"
 _ROOTPASSCHANGED="Пароль успешно изменен"
 _ROOTPASS="Пароль:";

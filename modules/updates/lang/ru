@@ -18,8 +18,8 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 _NAME="Обновления"
-_DESC="Проверить наличие обновлений"
-_UPDATINGAPTDB="Локальная база пакетов обновляется..."
+_DESC="Проверка наличия обновлений"
+_UPDATINGAPTDB="Обновление локальной базы пакетов..."
 _UPDATEDOWNLOADLIST="Получение списка доступных обновлений..."
 _UPDATEAPTDBFAILED="Во время обновления базы пакетов произошла ошибка"
 _DOWNLOADINGPACKAGELIST="Загружается база пакетов..."

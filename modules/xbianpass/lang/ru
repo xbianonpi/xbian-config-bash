@@ -17,8 +17,8 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
-_NAME="XBian password"
-_DESC="Изменить пароль для пользователя xbian"
+_NAME="Пароль xbian"
+_DESC="Изменение пароля пользователя xbian"
 _XBIANPASSCHANGED="Пароль пользователя xbian успешно изменен"
 _XBIANPASS="Пароль:";
 _XBIANPASSEMPTYFIELDS="Вы должны ввести новый пароль и подтверждение"

@@ -19,7 +19,7 @@
 
 _NAME="Службы"
 _DESC="Запуск, остановка и управление службами"
-_LOADINGSERVICES="Загрузка статуса служб..."
+_LOADINGSERVICES="Загрузка служб..."
 _RESTARTINGSERVICE="Перезапуск службы..."
 _FAILEDTORESTARTSERVICE="Не удалось перезапустить службу..."
 _STARTINGSERVICE="Запуск службы..."

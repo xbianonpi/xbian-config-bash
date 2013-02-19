@@ -203,7 +203,7 @@ function showMainMenuDlg() {
 		elif [ $CODE -eq 0 ]; then 
 			IFS=$'\n';
 			MODULE=$(grep "^$LEVEL$RETURN*:" $BASEPATH/struct | cut -f 2 -d:)
-			
+
 			if [ -d $BASEPATH/modules/$MODULE ]; then
 				if [ -f $BASEPATH/modules/$MODULE/lang/$LANGUAGE ]; then
 					source $BASEPATH/modules/$MODULE/lang/$LANGUAGE
