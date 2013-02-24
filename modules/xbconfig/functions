@@ -48,7 +48,9 @@ function setXBConfigLanguageFn() {
 
 function setXBConfigAutoStartFn() {
 	if [ $1 -eq 0 ]; then
-		sed -i 's/sudo xbian-config/#sudo xbian-config/g' /home/xbian/.bashrc;
+		if [ $(grep '^sudo xbian-config' /home/xbian/.bashrc | wc -l) -eq 1 ]; then
+			sed -i 's/sudo xbian-config/#sudo xbian-config/g' /home/xbian/.bashrc;
+		fi
 	else
 		if [ $(grep xbian-config /home/xbian/.bashrc | wc -l) -eq 1 ]; then
 			sed -i 's/#sudo xbian-config/sudo xbian-config/g' /home/xbian/.bashrc;
