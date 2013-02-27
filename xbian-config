@@ -320,7 +320,7 @@ else
 				echo ${ARGUMENTS[@]};
 			else
 				# Quotation marks to preserve newlines
-				echo "$(showCMDFn $@)";
+				echo "$(showCMDFn "$@")";
 			fi
 		else
 			echo "Available arguments for module '$MODULE' are:";
