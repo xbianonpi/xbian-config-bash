@@ -155,7 +155,7 @@ function showSystemUpdateLogDlg() {
 }
 
 function showAvailableUpdatesDlg() {
-	IFS=$'\n';
+	IFS=' ';
 	ARRAY=($1);
 	MENU=();
 	I=0;
