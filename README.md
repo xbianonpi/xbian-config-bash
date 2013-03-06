@@ -19,7 +19,7 @@ cp etc/bash_completion.d/* /etc/bash_completion.d/
 echo 'APT::Update::Post-Invoke-Success {"touch /var/lib/apt/periodic/update-success-stamp 2>/dev/null || true";};' > /etc/apt/apt.conf.d/15update-stamp
 ```
 
-If you see wierd characters in xbian-config, followed the parts of these steps you didn't already do:
+If you see weird characters in xbian-config, follow the parts of the steps you didn't already do:
 ```
 export LANG=C.UTF-8
 export LC_ALL=C.UTF-8
