@@ -41,7 +41,7 @@ function showGUIFn() {
 	CURRENTLICENSE=$LICENSE;
 	showLicenseMPG2InputDlg $CURRENTLICENSE;
 	CODE=$?
-	if [ $CODE -eq 1 ] || [ $CODE -eq 0 ]; then
+	if [ $CODE -eq 0 ]; then
 		if [ ! -z $RETURN ] && [ ! -z $CURRENTLICENSE ]; then
 			updateLicenseMPG2Fn $RETURN $CURRENTLICENSE
 			if [ $? -eq 1 ]; then

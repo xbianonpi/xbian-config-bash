@@ -47,7 +47,7 @@ function showGUIFn() {
 	#Check if an actual selection was made.
 	if [ $? -eq 0 ]; then
 		if [ -z $RETURN ]; then
-			showTZNoCategorySelectedDlg;
+			showTZNoTimezoneSelectedDlg;
 			showGUIFn;
 		else
 			TZNEWTIMEZONE=${TZCATEGORIES[$(($RETURN-1))]};

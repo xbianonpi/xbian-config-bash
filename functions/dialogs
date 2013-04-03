@@ -28,7 +28,7 @@ DEFAULTDELIMITER="%"
 #  $3 (optional) Width
 #  $4 (optional) OK Label
 showMsgDlg() {
-	OKLABEL="$_CLOSE"
+	OKLABEL="$(_ dialog.close)"
 
 	# Default width and height
 	HEIGHT=$DEFAULTHEIGHT
@@ -79,9 +79,9 @@ showInfoDlg() {
 #  $1 File
 #  $2 (optional) Height
 #  $3 (optional) Width
-#  $4 (optional) OK Label
+#  $4 (optional) Close label
 showTextDlg() {
-	OKLABEL="$_CLOSE"
+	CLOSELABEL="$(_ dialog.close)"
 
 	# Default width and height
 	HEIGHT=$DEFAULTHEIGHT
@@ -94,14 +94,14 @@ showTextDlg() {
 		WIDTH=$3
 	fi
 	if [ $# -gt 3 ]; then
-		OKLABEL=$4
+		CLOSELABEL=$4
 	fi
 	
 	# Show messagebox
 	dialog \
 		--backtitle "$BACKTITLE" \
 		--title "$TITLE" \
-		--ok-label "$OKLABEL" \
+		--ok-label "$CLOSELABEL" \
 		--textbox "$1" $HEIGHT $WIDTH
 }
 
@@ -110,10 +110,10 @@ showTextDlg() {
 #  $2 (optional) Height
 #  $3 (optional) Width
 #  $4 (optional) Yes label
-#  $5 (optional) No Label
+#  $5 (optional) No label
 showConfirmDlg() {
-	YESLABEL="$_YES"
-	NOLABEL="$_NO"
+	YESLABEL="$(_ dialog.yes)"
+	NOLABEL="$(_ dialog.no)"
 
 	# Default width and height
 	HEIGHT=$DEFAULTHEIGHT
@@ -147,11 +147,11 @@ showConfirmDlg() {
 #  $3 (optional) Rows
 #  $4 (optional) Height
 #  $5 (optional) Width
-#  $6 (optional) Yes label
-#  $7 (optional) No Label
+#  $6 (optional) Select label
+#  $7 (optional) Return Label
 function showMenuDlg() {
-	YESLABEL="$_SELECT"
-	NOLABEL="$_RETURN"	
+	YESLABEL="$(_ dialog.select)"
+	NOLABEL="$(_ dialog.return)"	
 	
 	if [ $# -gt 2 ]; then
 		ROWS=$3;
@@ -193,11 +193,11 @@ function showMenuDlg() {
 #  $3 Rows
 #  $4 (optional) Height
 #  $5 (optional) Width
-#  $6 (optional) Yes label
-#  $7 (optional) No Label
+#  $6 (optional) Select label
+#  $7 (optional) Return label
 function showRadioDlg() {
-	YESLABEL="$_SELECT"
-	NOLABEL="$_RETURN"
+	YESLABEL="$(_ dialog.select)"
+	NOLABEL="$(_ dialog.return)"
 	HEADER=$1;
 
 	if [ $# -gt 2 ]; then
@@ -210,7 +210,7 @@ function showRadioDlg() {
 		WIDTH=$5
 	fi
 	
-	centerTxtFn "$_SPACEOPTIONSELECT" $(($DEFAULTWIDTH+11))
+	centerTxtFn "$(_ dialog.space_option_select)" $(($DEFAULTWIDTH+11))
 	HEIGHT=$(($DEFAULTHEIGHT+5));
 	if [ $# -gt 3 ]; then
 		HEIGHT=$4
@@ -243,12 +243,12 @@ function showRadioDlg() {
 #  $3 Rows
 #  $4 (optional) Height
 #  $5 (optional) Width
-#  $6 (optional) Yes label
-#  $7 (optional) No Label
+#  $6 (optional) Select label
+#  $7 (optional) Return Label
 #  $8 (optional) Opt. label
 function showChecklistDlg() {
-	YESLABEL="$_SELECT"
-	NOLABEL="$_RETURN"
+	YESLABEL="$(_ dialog.select)"
+	NOLABEL="$(_ dialog.return)"
 	OPTLABEL=0;
 	HEADER=$1;
 
@@ -262,7 +262,7 @@ function showChecklistDlg() {
 		WIDTH=$5
 	fi
 	
-	centerTxtFn "$_SPACECHECKSELECT" $(($DEFAULTWIDTH+11));
+	centerTxtFn "$(_ dialog.space_check_select)" $(($DEFAULTWIDTH+11));
 	HEIGHT=$(($DEFAULTHEIGHT+5));
 	if [ $# -gt 3 ]; then
 		HEIGHT=$4
@@ -300,8 +300,8 @@ function showChecklistDlg() {
 #  $5 (optional) Change Label
 #  $6 (optional) Cancel Label
 function showInputDlg() {
-	CHANGELABEL="$_CHANGE"
-	CANCELLABEL="$_CANCEL"
+	CHANGELABEL="$(_ dialog.change)"
+	CANCELLABEL="$(_ dialog.cancel)"
 	VALUE=$2;
 	WIDTH=$DEFAULTWIDTH;
 	HEIGHT=$(($DEFAULTHEIGHT+1))
@@ -338,8 +338,8 @@ function showInputDlg() {
 function showPassDlg() {
 	WIDTH=$DEFAULTWIDTH;
 	HEIGHT=$(($DEFAULTHEIGHT+2))
-	CHANGELABEL=$_CHANGE
-	CANCELLABEL=$_CANCEL
+	CHANGELABEL=$(_ dialog.change)
+	CANCELLABEL=$(_ dialog.cancel)
 	
 	if [ $# -gt 2 ]; then
 		HEIGHT=$3
@@ -369,13 +369,13 @@ function showPassDlg() {
 
 # Standard error dialog
 function showErrorDlg() {
-	centerTxtFn "$_ERROR" $(($DEFAULTWIDTH-4))
+	centerTxtFn "$(_ dialog.unexpected_error)" $(($DEFAULTWIDTH-4))
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $DEFAULTHEIGHT;
 }
 
 function showLoadingDlg() {
-	centerTxtFn "$_LOADING" $(($DEFAULTWIDTH-4))
+	centerTxtFn "$(_ dialog.loading_module)" $(($DEFAULTWIDTH-4))
 	valignTxtFn "$CENTEREDTXT"
 	showInfoDlg "$ALIGNEDTXT" $DEFAULTHEIGHT;
 }
@@ -388,9 +388,8 @@ function showLoadingDlg() {
 #  $4 Label 2
 #  $5 Value 2
 function showInputForm2Dlg() {
-
-	CHANGELABEL="$_CHANGE"
-	CANCELLABEL="$_CANCEL"
+	CHANGELABEL="$(_ dialog.change)"
+	CANCELLABEL="$(_ dialog.cancel)"
 
         WIDTH=$DEFAULTWIDTH;
         HEIGHT=$(($DEFAULTHEIGHT+3))
@@ -447,8 +446,8 @@ function showInputForm5Dlg() {
 	fi
 	LABELW=$(($LABELW+5));
 
-	CHANGELABEL="$_CHANGE"
-	CANCELLABEL="$_CANCEL"
+	CHANGELABEL="$(_ dialog.change)"
+	CANCELLABEL="$(_ dialog.cancel)"
 
 	WIDTH=$DEFAULTWIDTH;
 	HEIGHT=$(($DEFAULTHEIGHT+6))

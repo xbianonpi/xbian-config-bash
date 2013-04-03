@@ -42,6 +42,9 @@ OCDANGEROUS=(Turbo)
 # Define the safe overclock settings
 OCSAFE=(None Modest XBian)
 
+# Did we already show the warning
+OCWARNING=0;
+
 #|------------------------------------|
 #|          Include files             |
 #|------------------------------------|
@@ -56,7 +59,10 @@ source $BASEPATH/functions/config
 
 # Executes the GUI version of this module
 function showGUIFn() {
-	showOCWarningDlg;
+	if [ $OCWARNING -eq 0 ]; then
+		showOCWarningDlg;
+		OCWARNING=1;
+	fi
 	showLoadingDlg;
 	getCurrentOCSettingsFn;	
 	createOCDLGMenuFn $CURRENTOC;
@@ -64,6 +70,7 @@ function showGUIFn() {
 	if [ $? -eq 0 ]; then
 		if [ $RETURN -eq $(($CURRENTOC+1)) ]; then
 			showNoOCChangeDlg;
+			showGUIFn;
 		elif [ $RETURN -eq $((${#OCSETTINGS[@]}+1)) ]; then
 			if [ $CURRENTOC -eq -1 ]; then
 				SETTINGS="${OCOLDSETTINGS[@]}";
@@ -80,6 +87,7 @@ function showGUIFn() {
 					if [ $? -eq 1 ]; then
 						showUpdatedOCDlg;
 						askForRebootFn;
+						showGUIFn;
 					else
 						showErrorDlg;
 					fi
@@ -95,6 +103,7 @@ function showGUIFn() {
 			if [ $? -eq 1 ]; then
 				showUpdatedOCDlg;
 				askForRebootFn;
+				showGUIFn;
 			else
 				showErrorDlg;
 			fi
