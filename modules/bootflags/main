@@ -1,0 +1,122 @@
+#!/bin/bash
+#
+#Copyright 2012 CurlyMo <development@xbian.org>
+#
+#This file is part of XBian - XBMC on the Raspberry Pi.
+# 
+#XBian is free software: you can redistribute it and/or modify it under the
+#terms of the GNU General Public License as published by the Free Software
+#Foundation, either version 3 of the License, or (at your option) any later
+#version.
+#
+#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#details.
+#
+#You should have received a copy of the GNU General Public License along
+#with XBian. If not, see <http://www.gnu.org/licenses/>
+
+#|------------------------------------|
+#|          Global variables          |
+#|------------------------------------|
+
+# The arguments this module accepts
+ARGUMENTS=(list select update);
+BOOTFLAGS=(splash);
+declare -A BOOTSETTINGS;
+
+#|------------------------------------|
+#|          Include files             |
+#|------------------------------------|
+
+source $BASEPATH/modules/bootflags/functions
+source $BASEPATH/modules/bootflags/dialogs
+
+#|------------------------------------|
+#|           Main program             |
+#|------------------------------------|
+
+# Executes the GUI version of this module
+function showGUIFn() {
+	getBootFlagsFn;
+	showBootFlagsDlg;
+	if [ $? -eq 0 ]; then
+		updateBootFlagsFn "$RETURN"
+		if [ $? -eq 0 ]; then
+			showBootFlagsSuccessDlg;
+		else
+			showErrorDlg;
+		fi
+		askForRebootFn;
+	fi
+}
+
+# Executes the command line version of this module
+# *
+#  $1 Argument [String]
+# select|update
+#  $2 Bootflag [String]
+# update
+#  $3 Status [Integer]
+# Returns
+#  - 1: Success | active
+#  - 0: Failed | not-active
+function showCMDFn() {
+	case $1 in
+		list)
+			for FLAG in ${BOOTFLAGS[@]}; do
+				echo $FLAG;
+			done;
+		;;
+		select)
+			if [ $# -eq 2 ]; then
+				if [ $(echo ${BOOTFLAGS[@]} | grep -o $2 | wc -l) -gt 0 ]; then
+					getBootFlagsFn;
+					echo ${BOOTSETTINGS[$2]};
+				else
+					echo 0;
+				fi
+			else
+				echo 0;
+			fi
+		;;
+		update)
+			if [ $# -eq 3 ]; then
+				if [ $(echo ${BOOTFLAGS[@]} | grep -o $2 | wc -l) -gt 0 ]; then
+					if [[ $3 =~ ^[01] ]]; then
+						if [ $3 -eq 0 ]; then
+							getBootFlagsFn;
+							RETURN="";
+							for KEY in ${!BOOTFLAGS[@]}; do
+								FLAG=${BOOTFLAGS[$KEY]};
+								if [ ${BOOTSETTINGS[$FLAG]} -eq 1 ] && [ $FLAG != $2 ]; then
+									RETURN+="$(($KEY+1)) ";
+								fi
+							done;
+							updateBootFlagsFn "$RETURN";
+							echo $ERROR;
+						else
+							getBootFlagsFn;
+							RETURN="";
+							for KEY in ${!BOOTFLAGS[@]}; do
+								FLAG=${BOOTFLAGS[$KEY]};
+								if [ ${BOOTSETTINGS[$FLAG]} -eq 0 ] || [ $FLAG == $2 ]; then
+									RETURN+="$(($KEY+1)) ";
+								fi
+							done;
+							updateBootFlagsFn "$RETURN";
+							echo $ERROR;
+						fi
+					else
+						echo 0;
+					fi
+				else
+					echo 0;
+				fi
+			else
+				echo 0;
+			fi
+		;;		
+	esac;
+}
