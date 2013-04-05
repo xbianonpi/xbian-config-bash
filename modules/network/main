@@ -141,8 +141,8 @@ function showInterfaceStaticGUIFn() {
 
 function showWlanScanGUIFn() {
 
-	SSID=$(echo -e "$2" | grep ssid | cut -f 2 -d" ")
-	WLANKEY=$(echo -e "$2" | grep key | cut -f 2 -d" ")
+	SSID=$(echo -e "$2" | sed -ne 's/ssid[\ ]\(.*\)/\1/p')
+	WLANKEY=$(echo -e "$2" | sed -ne 's/key[\ ]\(.*\)/\1/p')
 	PROTECTION=$(echo "$2" | grep protection | cut -f 2 -d" ")
 
 	showScanForWLANDlg;
