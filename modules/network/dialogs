@@ -134,7 +134,11 @@ function showInterfaceCredentialsDlg() {
 	wrapTxtFn "$(_ network.credentials.enter)" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showInputForm2Dlg "$ALIGNEDTXT" "$(_ network.label.ssid):" "$1" "$(_ network.label.key):" "$2"
+	
+	ELEMENTS=();
+	ELEMENTS+=("1,3,$(_ network.label.ssid):,$1,16,255,0,0");
+	ELEMENTS+=("2,3,$(_ network.label.key):,$2,16,255,0,0");
+	showInputFormDlg "$ALIGNEDTXT"
 }
 
 # Ask for static IP configuration
@@ -148,7 +152,14 @@ function showInterfaceStaticDlg() {
 	wrapTxtFn "$(_ network.credentials.enter)" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	showInputForm5Dlg "$ALIGNEDTXT" "$(_ network.label.ipaddress)*:" "$1" "$(_ network.label.netmask)*:" "$2" "$(_ network.label.gateway)*:" "$3" "$(_ network.label.nameserver):" "$4" "$(_ network.label.nameserver):" "$5"
+	
+	ELEMENTS=();
+	ELEMENTS+=("1,3,$(_ network.label.ipaddress)*:,$1,24,16,15,0");
+	ELEMENTS+=("2,3,$(_ network.label.netmask)*:,$2,24,16,15,0");
+	ELEMENTS+=("3,3,$(_ network.label.gateway)*:,$3,24,16,15,0");
+	ELEMENTS+=("4,3,$(_ network.label.nameserver)*:,$4,24,16,15,0");
+	ELEMENTS+=("5,3,$(_ network.label.nameserver)*:,$5,24,16,15,0");
+	showInputFormDlg "$ALIGNEDTXT" 13;
 }
 
 function showInterfaceCredentialsErrorDlg() {

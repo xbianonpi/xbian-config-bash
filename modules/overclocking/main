@@ -52,6 +52,7 @@ OCWARNING=0;
 source $BASEPATH/modules/overclocking/functions
 source $BASEPATH/modules/overclocking/dialogs
 source $BASEPATH/functions/config
+source $BASEPATH/functions/dialogs
 
 #|------------------------------------|
 #|           Main program             |
@@ -79,8 +80,13 @@ function showGUIFn() {
 			fi
 			showCustomOCDlg "${SETTINGS[@]}";
 			if [ $? -eq 0 ]; then
-				NEWSETTINGS=($(echo $VALUES | sed 's/Mhz //g'));
-				if [ "${NEWSETTINGS[0]} ${NEWSETTINGS[2]} ${NEWSETTINGS[4]} ${NEWSETTINGS[6]}" ==  "${SETTINGS[*]}" ]; then
+				IFS=$'\n';
+				VALUES=($RETURN);
+				NEWSETTINGS[0]=${VALUES[0]};
+				NEWSETTINGS[1]=${VALUES[2]};
+				NEWSETTINGS[2]=${VALUES[4]};
+				NEWSETTINGS[3]=${VALUES[6]};
+				if [ "${NEWSETTINGS[0]} ${NEWSETTINGS[1]} ${NEWSETTINGS[2]} ${NEWSETTINGS[3]}" ==  "${SETTINGS[*]}" ]; then
 					showNoOCChangeDlg;
 				elif [ ${#NEWSETTINGS[@]} -eq 4 ]; then
 					updateCustomOCSettingsFn "${NEWSETTINGS[*]}";

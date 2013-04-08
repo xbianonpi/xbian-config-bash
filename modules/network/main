@@ -109,7 +109,9 @@ function showInterfaceStaticGUIFn() {
 	
 	showInterfaceStaticDlg "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2"
 	if [ $? -eq 0 ]; then
+		IFS=$'\n';
 		STATICCONF=($(echo -e "$RETURN"))
+		IFS=$ORIGINALIFS;
 		if [ ${#STATICCONF[@]} -gt 2 ]; then
 			IP="${STATICCONF[0]}"
 			NETMASK="${STATICCONF[1]}"
@@ -219,7 +221,9 @@ function showWlanProtectionGUIFn() {
 	if [ $NEWPROTECTION -lt 3 ]; then
 		showInterfaceCredentialsDlg "$SSID" "$WLANKEY"
 		if [ $? -eq 0 ]; then
+			IFS=$'\n';
 			CREDENTIALS=($(echo -e "$RETURN"))
+			IFS=$ORIGINALIFS;
 			if [ ${#CREDENTIALS[@]} -eq 2 ];then
 				SSID=${CREDENTIALS[0]}
 				WLANKEY=${CREDENTIALS[1]}
