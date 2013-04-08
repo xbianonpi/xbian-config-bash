@@ -52,7 +52,6 @@ OCWARNING=0;
 source $BASEPATH/modules/overclocking/functions
 source $BASEPATH/modules/overclocking/dialogs
 source $BASEPATH/functions/config
-source $BASEPATH/functions/dialogs
 
 #|------------------------------------|
 #|           Main program             |
