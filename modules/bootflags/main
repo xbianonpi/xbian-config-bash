@@ -31,7 +31,9 @@ declare -A BOOTSETTINGS;
 #|------------------------------------|
 
 source $BASEPATH/modules/bootflags/functions
-source $BASEPATH/modules/bootflags/dialogs
+if [ $GUIMODE -eq 1 ]; then
+	source $BASEPATH/modules/bootflags/dialogs
+fi
 
 #|------------------------------------|
 #|           Main program             |

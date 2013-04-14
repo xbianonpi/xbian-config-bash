@@ -50,7 +50,9 @@ OCWARNING=0;
 #|------------------------------------|
 
 source $BASEPATH/modules/overclocking/functions
-source $BASEPATH/modules/overclocking/dialogs
+if [ $GUIMODE -eq 1 ]; then
+	source $BASEPATH/modules/overclocking/dialogs
+fi
 source $BASEPATH/functions/config
 
 #|------------------------------------|

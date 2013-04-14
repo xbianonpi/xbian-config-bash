@@ -29,7 +29,9 @@ ARGUMENTS=(list select update date);
 #|------------------------------------|
 
 source $BASEPATH/modules/timezone/functions
-source $BASEPATH/modules/timezone/dialogs
+if [ $GUIMODE -eq 1 ]; then
+	source $BASEPATH/modules/timezone/dialogs
+fi
 
 #|------------------------------------|
 #|           Main program             |

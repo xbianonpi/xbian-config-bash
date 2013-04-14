@@ -29,7 +29,9 @@ ARGUMENTS=(select update list);
 #|------------------------------------|
 
 source $BASEPATH/modules/locales/functions
-source $BASEPATH/modules/locales/dialogs
+if [ $GUIMODE -eq 1 ]; then
+	source $BASEPATH/modules/locales/dialogs
+fi
 
 #|------------------------------------|
 #|           Main program             |

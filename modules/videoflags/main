@@ -31,7 +31,9 @@ declare -A VIDEOSETTINGS;
 #|------------------------------------|
 
 source $BASEPATH/modules/videoflags/functions
-source $BASEPATH/modules/videoflags/dialogs
+if [ $GUIMODE -eq 1 ]; then
+	source $BASEPATH/modules/videoflags/dialogs
+fi
 source $BASEPATH/functions/config
 
 #|------------------------------------|

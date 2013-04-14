@@ -35,7 +35,9 @@ IFS=$ORIGINALIFS;
 #|------------------------------------|
 
 source $BASEPATH/modules/xbconfig/functions
-source $BASEPATH/modules/xbconfig/dialogs
+if [ $GUIMODE -eq 1 ]; then
+	source $BASEPATH/modules/xbconfig/dialogs
+fi
 
 #|------------------------------------|
 #|           Main program             |

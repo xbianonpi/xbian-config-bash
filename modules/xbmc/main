@@ -30,7 +30,9 @@ GUIRES=(480 540 720 1080);
 #|------------------------------------|
 
 source $BASEPATH/modules/xbmc/functions
-source $BASEPATH/modules/xbmc/dialogs
+if [ $GUIMODE -eq 1 ]; then
+	source $BASEPATH/modules/xbmc/dialogs
+fi
 
 #|------------------------------------|
 #|           Main program             |

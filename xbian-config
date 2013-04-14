@@ -54,6 +54,9 @@ BASEPATH="/usr/local/include/xbian-config"
 #Set GUI language
 LANGUAGE="en"
 
+#Check if xbian-config is run in GUI mode
+GUIMODE=1;
+
 #|------------------------------------|
 #|           Main program             |
 #|------------------------------------|	
@@ -253,8 +256,10 @@ else
 	#|------------------------------------|
 
 	# System functions
-	source $BASEPATH/functions/system
-	clrMemCacheFn;
+	#source $BASEPATH/functions/system
+	#clrMemCacheFn;
+	
+	GUIMODE=0;
 	# Check xbian-config was opened using arguments
 	MODULE=$1;
 	if [ $MODULE == "reboot" ]; then
@@ -269,13 +274,16 @@ else
 		# If the module was called with arguments
 		if [ $# -gt 0 ]; then
 			# Check if it's a valid argument
-			if [ $(echo ${ARGUMENTS[@]} | grep $1 | wc -l) -eq 0 ]; then
-				echo "Available arguments for module '$MODULE' are:";
-				echo ${ARGUMENTS[@]};
-			else
-				# Quotation marks to preserve newlines
-				echo "$(showCMDFn "$@")";
-			fi
+			case "${ARGUMENTS[@]}" in 
+				*"$1"*)
+					# Quotation marks to preserve newlines
+					showCMDFn "$@"
+				;;
+				*)
+					echo "Available arguments for module '$MODULE' are:";
+					echo ${ARGUMENTS[@]};
+				;;
+			esac
 		else
 			echo "Available arguments for module '$MODULE' are:";
 			echo ${ARGUMENTS[@]};

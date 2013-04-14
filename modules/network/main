@@ -29,7 +29,9 @@ ARGUMENTS=(list status dhcp static credentials scan restart progress type);
 #|------------------------------------|
 
 source $BASEPATH/modules/network/functions
-source $BASEPATH/modules/network/dialogs
+if [ $GUIMODE -eq 1 ]; then
+	source $BASEPATH/modules/network/dialogs
+fi
 source $BASEPATH/functions/markup
 
 #|------------------------------------|
