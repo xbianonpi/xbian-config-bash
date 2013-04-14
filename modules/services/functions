@@ -211,7 +211,7 @@ function updateServiceConfFn() {
 	if [ -f "$BASEPATH/config/services" ]; then
 		sed -i "/${DATA[0]}:/d" $BASEPATH/config/services;
 	fi
-	echo "${DATA[0]}:${DATA[1]}" >> /home/xbian/services;
+	echo "${DATA[0]}:${DATA[1]}" >> $BASEPATH/config/services;
 	if [ -f "$BASEPATH/config/services" ] && [ $(cat $BASEPATH/config/services | grep "${DATA[0]}:${DATA[1]}" | wc -l) -eq 1 ]; then
 		return 1;
 	else
