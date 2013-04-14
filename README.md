@@ -16,6 +16,8 @@ cp -R prereqs /usr/local/include/xbian-config/
 cp -R struct /usr/local/include/xbian-config/
 cp -R config /usr/local/include/xbian-config/
 cp etc/bash_completion.d/* /etc/bash_completion.d/
+cd /home/xbian/xbian-config-bash/gettext/
+msgfmt -o /usr/share/locale/en/LC_MESSAGES/xbian.mo xbian.po
 echo 'APT::Update::Post-Invoke-Success {"touch /var/lib/apt/periodic/update-success-stamp 2>/dev/null || true";};' > /etc/apt/apt.conf.d/15update-stamp
 ```
 
