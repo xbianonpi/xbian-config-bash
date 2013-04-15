@@ -63,7 +63,7 @@ GUIMODE=1;
 function showMainCloseDlg() {
 
 	DOREBOOT=0;
-
+	umount /boot
 	# Is a reboot needed for the changes to get effect
 	if [ $ASKFORREBOOT -eq 1 ]; then
 		wrapTxtFn "$(_ main.reboot_question)"
@@ -90,6 +90,10 @@ function showMainCloseDlg() {
 }
 
 function showMainMenuDlg() {
+	if [ $(mount | grep /dev/mmcblk0p1 | wc -l) -eq 0 ]; then
+		mount /dev/mmcblk0p2 /boot
+	fi
+
 	ITEMS="";
 	LEVEL="";
 	ADD=".";
