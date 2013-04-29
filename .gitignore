@@ -1,8 +1,0 @@
-xbian-config
-*.ods
-.~lock.translations.ods#
-aptmirror
-pkglist
-junk
-python
-gettext

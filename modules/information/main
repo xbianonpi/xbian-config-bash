@@ -18,13 +18,6 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 #|------------------------------------|
-#|          Global variables          |
-#|------------------------------------|
-
-# The arguments this module accepts
-ARGUMENTS=();
-
-#|------------------------------------|
 #|          Include files             |
 #|------------------------------------|
 
@@ -34,12 +27,8 @@ ARGUMENTS=();
 
 # Executes the GUI version of this module
 function showGUIFn() {
-	wrapTxtFn "$(_ information.text)" $(($DEFAULTWIDTH-4));
+	wrapTxtFn "XBian is a free, Open Source media center distribution for the Raspberry Pi, which can be downloaded at http://www.xbian.org. Our slogan is \"XBMC on Raspberry Pi, bleeding edge\" as our main focus is delivering the fastest mediacenter solution for the Raspberry Pi. We believe that everyone can help make XBian better. Please visit our website for support and if you have suggestions, wishes or contributions, please share them with us!" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
-}
-
-function showCMDFn() {
-	echo;
 }

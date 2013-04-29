@@ -28,7 +28,7 @@ DEFAULTDELIMITER="%"
 #  $3 (optional) Width
 #  $4 (optional) OK Label
 showMsgDlg() {
-	OKLABEL="$(_ dialog.close)"
+	OKLABEL="Close"
 
 	# Default width and height
 	HEIGHT=$DEFAULTHEIGHT
@@ -81,7 +81,7 @@ showInfoDlg() {
 #  $3 (optional) Width
 #  $4 (optional) Close label
 showTextDlg() {
-	CLOSELABEL="$(_ dialog.close)"
+	CLOSELABEL="Close"
 
 	# Default width and height
 	HEIGHT=$DEFAULTHEIGHT
@@ -112,8 +112,8 @@ showTextDlg() {
 #  $4 (optional) Yes label
 #  $5 (optional) No label
 showConfirmDlg() {
-	YESLABEL="$(_ dialog.yes)"
-	NOLABEL="$(_ dialog.no)"
+	YESLABEL="Yes"
+	NOLABEL="No"
 
 	# Default width and height
 	HEIGHT=$DEFAULTHEIGHT
@@ -150,8 +150,8 @@ showConfirmDlg() {
 #  $6 (optional) Select label
 #  $7 (optional) Return Label
 function showMenuDlg() {
-	YESLABEL="$(_ dialog.select)"
-	NOLABEL="$(_ dialog.return)"	
+	YESLABEL="Select"
+	NOLABEL="Return"	
 	
 	if [ $# -gt 2 ]; then
 		ROWS=$3;
@@ -196,8 +196,8 @@ function showMenuDlg() {
 #  $6 (optional) Select label
 #  $7 (optional) Return label
 function showRadioDlg() {
-	YESLABEL="$(_ dialog.select)"
-	NOLABEL="$(_ dialog.return)"
+	YESLABEL="Select"
+	NOLABEL="Return"
 	HEADER=$1;
 
 	if [ $# -gt 2 ]; then
@@ -210,7 +210,7 @@ function showRadioDlg() {
 		WIDTH=$5
 	fi
 	
-	centerTxtFn "$(_ dialog.space_option_select)" $(($DEFAULTWIDTH+11))
+	centerTxtFn "Press [space] to select a different option" $(($DEFAULTWIDTH+11))
 	HEIGHT=$(($DEFAULTHEIGHT+5));
 	if [ $# -gt 3 ]; then
 		HEIGHT=$4
@@ -247,8 +247,8 @@ function showRadioDlg() {
 #  $7 (optional) Return Label
 #  $8 (optional) Opt. label
 function showChecklistDlg() {
-	YESLABEL="$(_ dialog.select)"
-	NOLABEL="$(_ dialog.return)"
+	YESLABEL="Select"
+	NOLABEL="Return"
 	OPTLABEL=0;
 	HEADER=$1;
 
@@ -262,7 +262,7 @@ function showChecklistDlg() {
 		WIDTH=$5
 	fi
 	
-	centerTxtFn "$(_ dialog.space_check_select)" $(($DEFAULTWIDTH+11));
+	centerTxtFn "Press [space] to select a different option" $(($DEFAULTWIDTH+11));
 	HEIGHT=$(($DEFAULTHEIGHT+5));
 	if [ $# -gt 3 ]; then
 		HEIGHT=$4
@@ -300,8 +300,8 @@ function showChecklistDlg() {
 #  $5 (optional) Change Label
 #  $6 (optional) Cancel Label
 function showInputDlg() {
-	CHANGELABEL="$(_ dialog.change)"
-	CANCELLABEL="$(_ dialog.cancel)"
+	CHANGELABEL="Change"
+	CANCELLABEL="Cancel"
 	VALUE=$2;
 	WIDTH=$DEFAULTWIDTH;
 	HEIGHT=$(($DEFAULTHEIGHT+1))
@@ -338,8 +338,8 @@ function showInputDlg() {
 function showPassDlg() {
 	WIDTH=$DEFAULTWIDTH;
 	HEIGHT=$(($DEFAULTHEIGHT+2))
-	CHANGELABEL=$(_ dialog.change)
-	CANCELLABEL=$(_ dialog.cancel)
+	CHANGELABEL="Change"
+	CANCELLABEL="Cancel"
 	
 	if [ $# -gt 2 ]; then
 		HEIGHT=$3
@@ -369,13 +369,13 @@ function showPassDlg() {
 
 # Standard error dialog
 function showErrorDlg() {
-	centerTxtFn "$(_ dialog.unexpected_error)" $(($DEFAULTWIDTH-4))
+	centerTxtFn "An unexpected error occured" $(($DEFAULTWIDTH-4))
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $DEFAULTHEIGHT;
 }
 
 function showLoadingDlg() {
-	centerTxtFn "$(_ dialog.loading_module)" $(($DEFAULTWIDTH-4))
+	centerTxtFn "Loading module..., please wait" $(($DEFAULTWIDTH-4))
 	valignTxtFn "$CENTEREDTXT"
 	showInfoDlg "$ALIGNEDTXT" $DEFAULTHEIGHT;
 }
@@ -387,8 +387,8 @@ function showLoadingDlg() {
 #  $4 (optional) Change label
 #  $5 (optional) Cancel Label
 function showInputFormDlg() {
-	CHANGELABEL="$(_ dialog.change)"
-	CANCELLABEL="$(_ dialog.cancel)"
+	CHANGELABEL="Change"
+	CANCELLABEL="Cancel"
 
 	HEIGHT=$(($DEFAULTHEIGHT+3))
 	WIDTH=$DEFAULTWIDTH;
