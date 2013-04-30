@@ -85,6 +85,7 @@ function setLocaleFn() {
 	if [ $(locale -a | grep $INPUT.utf8 | wc -l) -eq 0 ]; then
 		localedef -i $INPUT -c -f $CHARSET -A /usr/share/locale/locale.alias $LOCALE
 	fi
+	sed -i "s/# $LOCALE/$LOCALE/g" /etc/locale.gen
 	update-locale $LOCALE
 	export LANG="$LOCALE" &>/dev/null
 	export LC_ALL="$LOCALE" &>/dev/null
