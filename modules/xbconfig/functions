@@ -18,30 +18,17 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
 function setXBConfigAutoStartFn() {
-	if [ $1 -eq 0 ]; then
-		if [ $(grep '^sudo xbian-config' /home/xbian/.bashrc | wc -l) -eq 1 ]; then
-			sed -i 's/sudo xbian-config/#sudo xbian-config/g' /home/xbian/.bashrc;
-		fi
-	else
-		if [ $(grep xbian-config /home/xbian/.bashrc | wc -l) -eq 1 ]; then
-			sed -i 's/#sudo xbian-config/sudo xbian-config/g' /home/xbian/.bashrc;
-		else
-			echo "sudo xbian-config" >> /home/xbian/.bashrc;
-		fi
-	fi
-	if [ $1 -eq 1 ]; then
-		if [ $(grep "^sudo xbian-config" /home/xbian/.bashrc | wc -l) -eq 1 ]; then
-			return 1;
-		else
-			return 0;
-		fi
-	elif [ $1 -eq 0 ]; then
-		if [ $(grep "^#sudo xbian-config" /home/xbian/.bashrc | wc -l) -eq 1 ] || [ $(grep "xbian-config" /home/xbian/.bashrc | wc -l) -eq 0 ]; then
-			return 1;
-		else
-			return 0;
-		fi
-	else
-		return 0;
-	fi
+	case $1 in
+		0)
+			echo 0 > /home/xbian/.xbian-config-start
+			;;
+		1)
+			echo 1 > /home/xbian/.xbian-config-start
+			;;
+		*)
+			return 0
+			;;
+	esac
+
+	return $(cat /home/xbian/.xbian-config-start)
 }
