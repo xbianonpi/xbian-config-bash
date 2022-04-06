@@ -24,14 +24,14 @@ function showInterfacesSelectDlg() {
 	IFACES="$1"
 	I=1
 	for IFACE in ${IFACES[@]}; do
-		IPADDR=$(ifconfig $IFACE | grep 'inet' | cut -d: -f2 | awk '{print $1}')
-		NETMASK=$(ifconfig $IFACE | grep 'inet' | cut -d: -f4 | awk '{print $1}')
+		IPADDR=$(ip a show $IFACE | sed -n -e 's/:127\.0\.0\.1 //g' -e 's/ *inet \([0-9.]\+\).*/\1/gp')
+		NETMASK=$(ip a show $IFACE | grep inet | awk '{print $4}')
 		MENU+=($I",\Zn"$IFACE",\Zn"$IPADDR",\Zn"$NETMASK)
 		I=$(($I+1))
 	done
 	TBLCOLUMNCENTER=0;
 	createTableFn "menu"\
-	"#,\Zb$(_ network.label.interfaces),\Zb$(_ network.label.ipaddress),\Zb$(_ network.label.netmask)"\
+	"#;\Zb$(_ network.label.interfaces);\Zb$(_ network.label.ipaddress);\Zb$(_ network.label.netmask)"\
 	"${MENU[@]}";
 	TBLCOLUMNCENTER=1;
 	
@@ -60,9 +60,10 @@ function showIPModeConfigDlg() {
 	IFS=$ORIGINALIFS;
 	MENU+=(1",\Zn$(_ network.label.dhcp),"$STATUSDHCP);
 	MENU+=(2",\Zn$(_ network.label.static),"$STATUSSTATIC);
+	MENU+=(3",\Zn$(_ dialog.disable),off");
 	
 	createTableFn "radio" \
-	"#,\Zb$(_ network.label.type)"\
+	"#;\Zb$(_ network.label.type)"\
 	"${MENU[@]}"
 	
 	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+6));
@@ -97,7 +98,7 @@ function showWlanModeConfigDlg() {
 	MENU+=(2",\Zn$(_ network.label.wep),$STATUSWEP");
 	MENU+=(3",\Zn$(_ network.label.open),$STATUSOPEN");
 	createTableFn "radio" \
-	"#,\Zb$(_ network.label.protection)"\
+	"#;\Zb$(_ network.label.protection)"\
 	"${MENU[@]}"
 	
 	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+6));
@@ -134,7 +135,7 @@ function showInterfaceCredentialsDlg() {
 	wrapTxtFn "$(_ network.credentials.enter)" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	
+
 	ELEMENTS=();
 	ELEMENTS+=("1,3,$(_ network.label.ssid):,$1,16,255,0,0");
 	ELEMENTS+=("2,3,$(_ network.label.key):,$2,16,255,0,0");
@@ -152,14 +153,14 @@ function showInterfaceStaticDlg() {
 	wrapTxtFn "$(_ network.credentials.enter)" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
-	
+
 	ELEMENTS=();
 	ELEMENTS+=("1,3,$(_ network.label.ipaddress)*:,$1,24,16,15,0");
 	ELEMENTS+=("2,3,$(_ network.label.netmask)*:,$2,24,16,15,0");
 	ELEMENTS+=("3,3,$(_ network.label.gateway)*:,$3,24,16,15,0");
 	ELEMENTS+=("4,3,$(_ network.label.nameserver)*:,$4,24,16,15,0");
 	ELEMENTS+=("5,3,$(_ network.label.nameserver)*:,$5,24,16,15,0");
-	showInputFormDlg "$ALIGNEDTXT" 13;
+	showInputFormDlg "$ALIGNEDTXT" 14;
 }
 
 function showInterfaceCredentialsErrorDlg() {
@@ -197,6 +198,13 @@ function showInterfaceDhcpSuccessDlg() {
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
+function showInterfaceDisableSuccessDlg() {
+	wrapTxtFn "$(_ network.disabled)" $(($DEFAULTWIDTH-4));
+	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
+	valignTxtFn "$CENTEREDTXT"
+	showMsgDlg "$ALIGNEDTXT" $HEIGHT
+}
+
 # Shows available wlan networks
 # Arguments
 #  $1 Current SSID
@@ -214,18 +222,19 @@ function showAvailableWLANDlg() {
 		VALUES=($WNETWORK);
 
 		NAME=$(echo "${VALUES[0]}" | awk '{print substr($0,2,length-2)}');
-		if [ ${#NAME} -gt 13 ]; then
-			NAME=${NAME:0:10}"...";
+		SELECTED="off";
+		if [ "$NAME" == "$SSID" ]; then
+			SELECTED="on";
+		fi
+		NAME=$(echo $NAME | tr '!' '|')
+		if [ ${#NAME} -gt 20 ]; then
+			NAME=${NAME:0:17}"...";
 		fi
 		SECURITY=${VALUES[2]};
 		if [ "$SECURITY" == "on" ]; then
 			SECURITY="$(_ dialog.yes)";
 		else
 			SECURITY="$(_ dialog.no)";
-		fi
-		SELECTED="off";
-		if [ "$NAME" == "$SSID" ]; then
-			SELECTED="on";
 		fi
 		if [ ${VALUES[3]} -eq 100 ]; then
 			SIGNAL="*****";
@@ -243,11 +252,11 @@ function showAvailableWLANDlg() {
 	done
 	TBLCOLUMNCENTER=0;
 	createTableFn "radio" \
-	"#,\Zb$(_ network.label.name),\Zb$(_ network.label.protection),\Zb$(_ network.label.type),\Zb$(_ network.label.signal)" \
+	"#;\Zb$(_ network.label.name);\Zb$(_ network.label.protection);\Zb$(_ network.label.type);\Zb$(_ network.label.signal)" \
 	"${MENU[@]}"
 	TBLCOLUMNCENTER=1;
 	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+7));
-	showRadioDlg "$CENTEREDTXT" "$ROWS" 6 15
+	showRadioDlg "$CENTEREDTXT" "$ROWS" 6 15 $((DEFAULTWIDTH+22))
 }
 
 function showScanForWLANDlg() {
@@ -255,13 +264,13 @@ function showScanForWLANDlg() {
 	
 	TBLCOLUMNCENTER=0;
 	createTableFn "menu" \
-	"#,\Zb$(_ network.label.wlan)" \
+	"#;\Zb$(_ network.label.wlan)" \
 	"1,\Zn$(_ network.label.scan)" \
 	"2,\Zn$(_ network.label.custom)"
 	TBLCOLUMNCENTER=1;
 	
 	# Show interface selector dialog
-	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+11));
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+8));
 	showMenuDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} $((${#MENU[@]}+8))
 }
 
@@ -279,21 +288,21 @@ function showRestartAdapterDlg() {
 	showInfoDlg "$ALIGNEDTXT" $HEIGHT
 }
 
-function showWLANConnectingDlg() {
+function showConnectingDlg() {
 	wrapTxtFn "$(printf "$(_  network.connection.updating)" "$1")" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showInfoDlg "$ALIGNEDTXT" $HEIGHT
 }
 
-function showWLANConnectionFailedDlg() {
+function showConnectionFailedDlg() {
 	wrapTxtFn "$(printf "$(_  network.connection.failed)" "$1")" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"
 	showMsgDlg "$ALIGNEDTXT" $HEIGHT
 }
 
-function showWLANConnectionSuccessDlg() {
+function showConnectionSuccessDlg() {
 	wrapTxtFn "$(printf "$(_  network.connection.success)" "$1")" $(($DEFAULTWIDTH-4));
 	centerTxtFn "$WRAPPEDTXT" $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT"

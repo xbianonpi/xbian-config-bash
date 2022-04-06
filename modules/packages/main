@@ -28,8 +28,6 @@ if [ -f "$BASEPATH/config/pkglist" ]; then
 else
 	CONTENT="";
 fi
-ALLPKGLST=$(dpkg --get-selections xbian*);
-PKGNOTFOUND=0;
 
 #|------------------------------------|
 #|          Include files             |
@@ -41,6 +39,8 @@ if [ $GUIMODE -eq 1 ]; then
 fi
 source $BASEPATH/functions/packages
 
+[ -z "$ALLPKGLST" ] && updateAllPackagesListFn
+PKGNOTFOUND=0;
 #|------------------------------------|
 #|           Main program             |
 #|------------------------------------|
@@ -137,12 +137,11 @@ function showPackageListFn() {
 function showGUIFn() {
 	if [ $REMOTEPKGDBUPDATED -eq 0 ]; then
 		showDownloadPackageListDlg;
-		updateAptMirrorsFn;
-		if [ $? -eq 0 ]; then
+		if ! updateAptMirrorsFn; then
 			showFailedToRetrieveAptMirrosDlg;
 		else
 			downloadPackageListFn;
-			REMOTEPKGDBUPDATED=$?
+			REMOTEPKGDBUPDATED=$((1-$?))
 		fi;
 	CONTENT=$(cat $BASEPATH/config/pkglist);
 	fi
@@ -216,20 +215,21 @@ function showGUIFn() {
 function showCMDFn() {
 	case $1 in
 		list)
+                        int=$(grep "APT::Periodic::Update-Package-Lists" /etc/apt/apt.conf.d/20auto-upgrades 2>/dev/null| grep -o "[0-9]*")
+                        [ -z "$int" -o "$int" -eq 0 ] && int=1440 || int=$((int*24*60))
+                        [ -z "$(eval find /var/lib/apt/periodic/update-success-stamp -cmin -$int 2>/dev/null)" ] && getInternetFn  && { echo -3; exit 0; }
+ 
 			if [ $# -eq 1 ]; then
 				if [ -f "$BASEPATH/config/pkglist" ] && [ -f "$BASEPATH/config/aptmirror" ]; then
-					getPackageCategoryListFn;
-					updateAllPackagesListFn;
+					getPackageCategoryListFn
+					updateAllPackagesListFn
 					for CATEGORY in ${CATEGORIES[@]}; do
 						getPackagesFromCategoryFn $CATEGORY;
-						X=0;
-						for PACKAGE in ${PACKAGES[@]}; do
-							getPackageStatusFn $PACKAGE;
-							if [ $? -eq 1 ]; then
-								X=$(($X+1));
-							fi
+						X=0; L=""; S=''
+						for P in ${PACKAGES[@]}; do
+							L=$L"$S$P|xbian-package-$P"; S='|'
 						done
-						echo $CATEGORY,${#PACKAGES[@]},$X;
+						echo $CATEGORY,${#PACKAGES[@]},$(getPackageStatusCountFn $L; echo $?)
 					done;
 				else
 					echo -3;
@@ -238,7 +238,7 @@ function showCMDFn() {
 				if [ -f "$BASEPATH/config/pkglist" ] && [ -f "$BASEPATH/config/aptmirror" ]; then
 					updateAllPackagesListFn;
 					getPackageCategoryListFn;
-					if [ $(echo ${CATEGORIES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					if [ $(echo ${CATEGORIES[*]} | grep -c -o $2 ) -eq 1 ]; then
 						getPackagesFromCategoryFn "$2"
 						for PACKAGE in ${PACKAGES[@]}; do
 							getPackageStatusFn $PACKAGE;
@@ -262,9 +262,9 @@ function showCMDFn() {
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/pkglist" ] && [ -f "$BASEPATH/config/aptmirror" ]; then
 					getAllPackagesFn;
-					if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					if [ $(echo ${PACKAGES[*]} | grep -c -o $2) -eq 1 ]; then
 						updateAllPackagesListFn;
-						if [ $(echo ${ALLPKGLST[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+						if [ $(echo ${ALLPKGLST[*]} | grep -c -o $2) -eq 1 ]; then
 							getPackageStatusFn $2;
 							if [ $? -eq 1 ]; then
 								echo 1;
@@ -281,14 +281,14 @@ function showCMDFn() {
 					echo -3;
 				fi
 			else
-				echo -1;
+				echo $(cat /tmp/aptstatus | grep -i "newly installed" | awk '{ print $1+$3+$6 }');
 			fi
 		;;
 		info)
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/pkglist" ] && [ -f "$BASEPATH/config/aptmirror" ]; then
 					getAllPackagesFn;
-					if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					if [ $(echo ${PACKAGES[*]} | grep -c -o $2) -eq 1 ]; then
 						getPackageInformationFn $2;
 						echo "name "${PKGINFO[0]} 
 						echo "versionl "$(getPackageVersionFn ${PKGINFO[0]});
@@ -311,7 +311,7 @@ function showCMDFn() {
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/pkglist" ] && [ -f "$BASEPATH/config/aptmirror" ]; then
 					getAllPackagesFn;
-					if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					if [ $(echo ${PACKAGES[*]} | grep -c -o $2) -eq 1 ]; then
 						getPackageInformationFn $2;
 						installPackageFn 1 ${PKGINFO[0]};
 						RETURN=$?;
@@ -337,7 +337,7 @@ function showCMDFn() {
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/pkglist" ] && [ -f "$BASEPATH/config/aptmirror" ]; then
 					getAllPackagesFn;
-					if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					if [ $(echo ${PACKAGES[*]} | grep -c -o $2) -eq 1 ]; then
 						getPackageInformationFn $2;
 						installPackageFn 2 ${PKGINFO[0]};
 						RETURN=$?;
@@ -363,7 +363,7 @@ function showCMDFn() {
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/pkglist" ] && [ -f "$BASEPATH/config/aptmirror" ]; then
 					getAllPackagesFn;
-					if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					if [ $(echo ${PACKAGES[*]} | grep -c -o $2) -eq 1 ]; then
 						getPackageInformationFn $2;
 						removePackageFn 1 ${PKGINFO[0]}
 						RETURN=$?;
@@ -389,7 +389,7 @@ function showCMDFn() {
 			if [ $# -eq 2 ]; then
 				if [ -f "$BASEPATH/config/pkglist" ] && [ -f "$BASEPATH/config/aptmirror" ]; then
 					getAllPackagesFn;
-					if [ $(echo ${PACKAGES[*]} | grep -o $2 | wc -l) -eq 1 ]; then
+					if [ $(echo ${PACKAGES[*]} | grep -c -o $2 ) -eq 1 ]; then
 						getPackageInformationFn $2;
 						removePackageFn 2 ${PKGINFO[0]};
 						RETURN=$?;
@@ -421,13 +421,13 @@ function showCMDFn() {
 		updatedb)
 			STATUS=0;
 			updateAptMirrorsFn;
-			if [ $? -eq 1 ]; then
+			if [ $? -eq 0 ]; then
 				downloadPackageListFn;
-				if [ $? -eq 1 ]; then
+				if [ $? -eq 0 ]; then
 					localPackageDBOutdatedFn;
 					if [ $? -eq 1 ]; then
 						updateAptFn;
-						if [ $? -eq 1 ]; then
+						if [ $? -eq 0 ]; then
 							STATUS=1;
 						else
 							STATUS=0;

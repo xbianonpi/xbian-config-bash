@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#Copyright 2012 - 2013 CurlyMo & mk01 <development@xbian.org>
+#Copyright 2012 - 2017 CurlyMo, mk01 & mkreisl <development@xbian.org>
 #
 #This file is part of XBian - XBMC on the Raspberry Pi.
 #
@@ -19,28 +19,27 @@
 #
 
 function updateAptMirrorsFn() {
-	if [ $(wget --spider http://apt.xbian.org/mirror.txt >/dev/null 1>/dev/null 2>/dev/null; echo $?) -eq 0 ]; then
-		URL=$APTBASE"mirror.txt"
-		wget -O - "$URL" > $BASEPATH/config/aptmirror 2>/dev/null
-		return 1;
-	else
-		return 0;
-	fi
-	
+	src="$(cat /etc/apt/sources.list /etc/apt/sources.list.d/*.list 2>/dev/null| grep '^deb.*xbian.*\|^mirror.*xbian.*'  | awk '{print $2}' | sort | uniq)"
+	[ -z "$src" ] && URL=$APTBASE || URL=$src
+
+	rm -f $BASEPATH/config/aptmirror.new
+	for a in $URL; do    
+	    a=$(echo $a | sed 's%mirror://%http://%')
+	    a=${a%%/mirror.txt}; a=${a%%/}
+	    wget --spider $a/mirror.txt >/dev/null 2>&1 || return 1
+	    wget -O - $a/mirror.txt >> $BASEPATH/config/aptmirror.new 2>/dev/null
+	done
+
+	cat $BASEPATH/config/aptmirror.new | sort | uniq > $BASEPATH/config/aptmirror
+	return 0
 }
 
 function localPackageDBOutdatedFn() {
 	if [ -f "/var/lib/apt/periodic/update-success-stamp" ]; then
-		if [ $(find /var/lib/apt/periodic/update-success-stamp -mtime +7 | wc -l) -gt 0 ]; then
-			if [ -f "$BASEPATH/config/pkglist" ] && [ -f "/var/lib/apt/lists/apt.xbian.org*Packages" ]; then
-				if [ "$(md5sum /var/lib/apt/lists/apt.xbian.org*Packages | awk '{print $1}')" == "$(md5sum $BASEPATH/config/pkglist | awk '{print $1}')" ]; then
-					return 0;
-				else
-					return 1;
-				fi
-			else
-				return 1;
-			fi
+		int=$(grep "APT::Periodic::Update-Package-Lists" /etc/apt/apt.conf.d/20auto-upgrades 2>/dev/null| grep -o "[0-9]*")
+		[ -z "$int" -o "$int" -eq 0 ] && int=1440 || int=$((int*24*60))
+		if [ -z "$(eval find /var/lib/apt/periodic/update-success-stamp -cmin -$int 2>/dev/null)" ]; then
+			return 1;
 		else
 			return 0;
 		fi
@@ -50,21 +49,34 @@ function localPackageDBOutdatedFn() {
 }
 
 function downloadPackageListFn() {
-	RETURN=0;
+	test -n "$(find /var/lib/apt/periodic/package-success-stamp -cmin -10 2>/dev/null)" && return 1
+	RETURN=1;
 	if [ -f "$BASEPATH/config/aptmirror" ]; then
 		IFS=$'\n';
 		MIRRORS=($(cat $BASEPATH/config/aptmirror));
 		for MIRROR in ${MIRRORS[@]}; do
-			URL=$MIRROR"/dists/wheezy/main/binary-armhf/Packages"
-			if [ $(wget --spider $URL >/dev/null 1>/dev/null 2>/dev/null; echo $?) -eq 0 ]; then
-				wget -O - $URL > $BASEPATH/config/pkglist 2>/dev/null
-				RETURN=1;
-				break;
-			fi
+			MIRROR=${MIRROR%%/}
+			RETURN=0; rm /tmp/sources 2>/dev/null
+			IFS=$'\ ';
+			rm -f $BASEPATH/config/pkglist.new
+			err=0
+			cat /etc/apt/sources.list /etc/apt/sources.list.d/*.list 2>/dev/null| grep '^deb.*xbian.*\|^mirror.*xbian.*' | awk '{print "dists/"$3"/{"$4","$5"}/binary-armhf/Packages"}' | \
+			while read m; do
+			    m=$(eval echo $m)
+			    for n in $m; do
+				n=$(echo $MIRROR/$n | sed 's%mirror://%http://%')
+				n=${n%%/mirror.txt}; n=${n%%/}
+				if [ $(wget --spider $n >/dev/null 1>/dev/null 2>/dev/null; echo $?) -eq 0 ]; then
+				    wget -O - $n >> $BASEPATH/config/pkglist.new 2>/dev/null
+				    err=$((err + $?))
+				fi
+			    done
+			done
+			[ $err -ne 0 ] || { mv $BASEPATH/config/pkglist.new $BASEPATH/config/pkglist; touch /var/lib/apt/periodic/package-success-stamp; break; }
 		done
 		IFS=$ORIGINALIFS;
 	fi
-	return $RETURN;
+	return $err
 }
 
 #Retrieves the package version
@@ -74,12 +86,15 @@ function getPackageVersionFn() {
 }
 
 function updateAptFn() {
-	apt-get update &>/tmp/aptstatus
-	if [ $? -eq 0 ]; then
-		return 1;
-	else
-		return 0;
-	fi
+        apt-get -q clean
+        if [ "$1" = speak ]; then
+                apt-get update 2>&1 | tee /tmp/aptstatus 
+        else
+        	apt-get update 2>&1 >/tmp/aptstatus
+        fi
+        rm -f /tmp/aptupdates
+        touch /var/lib/apt/periodic/update-stamp
+        touch /var/lib/apt/periodic/update-success-stamp
 }
 
 function getAllPackagesForInstallFn() {
@@ -87,19 +102,19 @@ function getAllPackagesForInstallFn() {
 }
 
 function getAptErrorCodeFn() {
-	if [ $(cat /tmp/aptstatus | grep "already the newest version" | wc -l) -eq 1 ]; then
+	if [ $(grep -c "already the newest version" /tmp/aptstatus) -eq 1 ]; then
 		return 1;
-	elif [ $(cat /tmp/aptstatus | grep "was not found" | wc -l) -eq 1 ]; then
+	elif [ $(grep -c "was not found" /tmp/aptstatus) -eq 1 ]; then
 		return 2;
-	elif [ $(cat /tmp/aptstatus | grep "Unable to locate package" | wc -l) -eq 1 ]; then
+	elif [ $(grep -c "Unable to locate package" /tmp/aptstatus) -eq 1 ]; then
 		return 3;
-	elif [ $(cat /tmp/aptstatus | grep "DOWNGRADED" | wc -l) -eq 1 ]; then
+	elif [ $(grep -c "DOWNGRADED" /tmp/aptstatus) -eq 1 ]; then
 		return 4;
-	elif [ $(cat /tmp/aptstatus | grep -i "size mismatch" | wc -l) -eq 1 ]; then
+	elif [ $(grep -c -i "size mismatch" /tmp/aptstatus) -eq 1 ]; then
 		return 5;
-	elif [ $(cat /tmp/aptstatus | grep -i "returned an error code" | wc -l) -eq 1 ]; then
+	elif [ $(grep -c -i "returned an error code" /tmp/aptstatus) -eq 1 ]; then
 		return 6;
-	elif [ $(cat /tmp/aptstatus | grep -i "impossible situation" | wc -l) -eq 1 ]; then
+	elif [ $(grep -c -i "impossible situation" /tmp/aptstatus) -eq 1 ]; then
 		return 6;
 	else
 		return 0;

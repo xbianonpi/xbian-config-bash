@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#Copyright 2012 - 2013 CurlyMo & mk01 <development@xbian.org>
+#Copyright 2012 - 2018 CurlyMo, mk01 & mkreisl <development@xbian.org>
 #
 #This file is part of XBian - XBMC on the Raspberry Pi.
 #
@@ -19,214 +19,177 @@
 
 # Get list of installed services
 function getInstalledServicesFn() {
-	INSTSERV=();
-	SERVLIST=($SERVICES);
-	for SERVRAW in ${SERVLIST[@]}; do
-		NAME=${SERVRAW%:*};
-		FOUND=$(ls /etc/init.d/ | grep -io "^$NAME*");
-		if [ ! -z "$FOUND" ]; then
-			INSTSERV+=($SERVRAW);
-		fi
+	for s in $(printf "%s\n" ${!SERVICES[@]}); do
+		a=${ISALIAS[$s]}; [ -z "$a" ] && u=$s || u=$a
+		[ ! -e /etc/init.d/$u ] && [ ! -e /etc/init/$u.conf ] && [ ! -e $BASEPATH/config/$u.inetd ] && unset SERVICES[$s]
 	done
+        X=$((${#SERVICES[@]}-1))
+        IDX=($(printf "%s\n" ${!SERVICES[@]} | sort))
+}
+
+in_list() 
+{
+#        case $PROCESSES in
+#                *" $1 "*)
+#                        echo "$1 ok" >> /run/xbian-config
+#                        return 0
+#                        ;;
+#        esac
+#
+#        echo "$1 nok" >> /run/xbian-config
+        true
+#        return 1
 }
 
 function getServiceAutoStartStatusFn() {
-	if [ ! -z "$1" ]; then
-		return $(ls /etc/rc2.d/ | grep -io "S[0-9]\{1,\}$1" | wc -l);
-	else
-		return 0;
-	fi
+	[ -z "$1" ] && return 1
+	a=${ISALIAS[$1]}; [ -z "$a" ] || set -- $a
+        [ -e $BASEPATH/config/$1.inetd ] && { while read a; do ! grep -qx ^"$a" /etc/inetd.conf && return 1; done < $BASEPATH/config/$1.inetd ; return 0; }
+
+        grep -qx manual /etc/init/$1.override /etc/init/$1.conf 2>/dev/null && return 1
+        [ ! -e /etc/init/$1.conf ] && [ ! -e /etc/rc2.d/S??$1 -a ! -e /etc/rcS.d/S??$1 ] && return 1
+	return 0
 }
 
+refreshProcessesFn()
+{
+#        echo "Reloading process list" >> /run/xbian-splash
+        PROCESSES=$(ps eax | awk '{print $5" "$6}')
+}
 function getServiceRunningStatusFn() {
-	SERVICE=$1;
-	SERVCONF=${SERVCONF#:*};
-	SERVCONF=${SERVCONF//,/ /};
-	RUNNING=0;
-	if [ ${#DAEMONS[@]} -eq 0 ]; then
-		if [[ "$PROCESSES" =~ "$SERVICE" ]]; then
-			RUNNING=1;
-		fi
-	else
-		for DAEMON in ${DAEMONS[@]}; do
-			if [[ "$PROCESSES" =~ "$DAEMON" ]]; then
-				RUNNING=$(($RUNNING+1));
-			fi
+        [ -z "$1" ] && return 2
+        a=${ISALIAS[$1]}; [ -z "$a" ] || set -- $a
+	[ -e $BASEPATH/config/$1.inetd ] && { getServiceAutoStartStatusFn $1 && { getServiceRunningStatusFn "openbsd-inetd" && return 0; } || return 1; }
+
+        p=${SERVICES[$1]//,/ }
+
+	[ -z "$PROCESSES" ] && refreshProcessesFn
+	[ -z "$p" ] && { [[ $PROCESSES =~ "$1" ]] && return 0 || { status "$1" 2>/dev/null| grep -q "start/running"; return $?; }; }
+	(
+		IFS=$' '
+		for pn in $p; do
+			[[ $PROCESSES =~ "$pn" ]] || exit 1
 		done
-		if [ $RUNNING -eq ${#DAEMONS[@]} ]; then
-			RUNNING=1;
-		else
-			RUNNING=0;
-		fi
-	fi
-	return $RUNNING;
+		exit 0
+	)
+	return $?
 }
 
 function getServiceNameFn() {
-	IFS=$'\n';
-	SERVCONF=($(echo -e "$SERVICES"));
-	IFS=$ORIGINALIFS;
-	I=0;
-	for SERVRAW in ${SERVCONF[@]}; do
-		SERV=${SERVRAW%:*};
-		FOUND=$(ls /etc/init.d/ | grep -i "^$SERV*");
-		if [ ! -z "$FOUND" ]; then
-			if [ $I -eq $1 ]; then
-				break;
-			fi
-			I=$(($I+1));
-		fi 
-	done
-	NAME=$(ls -Al /etc/init.d/ | grep -m1 "$SERV" | awk '{print $9}');
+        NAME=$(echo ${IDX[$1]})
 }
 
 function getServiceIDFn() {
-	I=0;
-	
-	for SERVRAW in ${INSTSERV[@]}; do
-		SERV=${SERVRAW%:*};
-
-		if [ "$SERV" == "$1" ]; then
-			break;
-		fi
+	I=0
+	for s in $(printf "%s\n" ${IDX[@]} | sort); do
+                [ "$1" = $s ] && return $I
 		I=$(($I+1));
 	done
-	return $I;
+	return 999
 }
 
 function checkServiceExistsFn() {
-	COMMAND="ls -Al /etc/init.d/ | awk '{print \$9}' | grep ^$1\$ | wc -l"
-	if [ $(eval $COMMAND) -ge 1 ]; then
-		return 1;
-	else
-		return 0;
-	fi
+	a=${ISALIAS[$1]}; [ -z "$a" ] || set -- $a
+	[ -e "/etc/init.d/$1" -o -e "/etc/init/$1.conf" -o -e $BASEPATH/config/$1.inetd ] && return 0
+	return 1
 }
 
 function restartServiceFn() {
-	getServiceNameFn $1;
-	if [ -f "/etc/init.d/$NAME" ]; then
-		/etc/init.d/$NAME restart &>/dev/null
-		RETURN=$?;
-		X=0;
-		while [ $(getServiceRunningStatusFn $NAME; echo $?) -eq 0 ] || [ $X -lt 10 ]; do
-			sleep 1;
-			PROCESSES=$(ps -A);
-			X=$(($X+1));
-		done;
-		return $RETURN;
-	else
-		return -1;
+	a=${ISALIAS[$1]}; [ -z "$a" ] || set -- $a $2
+	[ -z "$2" ] && c="restart" || c="$2"
+
+	if [ -e $BASEPATH/config/$1.inetd ]; then
+		[ "$c" =  stop ] && return 1
+		restartServiceFn "openbsd-inetd" restart && return 0 || return 1
+	elif [ -f "/etc/init/$1.conf" ]; then
+		[ $c = restart ] && c=reload
+		$c -q $1
+	else 
+		/etc/init.d/$1 $c > /dev/null
 	fi
+
+	r=$?
+	[ "$c" = stop ] && sleep 1
+	refreshProcessesFn
+	return $r
 }
 
 function startServiceFn() {
-	getServiceNameFn $1;
-	if [ -f "/etc/init.d/$NAME" ]; then
-		/etc/init.d/$NAME start &>/dev/null
-		RETURN=$?;
-		X=0;
-		while [ $(getServiceRunningStatusFn $NAME; echo $?) -eq 0 ] && [ $X -lt 10 ]; do
-			sleep 1;
-			PROCESSES=$(ps -A);
-			X=$(($X+1));
-		done;
-		return $RETURN;
-	else
-		return 1;
-	fi
+        restartServiceFn $1 start
 }
 
 function stopServiceFn() {
-	getServiceNameFn $1;
-	if [ -f "/etc/init.d/$NAME" ]; then
-		/etc/init.d/$NAME stop &>/dev/null
-		RETURN=$?;
-		X=0;
-		while [ $(getServiceRunningStatusFn $NAME; echo $?) -eq 1 ] && [ $X -lt 10 ]; do
-			sleep 1;
-			PROCESSES=$(ps -A);
-			X=$(($X+1));
-		done;
-		return $RETURN;
-	else
-		return 1;
-	fi
+        restartServiceFn $1 stop
 }
 
 function disableAutoStartFn() {
-	getServiceNameFn $1;
-	if [ -f "/etc/init.d/$NAME" ]; then	
-		update-rc.d $NAME remove &>/dev/null
-		RETURN=$?;
-		X=0;
-		while [ $(getServiceAutoStartStatusFn $NAME; echo $?) -eq 1 ] && [ $X -lt 10 ]; do
-			sleep 1;
-			X=$(($X+1));
-		done;
-		if [ $X -eq 9 ]; then
-			RETURN=0;
-		fi
-		return $RETURN;
-	else
-		return 1;
-	fi
+	a=${ISALIAS[$1]}; [ -z "$a" ] || set -- $a
+        [ -e $BASEPATH/config/$1.inetd ] && { 	while read service details; do
+						    [ -z "$service" ] && continue
+						    service=$(echo $service | awk '{print $1}')
+						    update-inetd --multi --disable $service || return 1
+						done < $BASEPATH/config/$1.inetd; return 0; }
+
+	if [ -f "/etc/init/$1.conf" ]; then
+		grep -xq manual "/etc/init/$1.override" 2>/dev/null || {
+			[ -f "/etc/init/$1.override" ] && sed -i "1 i\manual" "/etc/init/$1.override" || echo "manual" > "/etc/init/$1.override"
+		}
+		grep -xq manual "/etc/init/$1.override"; return $?
+        else
+		update-rc.d -f "$1" remove > /dev/null 2>&1;insserv -rf "/etc/init.d/$1"  > /dev/null 2>&1; return $?
+        fi
 }
 
 function enableAutoStartFn() {
-	getServiceNameFn $1;
-	if [ -f "/etc/init.d/$NAME" ]; then
-		update-rc.d $NAME defaults &>/dev/null
-		RETURN=$?;
-		X=0;
-		while [ $(getServiceAutoStartStatusFn $NAME; echo $?) -eq 0 ] && [ $X -lt 10 ]; do
-			sleep 1;
-			X=$(($X+1));
-		done;
-		if [ $X -eq 9 ]; then
-			RETURN=0;
-		fi
-		return $RETURN;
-	else
-		return 1;
-	fi
+	a=${ISALIAS[$1]}; [ -z "$a" ] || set -- $a
+        [ -e $BASEPATH/config/$1.inetd ] && { 	while read service; do
+						    details="$service"
+						    [ -z "$service" ] && continue
+						    service=$(echo "$service" | sed -r 's/[\\ ]+/[\\t\\ ]\*/g' | sed 's/-/\\-/g' )
+						    grep -q "$service" /etc/inetd.conf || echo "$details" >> /etc/inetd.conf
+						    update-inetd --multi --enable $(echo $details |awk '{print $1}') || return 1
+						done < $BASEPATH/config/$1.inetd; return 0; }
+
+	if [ -f "/etc/init/$1.conf" ]; then
+		grep -xq manual "/etc/init/$1.override" && sed -i "/^manual$/d" "/etc/init/$1.override"
+		[ "$(stat -c %s "/etc/init/$1.override")" -eq 0 ] && rm -f /etc/init/$1.override && return 0
+		return $(grep -cx manual "/etc/init/$1.override")
+        else
+		update-rc.d -f "$1" remove > /dev/null 2>&1 ;insserv -f "/etc/init.d/$1" > /dev/null 2>&1; return $?
+        fi
 }
 
 function getServiceConfFn() {
 	DATA=();
-	I=0;
+        getServiceIDFn $1; I=$?
+        DATA[0]=$1
+	DATA[1]=${SERVICES[$1]}
 
-	for SERVRAW in ${INSTSERV[@]}; do
-		if [ $I -eq $1 ]; then
-			DATA[0]=${SERVRAW%:*};
-			DATA[1]=${SERVRAW#*:}
-			break;
-		fi 
-		I=$(($I+1));
-	done
+        [ $I != 999 ] || return 1
+        return 0 
 }
 
 function updateServiceConfFn() {
-	DATA=($2);
+        [ -z "$1" ] && return 1
 	if [ -f "$BASEPATH/config/services" ]; then
-		sed -i "/${DATA[0]}:/d" $BASEPATH/config/services;
+		sed -i "/$1:/d" $BASEPATH/config/services 
 	fi
-	echo "${DATA[0]}:${DATA[1]}" >> $BASEPATH/config/services;
-	if [ -f "$BASEPATH/config/services" ] && [ $(cat $BASEPATH/config/services | grep "${DATA[0]}:${DATA[1]}" | wc -l) -eq 1 ]; then
-		return 1;
-	else
+	echo "$1:$2" >> $BASEPATH/config/services;
+	if [ -f "$BASEPATH/config/services" ] && [ $(cat $BASEPATH/config/services | grep -c "$1:$2" ) -eq 1 ]; then
 		return 0;
+	else
+		return 1;
 	fi
 }
 
 function deleteServiceFn() {
-	DATA=($2);
+        [ -z "$1" ] && return 1
 	if [ -f "$BASEPATH/config/services" ]; then
-		sed -i "/${DATA[0]}:/d" $BASEPATH/config/services;
+		sed -i "/$1:/d" $BASEPATH/config/services;
 	fi
-	if [ -f "$BASEPATH/config/services" ] && [ $(cat $BASEPATH/config/services | grep "${DATA[0]}:" | wc -l) -eq 0 ]; then
-		return 1;
+	if [ -f "$BASEPATH/config/services" ] && [ $(cat $BASEPATH/config/services | grep -c "$1:") -eq 0 ]; then
+		return 0
 	else
-		return 0;
+		return 1
 	fi
 }

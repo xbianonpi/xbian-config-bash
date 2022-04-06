@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#Copyright 2012 - 2013 CurlyMo & mk01 <development@xbian.org>
+#Copyright 2012 - 2017 CurlyMo, mk01 & mkreisl <development@xbian.org>
 #
 #This file is part of XBian - XBMC on the Raspberry Pi.
 #
@@ -17,15 +17,73 @@
 #You should have received a copy of the GNU General Public License along
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 
+function setEnableAuto() {
+	if [ -z "$1" ]; then
+	    [ -e /etc/apt/apt.conf.d/20auto-upgrades ] && return $(grep "APT::Periodic::Unattended-Upgrade" /etc/apt/apt.conf.d/20auto-upgrades | grep -o "[0-9]*") || return 0
+	else
+            grep -v "APT::Periodic::Unattended-Upgrade" /etc/apt/apt.conf.d/20auto-upgrades > /etc/apt/apt.conf.d/20auto-upgrades.new
+            mv /etc/apt/apt.conf.d/20auto-upgrades.new /etc/apt/apt.conf.d/20auto-upgrades
+	    echo "APT::Periodic::Unattended-Upgrade \"$1\";" >> /etc/apt/apt.conf.d/20auto-upgrades
+	    [ "$(xbian-config updates enableauto)" = "$1" ] && return 1 || return 0
+	fi
+}
+
+function setEnableInventoryAuto() {
+	if [ -z "$1" ]; then
+	    [ -e /etc/apt/apt.conf.d/20auto-upgrades ] && return $(grep "APT::Periodic::Update-Package-Lists" /etc/apt/apt.conf.d/20auto-upgrades | grep -o "[0-9]*") || return 0
+	else
+	    [ $1 -ne 0 ] && int=$2 || int=0
+	    [ -z $int ] && int=1
+            grep -v "APT::Periodic::Update-Package-Lists" /etc/apt/apt.conf.d/20auto-upgrades > /etc/apt/apt.conf.d/20auto-upgrades.new
+            mv /etc/apt/apt.conf.d/20auto-upgrades.new /etc/apt/apt.conf.d/20auto-upgrades
+	    echo "APT::Periodic::Update-Package-Lists \"$int\";" >> /etc/apt/apt.conf.d/20auto-upgrades
+	    [ $(grep "APT::Periodic::Update-Package-Lists" /etc/apt/apt.conf.d/20auto-upgrades | grep -o "[0-9]*") = "$int" ] && return 1 || return 0
+	fi
+}
+
+function setSnapApt(){
+    if [ -z "$1" ]; then 
+	grep -q ENABLEDAPT=yes /etc/default/xbian-snap && return 1 || return 0
+    else
+	cs=$(grep ENABLEDAPT= /etc/default/xbian-snap)
+	[ $1 -eq 1 ] && sed -i 's/ENABLEDAPT=.*/ENABLEDAPT=yes/' /etc/default/xbian-snap && return $(xbian-config updates snapapt)
+	[ $1 -eq 0 ] && sed -i 's/ENABLEDAPT=.*/ENABLEDAPT=no/' /etc/default/xbian-snap && return $((1 - $(xbian-config updates snapapt) ))
+    fi
+}
+
+function setEnableRepo() {
+        sed -i 's/^[ \t]*//' /etc/apt/sources.list.d/xbian.list
+        sed -i 's/\t/ /g' /etc/apt/sources.list.d/xbian.list
+        if [ -z "$2" ]; then
+            grep $1 /etc/apt/sources.list.d/xbian.list | grep -q ^"deb " && return 1
+            return 0
+        elif [ "$2" -eq 0 ]; then
+            sed -i "/$1/s/^deb /### deb /g" /etc/apt/sources.list.d/xbian.list
+        elif ! grep $1 /etc/apt/sources.list.d/xbian.list | grep -q ^"deb "; then
+            if grep $1 /etc/apt/sources.list.d/xbian.list | grep -q ^"### deb "; then
+                sed -i "/$1/s/^### deb /deb /g" /etc/apt/sources.list.d/xbian.list
+            else
+                sed -i "/$1/s/^#.*deb /deb /g" /etc/apt/sources.list.d/xbian.list
+            fi
+        fi
+        return $2
+}
+
 function retrieveUpdateListFn() {
-	apt-get dist-upgrade -s &>/tmp/aptupdates 2>/dev/null;
+        if [[ "$(apt-get -v 2>/dev/null | grep ^apt | awk '{ print $2 }')" > "1.1" ]]; then
+		# apt shipped with Debian Stretch has newer [src]pkgcache.bin database format (v5)
+		# Unfortunately xbian-apt-show-versions is linked against older apt library (v4)
+		# so we have do use a bit slower python version until new version is available
+		xbian-apt-show-versions.py -nu >/tmp/aptupdates 2>>/tmp/aptstatus
+	else
+		xbian-apt-show-versions -nu >/tmp/aptupdates 2>/dev/null
+	fi
 }
 
 function getAllPackagesLisFn() {
 	if [ -f "/tmp/aptupdates" ]; then
-		IFS=$'\n';
-		PACKAGES=($(cat /tmp/aptupdates | sed -ne 's/\(Inst.*\)\([\ ]\{1\}\)\(xbian-[A-Za-z0-9\.\-]\{1,\}\)\([\ ]\)\(\[\)\(.*\)\(\]\)\(.*[(]\)\([0-9A-Za-z\~\.\:\+\-]\{1,\}\)\([\ ].*\)/\3;\6;\9/p' | grep -v xbian-update | sort | uniq));
-		IFS=$ORIGINALIFS;
+		PACKAGES=($(cat /tmp/aptupdates | sed 's/\/[a-z]*//g' | awk '{print $1";"$2";"$5}' | sort | uniq));
+                [ -z "${PACKAGES[0]}" ] && unset PACKAGES
 		return 1;
 	else
 		return 0;
@@ -33,41 +91,51 @@ function getAllPackagesLisFn() {
 }
 
 function getAllUpdatesLisFn() {
-	if [ -f "/tmp/aptupdates" ]; then
-		IFS=$'\n';
-		UPDATES=($(cat /tmp/aptupdates | sed -ne 's/\(Inst.*\)\([\ ]\{1\}\)\(xbian-update\)\([\ ]\)\(\[\)\(.*\)\(\]\)\(.*[(]\)\([0-9A-Za-z\~\.\:\+\-]\{1,\}\)\([\ ].*\)/\3;\6;\9/p' | sort | uniq));
-		IFS=$ORIGINALIFS;
-		return 1;
-	else
-		return 0;
-	fi
+        getAllPackagesLisFn
 }
 
 function updatePackagesFn() {
-	LIST="";
-	ARRAY=($2);
-	for INDEX in ${ARRAY[@]}; do
-		INDEX=${INDEX//\"/ };
-		NAME=$(echo ${PACKAGES[$((INDEX-1))]} | cut -f1 -d";");
-		VERSION=$(echo ${PACKAGES[$((INDEX-1))]} | cut -f3 -d";");
-		LIST+=$NAME"="$VERSION" ";
-	done;
+	LIST=""
+	OPTS=""
+	if [ "$2" = 'distupgrade' ]; then
+		COMMAND="dist-upgrade"
+		OPTS="--allow-downgrades"
+	else
+		COMMAND="install"
+		if [ "$2" = '-' -o "$2" = '0' -o "$2" = '"0"' ]; then
+			lt=${!PACKAGES[*]}
+			d=0
+		else
+			lt=$2
+			d=1
+		fi
+
+		ARRAY=($lt);
+		for INDEX in ${ARRAY[@]}; do
+			INDEX=${INDEX/\\/}
+			INDEX=$(echo $INDEX | tr -d "\"")
+			NAME=$(echo ${PACKAGES[$((INDEX-$d))]} | cut -f1 -d";");
+			VERSION=$(echo ${PACKAGES[$((INDEX-$d))]} | cut -f3 -d";");
+			LIST+=" "$NAME"="$VERSION
+		done;
+	fi
 
 	if [ $1 -eq 1 ]; then
-		apt-get install -s $LIST &>/tmp/aptstatus
+		LC_ALL=C.UTF-8 eval apt-get $COMMAND -s $LIST &>/tmp/aptstatus
 	elif [ $1 -eq 0 ]; then
-		apt-get install -y $LIST
+		{ rm -f /tmp/aptupdates; LC_ALL=C.UTF-8 DEBIAN_FRONTEND=noninteractive eval apt-get $COMMAND -y $OPTS -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" $LIST && { [ "$COMMAND" != dist-upgrade ] || apt-get install --reinstall xbian-update; } } 2>&1 | tee /tmp/aptstatus | dialog --progressbox $(tput lines) $(tput cols)
 	elif [ $1 -eq 2 ]; then
-		nohup apt-get install -y $LIST &>/tmp/aptstatus &
+		{ LC_ALL=C.UTF-8 DEBIAN_FRONTEND=noninteractive eval nohup apt-get $COMMAND -y $OPTS -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" $LIST && { [ "$COMMAND" != dist-upgrade ] || apt-get install --reinstall xbian-update && echo -e "Refreshing package lists... \c" && retrieveUpdateListFn; } } &>/tmp/aptstatus &
 	fi
-	getAptErrorCodeFn;
-	return $?;
+        # Returncode only correct on simulation (1) and on real operation (0)
+        getAptErrorCodeFn
+        return $?
 }
 
 function findNextUpdateVersionFn() {
 	CMAJVERSION=$1;
 	CMINVERSION=$2;
-	ISALPHA=$(echo $CMINVERSION | grep "\." | wc -l);
+	ISALPHA=$(echo $CMINVERSION | grep -c "\.");
 	ISBETA=0;
 	ISSTABLE=0;
 	NEXTVERSION="";
@@ -96,7 +164,7 @@ function findNextUpdateVersionFn() {
 		NEXTALPHA=$CURBETA"."$NEXTALPHA;
 	fi
 
-	if [ $(cat "$BASEPATH/config/pkglist" | grep "xbian-update_"$CMAJVERSION"-"$NEXTALPHA"_" | wc -l) -eq 1 ]; then
+	if [ $(cat "$BASEPATH/config/pkglist" | grep -c "xbian-update_"$CMAJVERSION"-"$NEXTALPHA"_") -eq 1 ]; then
 		NEXTVERSION=$CMAJVERSION-$NEXTALPHA;
 	fi
 	
@@ -110,7 +178,7 @@ function findNextUpdateVersionFn() {
 			NEXTBETA=$(echo "$NEXTBETA+1" | bc);
 		fi
 	fi
-	if [ $(cat "$BASEPATH/config/pkglist" | grep "xbian-update_"$CMAJVERSION"-"$NEXTBETA"_" | wc -l) -eq 1 ]; then
+	if [ $(cat "$BASEPATH/config/pkglist" | grep -c "xbian-update_"$CMAJVERSION"-"$NEXTBETA"_") -eq 1 ]; then
 		NEXTVERSION=$CMAJVERSION-$NEXTBETA;
 	fi
 	if [ -z "$NEXTVERSION" ]; then
@@ -120,14 +188,14 @@ function findNextUpdateVersionFn() {
 			NEXTMINSTABLE=$CMAJVERSION;
 		fi
 	fi
-	if [ $(cat "$BASEPATH/config/pkglist" | grep "xbian-update_"$NEXTMINSTABLE"_" | wc -l) -eq 1 ]; then
+	if [ $(cat "$BASEPATH/config/pkglist" | grep -c "xbian-update_"$NEXTMINSTABLE"_") -eq 1 ]; then
 		NEXTVERSION=$NEXTMINSTABLE;
 	fi	
 	if [ -z "$NEXTVERSION" ]; then
 		CMAJVERSION=$(echo "$CMAJVERSION" | cut -f1 -d"." | bc);
 		NEXTMAJSTABLE=$(echo "$CMAJVERSION+1" | bc);
 	fi
-	if [ $(cat "$BASEPATH/config/pkglist" | grep "xbian-update_"$NEXTMINSTABLE"_" | wc -l) -eq 1 ]; then
+	if [ $(cat "$BASEPATH/config/pkglist" | grep -c "xbian-update_"$NEXTMINSTABLE"_") -eq 1 ]; then
 		NEXTVERSION=$NEXTMAJSTABLE;
 	fi
 }
@@ -138,27 +206,33 @@ function updateSystemFn() {
 	ARRAY=($2);
 	NEXTVERSION="";
 	if [ ${#ARRAY[@]} -gt 0 ]; then
-		INDEX=${ARRAY[0]};
-		INDEX=${INDEX//\"/ };
+#		INDEX=${ARRAY[0]};
+#		INDEX=${INDEX/\\/}
+#		INDEX=$(echo $INDEX | tr -d "\"")
+		INDEX=1
 		NVERSION=$(echo ${UPDATES[$((INDEX-1))]} | cut -f3 -d";");
 		CVERSION=$(echo ${UPDATES[$((INDEX-1))]} | cut -f2 -d";");
 		CMAJVERSION=$(echo $CVERSION | cut -f1 -d"-");
 		CMINVERSION=$(echo $CVERSION | cut -f2 -d"-");
 
-		findNextUpdateVersionFn "$CMAJVERSION" "$CMINVERSION";
+#		findNextUpdateVersionFn "$CMAJVERSION" "$CMINVERSION";
+		VERSIONS=($(echo ${UPDATES[$((INDEX-1))]} | cut -f1 -d";"))
+		NEXTVERSION=$NVERSION
 	fi
 
 	if [ -z "$NEXTVERSION" ]; then
 		return 2;
 	else 
+		touch /run/noreboot
 		if [ $1 -eq 1 ]; then
-			apt-get install -s ${VERSIONS[0]}"="$NEXTVERSION &>/tmp/aptstatus
+			LC_ALL=C.UTF-8 DEBIAN_FRONTEND=noninteractive eval apt-get install -s ${VERSIONS[0]}"="$NEXTVERSION >/tmp/aptstatus
 		elif [ $1 -eq 0 ]; then
-			apt-get install -y ${VERSIONS[0]}"="$NEXTVERSION &>/tmp/aptstatus
+			{ rm -f /tmp/aptupdates; LC_ALL=C.UTF-8 DEBIAN_FRONTEND=noninteractive eval apt-get install -y ${VERSIONS[0]}"="$NEXTVERSION; } | tee /tmp/aptstatus | dialog --progressbox $(tput lines) $(tput cols)
 		elif [ $1 -eq 2 ]; then
-			nohup apt-get install -y ${VERSIONS[0]}"="$NEXTVERSION &>/tmp/aptstatus &
+			{ LC_ALL=C.UTF-8 DEBIAN_FRONTEND=noninteractive eval nohup apt-get install -y ${VERSIONS[0]}"="$NEXTVERSION; rm -f /tmp/aptupdates; } >/tmp/aptstatus &
 		fi
-		getAptErrorCodeFn;
-		return $?
+                # Returncode only correct on simulation (1) and on real operation (0)
+                getAptErrorCodeFn
+                return $?
 	fi
 }

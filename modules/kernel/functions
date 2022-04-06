@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#Copyright 2012 CurlyMo <development@xbian.org>
+#Copyright 2012 - 2016 CurlyMo & mkreisl <development@xbian.org>
 #
 #This file is part of XBian - XBMC on the Raspberry Pi.
 #
@@ -76,6 +76,8 @@ function setKernelVersionFn() {
 			KERNEL=${KERNEL%.*}; 
 			KERNEL=$(echo $KERNEL | sed -e 's/kernel//g' | sed -e 's/\_/./g')
 			if [ $KERNEL == $CURRENTKERNEL ]; then
+				echo "Updating initramfs, please wait…"
+				xbian-update-initramfs "$KERNEL+" >/dev/null
 				return 1;
 			else
 				return 0;
@@ -108,4 +110,17 @@ function createKernelsMenu() {
 			KERNELMENU+=($I",\Zn"$VALUE",off");
 		fi
 	done;
+}
+
+initRamFn() {
+    case $1 in
+        '')
+            grep -q ^FORCEINITRAM= /etc/default/xbian-initramfs && grep ^FORCEINITRAM= /etc/default/xbian-initramfs | cut -d '=' -f2 || echo "no"
+            ;;
+        *)
+            eval sed -i 's/FORCEINITRAM=.*/FORCEINITRAM=$1/' /etc/default/xbian-initramfs
+            [ -x /etc/xbian-initramfs/initram.switcher.sh ] && /etc/xbian-initramfs/initram.switcher.sh update
+            echo "1"
+            ;;
+    esac
 }

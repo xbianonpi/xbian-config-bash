@@ -1,0 +1,285 @@
+#!/bin/bash
+#
+#Copyright 2012 - 2019 CurlyMo & mkreisl <development@xbian.org>
+#
+#This file is part of XBian - XBMC on the Raspberry Pi.
+#
+#XBian is free software: you can redistribute it and/or modify it under the
+#terms of the GNU General Public License as published by the Free Software
+#Foundation, either version 3 of the License, or (at your option) any later
+#version.
+#
+#XBian is distributed in the hope that it will be useful, but WITHOUT ANY
+#WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#details.
+#
+#You should have received a copy of the GNU General Public License along
+#with XBian. If not, see <http://www.gnu.org/licenses/>
+
+
+mapAndMountFn() {
+    mountpath="/run/kodimap"
+    logger -t $(basename $0) "xbiancopy $1 $2"
+    ret=0
+
+    case $1 in
+        mount)
+            if echo "$2" | grep -qE ^"(nfs://|smb://|cifs://|ssh://|sftp://)"; then
+                getcredentials() {
+                    # $1 = server [[user[:password]@]server[:port]
+                    # $2 = type   smb, sftp of ssh
+                    user=$(echo $1 | cut -f 1 -d '@')
+                    pass=$(echo $user | awk -F ':' '{ print $2 }')
+                    user=${user%:*}
+                    serv=$(echo $1 | cut -f 2 -d '@')
+                    port=$(echo $serv | awk -F ':' '{ print $2 }')
+                    serv=${serv%:*}
+
+                    [ "$serv" = "$pass" ] && pass=''
+                    [ "$serv" = "$user" -o -z "$user" ] && user='' && pass=''
+                    [ "$serv" = "$port" ] && port=''
+
+                    if [ -z "$user" ]; then
+                        pwread=0
+                        if [ -e /home/xbian/.kodi/userdata/passwords.xml ]; then
+                            while read line; do
+                                if echo $line | grep -q "from pathversion=.*$2://"; then
+                                    echo $line | grep -q "${1%:*}" && pwread=1 || pwread=0
+                                elif [ "$pwread" -eq 1 ] && echo $line | grep -q "to pathversion"; then
+                                    user=$(echo $line | cut -f 1 -d '@' | cut -f 3 -d '/' | cut -f 1 -d ':')
+                                    pass=$(echo $line | cut -f 1 -d '@' | cut -f 3 -d '/' | cut -f 2 -d ':')
+                                    pwread=0
+                                fi
+                            done < /home/xbian/.kodi/userdata/passwords.xml
+                        fi
+                    fi
+                    [ -z "$LOG_CREDENTIALS" -a -e /etc/default/xbian-internals ] && . /etc/default/xbian-internals
+                    [ "$LOG_CREDENTIALS" = yes ] && { log_user=$user; log_pass=$pass; } || { log_user=XXXXXXXX; log_pass=XXXXXXXX; }
+                }
+                type=$(echo "$2" | cut -f 1 -d ':')
+                [ "$type" = cifs ] && type="smb"
+                server=$(echo "$2" | cut -f 3 -d '/')
+                pf="/$(echo "$2" | cut -f 4- -d '/')"
+                path=${pf%/*}
+                name=${pf##*/}
+                logger -t $(basename $0) "xbiancopy type=$type, server=$server, path=$path, name=$name"
+                mkdir -p $mountpath
+                case $type in
+                    smb)
+                        eval mopt=$(awk -F'OPTS=' "/^CIFSOPTS=/"'{print $2}' /etc/default/xbian-snap)
+                        getcredentials $server $type
+                        logger -t $(basename $0) "xbiancopy user=$log_user, pass=$log_pass"
+                        [ -z "$mopt" ] || mopt=",$mopt"
+                        eval mount -t cifs "//"$server"$path" -o username=$user,password=$pass,actimeo=120$mopt $mountpath &>/dev/null
+                    ;;
+                    nfs)
+                        eval mopt=$(awk -F'OPTS=' "/^NFSOPTS=/"'{print $2}' /etc/default/xbian-snap)
+                        [ -z "$mopt" ] || mopt="-o $mopt"
+                        eval mount -t $type $mopt $server:"$path" $mountpath &>/dev/null
+                    ;;
+                    ssh|sftp)
+                        eval mopt=$(awk -F'OPTS=' "/^SSHFSOPTS=/"'{print $2}' /etc/default/xbian-snap)
+                        getcredentials $server $type
+
+                        [ -z "$user" ] && usep='' || usep='@'
+                        [ -z "$pass" ] && sopt='' || sopt="password_stdin,"
+                        [ -z "$port" ] && popt='' || popt="port=$port,"
+                        logger -t $(basename $0) "xbiancopy serv=$serv, port=$port, user=$log_user, pass=$log_pass"
+
+                        modprobe -q fuse
+                        opts=$sopt$popt$mopt; opts=${opts%,}
+                        echo $pass | eval sshfs $user$usep$serv:"$path" -o $opts $mountpath &>/dev/null
+                    ;;
+                    *)
+                        false
+                    ;;
+                esac
+                ret=$?
+                echo $mountpath/$name
+            else
+                echo "$2"
+            fi
+        ;;
+        umount)
+            mountpoint -q $mountpath && umount $mountpath &>/dev/null
+            ret=$?
+        ;;
+    esac
+    return $ret
+}
+
+backupImgPlanFn() {
+    [ -z "$1" ] && { awk -F'=' "/^IMGPLAN=/"'{print $2}' /etc/default/xbian-snap; exit 0; }
+    case $1 in
+        none|daily|weekly|monthly)
+            eval sed -i 's/IMGPLAN=.*/IMGPLAN=$1/' /etc/default/xbian-snap
+            echo 1
+            ;;
+        *)
+            echo -1
+            ;;
+    esac
+}
+backupImgTypeFn() {
+    [ -z "$1" ] && { awk -F'=' "/^IMGTYPE=/"'{print $2}' /etc/default/xbian-snap; exit 0; }
+    case $1 in
+        "block"|"file")
+            eval sed -i 's/IMGTYPE=.*/IMGTYPE=$1/' /etc/default/xbian-snap
+            echo 1
+            ;;
+        *)
+            echo -1
+            ;;
+    esac
+}
+backupImgDestFn() {
+    [ -z "$1" ] && { awk -F'=' "/^IMGDEST=/"'{print $2}' /etc/default/xbian-snap | tr -d \"; exit 0; }
+    [ "$1" = "?" -o "$1" = "exp" ] && { . /etc/default/xbian-snap; echo $IMGDEST; exit 0; }
+    tt=$(backupImgTypeFn)
+    case $tt in
+        block)
+            [ ! -b "$1" ] && { echo -1; exit 0; }
+            ;;
+        file)
+            echo f=\"$(mapAndMountFn mount $(echo $1 | sed 's/\\)/)/g;s/\\(/(/g;s/\\ / /g'))\" >/run/xbiancopy.tmp; . /run/xbiancopy.tmp; rm /run/xbiancopy.tmp
+            [ ! -e "$f" ] && fdel=1
+            ! touch "$f" 2>/dev/null && { echo -1; mapAndMountFn umount; exit 0; }
+            [ "$(df -P "$f" | tail -1 | awk '{print $f}')" = "$(readlink -e /dev/root)" ] && { [ -n "$fdel" ] && rm "$f"; echo -2; mapAndMountFn umount; exit 0; }
+            [ -n "$fdel" ] && rm "$f"
+            mapAndMountFn umount
+            ;;
+        *)
+            { echo -1; exit 0; }
+    esac
+    eval sed -i 's\|IMGDEST=.*\|IMGDEST=\"$1\"\|' /etc/default/xbian-snap
+    echo 1
+}
+backupImgKeepFn() {
+    sch=0
+    case $1 in
+        '')
+            grep -q ENABLEDSCHEDULE=yes /etc/default/xbian-snap && sch=1
+            nr=$(grep IMGKEEP= /etc/default/xbian-snap| awk -F'=' '{print $2}')
+            [ $sch -eq 1 -a $nr -gt 0 ] && echo "$nr" || echo "0"
+            ;;
+        *)
+            eval sed -i 's/IMGKEEP=.*/IMGKEEP=$1/' /etc/default/xbian-snap
+            grep -q IMGKEEP=$1 /etc/default/xbian-snap && echo 1 || echo 0
+            ;;
+    esac
+}
+
+backupHomePlanFn() {
+    [ -z "$1" ] && { awk -F'=' "/^HOMEPLAN=/"'{print $2}' /etc/default/xbian-snap; exit 0; }
+    case $1 in
+        none|daily|weekly|monthly)
+            eval sed -i 's/HOMEPLAN=.*/HOMEPLAN=$1/' /etc/default/xbian-snap
+            echo 1
+            ;;
+        *)
+            echo -1
+            ;;
+    esac
+}
+backupHomeDestFn() {
+    [ -z "$1" ] && { awk -F'=' "/^HOMEDEST=/"'{print $2}' /etc/default/xbian-snap | tr -d \"; exit 0; }
+    [ "$1" = "?" -o "$1" = "exp" ] && { . /etc/default/xbian-snap; echo $HOMEDEST; exit 0; }
+    echo f=\"$(mapAndMountFn mount $(echo $1 | sed 's/\\)/)/g;s/\\(/(/g;s/\\ / /g'))\" >/run/xbiancopy.tmp; . /run/xbiancopy.tmp; rm /run/xbiancopy.tmp
+    [ ! -e "$f" ] && fdel=1
+    ! touch "$f" 2>/dev/null && { echo -1; mapAndMountFn umount; exit 0; }
+    [ "$(df -P "$f" | tail -1 | awk '{print $f}')" = "$(readlink -e /dev/root)" ] && { [ -n "$fdel" ] && rm "$f"; echo -2; mapAndMountFn umount; exit 0; }
+    [ -n "$fdel" ] && rm "$f"
+    mapAndMountFn umount
+    eval sed -i 's\|HOMEDEST=.*\|HOMEDEST=\"$1\"\|' /etc/default/xbian-snap
+    echo 1
+}
+backupHomeKeepFn() {
+    sch=0
+    case $1 in
+        '')
+            grep -q ENABLEDSCHEDULE=yes /etc/default/xbian-snap && sch=1
+            nr=$(grep HOMEKEEP= /etc/default/xbian-snap| awk -F'=' '{print $2}')
+            [ $sch -eq 1 -a $nr -gt 0 ] && echo "$nr" || echo "0"
+            ;;
+        *)
+            eval sed -i 's/HOMEKEEP=.*/HOMEKEEP=$1/' /etc/default/xbian-snap
+            grep -q HOMEKEEP=$1 /etc/default/xbian-snap && echo 1 || echo 0
+            ;;
+    esac
+}
+
+backupDoCleanFn() {
+    logger -t $(basename $0) "doclean $1 $2"
+    ret=0
+    if [ "$2" -gt 0 ]; then
+        p=$(echo $(mapAndMountFn mount $(echo $1 | sed 's/file://')) | sed "s/\$(hostname)/$(hostname)/;s/\$(.*)/\*/;s/ /\\ /")
+        logger -t $(basename $0) "doclean ls -t1 $p"
+        n=0
+        for f in $(ls -t1 $p); do
+            ((n++))
+            if (( $n > $2 )); then
+                logger -t $(basename $0) "doclean rm -f $f"
+                rm -f "$f"
+                [ $? -eq 0 ] || ret=$?
+            fi
+        done
+        mapAndMountFn umount
+    fi
+    echo $ret
+}
+
+getImgPartitionsFn() {
+    local h
+    [ "$1" = all ] && hide='' || hide='|sd[a-z] |mmcblk[0-9] '
+    h=$(readlink -e /dev/disk/by-uuid/$(zpool get -H guid -o value 2>/dev/null))
+    [ "$h" = /dev/disk/by-uuid ] || { [ "$1" = all ] && hide="$hide|${h%[0-9]}" || hide="$hide|$h"; }
+    h="$(readlink -e /dev/root)"; [ -z "$h" ] || { [ "$1" = all ] && hide="$hide|${h%[0-9]}" || hide="$hide|$h"; }
+    h="$(findmnt -n /boot -o SOURCE)"; [ -z "$h" ] || hide="$hide|$h"
+    printf "%s;" $(lsblk -alnp | grep -vE "zram|loop|$(blkid -t TYPE=swap -o device)$hide" | awk -F ' ' '{print $1}')
+}
+
+dailySnapFn() {
+    sch=0
+    case $1 in
+        '')
+            grep -q ENABLEDSCHEDULE=yes /etc/default/xbian-snap && sch=1
+            nr=$(grep KEEPDAYS= /etc/default/xbian-snap| awk -F'=' '{print $2}')
+            [ $sch -eq 1 -a $nr -gt 0 ] && echo "1 $nr" || echo "0"
+            ;;
+        *)
+            eval sed -i 's/KEEPDAYS=.*/KEEPDAYS=$1/' /etc/default/xbian-snap
+            grep -q KEEPDAYS=$1 /etc/default/xbian-snap && echo 1 || echo 0
+            ;;
+    esac
+}
+
+weeklySnapFn() {
+    sch=0
+    case $1 in
+        '')
+            grep -q ENABLEDSCHEDULE=yes /etc/default/xbian-snap && sch=1
+            nr=$(grep KEEPWEEKS= /etc/default/xbian-snap| awk -F'=' '{print $2}')
+            [ $sch -eq 1 -a $nr -gt 0 ] && echo "1 $nr" || echo "0"
+            ;;
+        *)
+            eval sed -i 's/KEEPWEEKS=.*/KEEPWEEKS=$1/' /etc/default/xbian-snap
+            grep -q KEEPWEEKS=$1 /etc/default/xbian-snap && echo 1 || echo 0
+            ;;
+    esac
+}
+
+monthlySnapFn() {
+    sch=0
+    case $1 in
+        '')
+            grep -q ENABLEDSCHEDULE=yes /etc/default/xbian-snap && sch=1
+            nr=$(grep KEEPMONTHS= /etc/default/xbian-snap| awk -F'=' '{print $2}')
+            [ $sch -eq 1 -a $nr -gt 0 ] && echo "1 $nr" || echo "0"
+            ;;
+        *)
+            eval sed -i 's/KEEPMONTHS=.*/KEEPMONTHS=$1/' /etc/default/xbian-snap
+            grep -q KEEPMONTHS=$1 /etc/default/xbian-snap && echo 1 || echo 0
+            ;;
+    esac
+}

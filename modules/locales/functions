@@ -35,7 +35,7 @@ function getLanguageByIdFn() {
 }
 
 function ISOLocaleExistsFn() {
-	if [ $(grep ^$1 $BASEPATH/config/languages | wc -l) -eq 1 ]; then
+	if [ $(grep -c ^$1 $BASEPATH/config/languages) -eq 1 ]; then
 		return 1;
 	else
 		return 0;
@@ -82,27 +82,20 @@ function setLocaleFn() {
 	INPUT=${LOCALE%.*}
 	CHARSET="UTF-8"
 	
-	if [ $(locale -a | grep $INPUT.utf8 | wc -l) -eq 0 ]; then
-		localedef -i $INPUT -c -f $CHARSET -A /usr/share/locale/locale.alias $LOCALE
+	if [ $(locale -a | grep -c $INPUT.utf8) -eq 0 ]; then
+		localedef -i $INPUT -c -f $CHARSET -A /etc/locale.alias $LOCALE
 	fi
 	sed -i "s/# $LOCALE/$LOCALE/g" /etc/locale.gen
-	update-locale $LOCALE
-	export LANG="$LOCALE" &>/dev/null
-	export LC_ALL="$LOCALE" &>/dev/null
-	export LANGUAGE="$LOCALE" &>/dev/null
-	CURLANG=$(sed -ne 's/LANG=\(.*\)/\1/p' /etc/default/locale);
-	sed -i "s/$CURLANG/$LOCALE/g" /etc/default/locale
-	CURLANG=$(sed -ne 's/export LANG=\(.*\)/\1/p' /etc/profile);
-	sed -i "s/$CURLANG/$LOCALE/g" /etc/profile
-	CURLANG=$(sed '/<language>/!d;s//\n/;s/[^\n]*\n//;:a;$!{/<\/language/!N;//!ba};y/\n/ /;s/<\/language>/\n/;P;D' /home/xbian/.xbmc/userdata/guisettings.xml | sed -ne 's/\([A-Za-z]\{1,\}\)\([\ ](.*\|.*\)/\1/p'); #)
+	update-locale LANG=$LOCALE
+
+	[ -d /home/xbian/.kodi ] && XBMC_KODI_DIR="/home/xbian/.kodi" || XBMC_KODI_DIR="/home/xbian/.xbmc"
+	CURLANG=$(sed '/<language>/!d;s//\n/;s/[^\n]*\n//;:a;$!{/<\/language/!N;//!ba};y/\n/ /;s/<\/language>/\n/;P;D' $XBMC_KODI_DIR/userdata/guisettings.xml | sed -ne 's/\([A-Za-z]\{1,\}\)\([\ ](.*\|.*\)/\1/p'); #)
 	XBMCLANG=$(grep "^$1" $BASEPATH/config/languages | awk '{print $5}' | sed -e 's/_/ /g');
-	if [ ! -z $XBMCLANG ]; then
-		sed -i "s/$CURLANG/$XBMCLANG/g" /home/xbian/.xbmc/userdata/guisettings.xml
+	mkdir -p /run/xbian-config
+	if [ -n $XBMCLANG ]; then
+		echo "sed -i 's%<language>.*</language>%<language>$XBMCLANG</language>%g' $XBMC_KODI_DIR/userdata/guisettings.xml" >> /run/xbian-config/xbmc-changesettings.sh
 	else
-		sed -i "s/$CURLANG/English/g" /home/xbian/.xbmc/userdata/guisettings.xml
+		echo "sed -i 's%<language>.*</language>%<language>English</language>%g' $XBMC_KODI_DIR/userdata/guisettings.xml" >> /run/xbian-config/xbmc-changesettings.sh
 	fi
-	
-	if [ ! -f "/usr/share/locale/${INPUT//_/ }/LC_MESSAGES/xbian.mo" ]; then
-		LANGUAGE=en_EN
-	fi
+	{ pgrep xbmc.bin >/dev/null || pgrep kodi.bin >/dev/null; } || { sh /run/xbian-config/xbmc-changesettings.sh && rm -f /run/xbian-config/xbmc-changesettings.sh; }
 }

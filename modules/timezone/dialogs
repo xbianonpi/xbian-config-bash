@@ -60,10 +60,10 @@ function showTZCategoryDlg() {
 	done;
 	TBLCOLUMNCENTER=0;
 	createTableFn "radio" \
-	"#,\Zb"$(_ timezone.label.timezone) \
+	"#;\Zb"$(_ timezone.label.timezone) \
 	"${MENU[@]}"
 	TBLCOLUMNCENTER=1;
-	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+5)); 
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+6)); 
 	showRadioDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} 15;
 }
 
@@ -93,17 +93,17 @@ function showTZLocationDlg() {
 	fi
 	TBLCOLUMNCENTER=0;
 	createTableFn "radio" \
-	"$NRSIGN,\Zb"$(_ timezone.label.location) \
+	"$NRSIGN;\Zb"$(_ timezone.label.location) \
 	"${MENU[@]}"
 	TBLCOLUMNCENTER=1;
-	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+5));  
+	centerTxtFn "$HEADER" $(($DEFAULTWIDTH+6));  
 	showRadioDlg "$CENTEREDTXT" "$ROWS" ${#MENU[@]} 15;
 }
 
 function showCurrentDateTimeDlg() {
-	TEXT=$(printf "$(gettext -d "xbian" -s "xbian-config.timezone.old")" "$2")
+	TEXT=$(printf "$(_ timezone.old)" "$2")
 	TEXT+="\n";
-	TEXT+=$(printf "$(gettext -d "xbian" -s "xbian-config.timezone.new")" "$1")
+	TEXT+=$(printf "$(_ timezone.new)" "$1")
 
 	centerTxtFn "$TEXT"  $(($DEFAULTWIDTH-4));
 	valignTxtFn "$CENTEREDTXT" 

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#Copyright 2012 CurlyMo <development@xbian.org>
+#Copyright 2012 - 2018 CurlyMo & mkreisl <development@xbian.org>
 #
 #This file is part of XBian - XBMC on the Raspberry Pi.
 #
@@ -25,22 +25,108 @@
 ARGUMENTS=(select update values list);
 
 declare -A OCSETTINGS
-# Names of the overclock settings
-OCNAMES=(None Modest XBian Medium High Turbo);
 
-# Values of the overclock settings
-OCSETTINGS[0]="700 250 400 0";
-OCSETTINGS[1]="800 300 400 0";
-OCSETTINGS[2]="840 250 400 0";
-OCSETTINGS[3]="900 333 450 0";
-OCSETTINGS[4]="950 450 450 2";
-OCSETTINGS[5]="1000 500 500 6";
+arch=$(xbian-arch revision)
+OCSCHMOO=1200
 
-# Define the (possible) dangerous overclock settings
-OCDANGEROUS=(Turbo)
+case "$arch" in
+    imx6)
+	grep -q 'overclock=.' /boot/boot.scr.txt || sed -i 's/setenv customcmdline /setenv customcmdline overclock=0 /' /boot/boot.scr.txt
+	# Names of the overclock settings
+	OCNAMES=(iMX6:None iMX6:High);
+
+	# Values of the overclock settings
+	OCSETTINGS[0]="996 n/a n/a n/a"
+	OCSETTINGS[1]="1200 n/a n/a n/a"
+
+	# Define the (possible) dangerous overclock settings
+	OCDANGEROUS=()
+	;;
+    rpi)
+	# Names of the overclock settings
+	OCNAMES=(Pi:None Pi:Modest Pi:XBian Pi:Medium Pi:High Pi:Turbo);
+
+	# Values of the overclock settings
+	OCSETTINGS[0]="700 250 400 0";
+	OCSETTINGS[1]="800 250 400 0";
+	OCSETTINGS[2]="840 320 400 0";
+	OCSETTINGS[3]="900 333 450 0";
+	OCSETTINGS[4]="950 450 500 2";
+	OCSETTINGS[5]="1000 500 500 6";
+
+	# Define the (possible) dangerous overclock settings
+	OCDANGEROUS=(Pi:Turbo)
+	;;
+    rpi2)
+	# Names of the overclock settings
+	OCNAMES=(Pi2:None Pi2:High);
+
+	# Values of the overclock settings
+	OCSETTINGS[0]="900 250 450 0";
+	OCSETTINGS[1]="1000 500 450 2";
+
+	# Define the (possible) dangerous overclock settings
+	OCDANGEROUS=()
+	;;
+    rpi3)
+	if command -v rpi_revision >/dev/null && rpi_revision | grep -q "Model B Pi 3+"; then
+	    # Names of the overclock settings
+	    OCNAMES=(Pi3B+:None Pi3B+:XBian Pi3B+:Turbo);
+
+	    # Values of the overclock settings
+	    OCSETTINGS[0]="1400 400 500 0";
+	    OCSETTINGS[1]="... ... 450 ...";
+	    OCSETTINGS[2]="1500 500 450 2";
+
+	    # Define the (possible) dangerous overclock settings
+	    OCDANGEROUS=(Pi3B+:Turbo)
+	    OCSCHMOO=1400
+	else
+	    # Names of the overclock settings
+	    OCNAMES=(Pi3:None Pi3:Turbo);
+
+	    # Values of the overclock settings
+	    OCSETTINGS[0]="1200 400 450 0";
+	    OCSETTINGS[1]="1300 500 450 2";
+
+	    # Define the (possible) dangerous overclock settings
+	    OCDANGEROUS=(Pi3:Turbo)
+	fi
+
+	;;
+    rpi0)
+	# Names of the overclock settings
+	OCNAMES=(PiZero:None);
+
+	# Values of the overclock settings
+	OCSETTINGS[0]="1000 400 450 0";
+
+	# Define the (possible) dangerous overclock settings
+	OCDANGEROUS=()
+	;;
+    rpi0w)
+	# Names of the overclock settings
+	OCNAMES=(PiZeroW:None);
+
+	# Values of the overclock settings
+	OCSETTINGS[0]="1000 400 450 0";
+
+	# Define the (possible) dangerous overclock settings
+	OCDANGEROUS=()
+	;;
+    *)
+	OCNAMES=(Unknown);
+
+	# Values of the overclock settings
+	OCSETTINGS[0]="1000 400 400 0";
+
+	# Define the (possible) dangerous overclock settings
+	OCDANGEROUS=()
+	;;
+esac
 
 # Define the safe overclock settings
-OCSAFE=(None Modest XBian)
+OCSAFE=(Pi:None Pi:Modest Pi:XBian Pi2:None Pi3:None Pi3B+:XBian PiZero:None PiZeroW:None iMX6:None)
 
 # Did we already show the warning
 OCWARNING=0;
@@ -54,7 +140,6 @@ if [ $GUIMODE -eq 1 ]; then
 	source $BASEPATH/modules/overclocking/dialogs
 fi
 source $BASEPATH/functions/config
-
 #|------------------------------------|
 #|           Main program             |
 #|------------------------------------|
@@ -66,10 +151,15 @@ function showGUIFn() {
 		OCWARNING=1;
 	fi
 	showLoadingDlg;
-	getCurrentOCSettingsFn;	
+	getCurrentOCSettingsFn;
 	createOCDLGMenuFn $CURRENTOC;
+	m="$(_ overclocking.label.preset)"
+	exp=$((${#m}-8)); (( $exp < 0 )) && exp=0
+	ODW=$DEFAULTWIDTH; DEFAULTWIDTH=$((DEFAULTWIDTH+exp))
 	showOCSettingsDlg $OCMENU;
-	if [ $? -eq 0 ]; then
+	rc=$?
+	DEFAULTWIDTH=$ODW
+	if [ $rc -eq 0 ]; then
 		if [ $RETURN -eq $(($CURRENTOC+1)) ]; then
 			showNoOCChangeDlg;
 			showGUIFn;
@@ -152,7 +242,7 @@ function showCMDFn() {
 		;;
 		"update")
 			shift;
-			if [ ${1,,} == "custom" ]; then
+			if [ "${1,,}" == "custom" ]; then
 				shift
 				if [ $# -eq 4 ]; then
 					NEWSETTINGS=($@);
@@ -220,6 +310,7 @@ function showCMDFn() {
 			for NAME in ${OCNAMES[@]}; do
 				echo $NAME;
 			done;
+			test $(xbian-arch) != iMX6 || return 0
 			echo "Custom"
 		;;
 	esac 

@@ -1,0 +1,1329 @@
+# msgfmt -o /usr/share/locale/en/LC_MESSAGES/xbian.mo xbian.po
+# 
+# Translators:
+# Translators:
+# Translators:
+# Translators:
+# Translators:
+# Freek Smulders, 2014
+# Freek Smulders, 2014
+# jwamsterdam <jwhennink@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: XBian Translation\n"
+"Report-Msgid-Bugs-To: development@xbian.org\n"
+"POT-Creation-Date: 09-03-2013 12:00+0100\n"
+"PO-Revision-Date: 2018-01-15 14:35+0000\n"
+"Last-Translator: belese <mkreisl@xbian.org>\n"
+"Language-Team: Dutch (http://www.transifex.com/teamxbian/xbian-translation/language/nl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: nl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "distribution"
+msgstr "XBian"
+
+# xbian-config main (menu)
+# 
+msgid "xbian-config.main.title"
+msgstr "Configuratie"
+
+msgid "xbian-config.main.reboot_question"
+msgstr "Een herstart is vereist. Wilt u nu opnieuw opstarten?"
+
+msgid "xbian-config.settings.name"
+msgstr "Instellingen"
+
+msgid "xbian-config.settings.description"
+msgstr "Verschillende systeeminstellingen wijzigen"
+
+msgid "xbian-config.system.name"
+msgstr "Systeem"
+
+msgid "xbian-config.system.description"
+msgstr "bijvoorbeeld: Resize SD, Overklokken, Hostnaam"
+
+msgid "xbian-config.accounts.name"
+msgstr "Accounts"
+
+msgid "xbian-config.accounts.description"
+msgstr "bijvoorbeeld: Wijzig wachtwoord, SSH root login"
+
+msgid "xbian-config.licenses.name"
+msgstr "Licenties"
+
+msgid "xbian-config.licenses.description"
+msgstr "Toevoegen/Verwijderen hardware licenties"
+
+msgid "xbian-config.connectivity.name"
+msgstr "Connectiviteit"
+
+msgid "xbian-config.connectivity.description"
+msgstr "Bijvoorbeeld Video uitgang"
+
+# xbian-config dialog
+# 
+msgid "xbian-config.dialog.error"
+msgstr "Foutmelding"
+
+msgid "xbian-config.dialog.apply"
+msgstr "Toepassen"
+
+msgid "xbian-config.dialog.ok"
+msgstr "OK"
+
+msgid "xbian-config.dialog.yes"
+msgstr "Ja"
+
+msgid "xbian-config.dialog.no"
+msgstr "Nee"
+
+msgid "xbian-config.dialog.on"
+msgstr "Aan"
+
+msgid "xbian-config.dialog.off"
+msgstr "Uit"
+
+msgid "xbian-config.dialog.insert"
+msgstr "Toevoegen"
+
+msgid "xbian-config.dialog.remove"
+msgstr "Verwijderen"
+
+msgid "xbian-config.dialog.update"
+msgstr "Bijwerken"
+
+msgid "xbian-config.dialog.cancel"
+msgstr "Annuleren"
+
+msgid "xbian-config.dialog.select"
+msgstr "Selecteren"
+
+msgid "xbian-config.dialog.return"
+msgstr "Terug"
+
+msgid "xbian-config.dialog.unexpected_error"
+msgstr "Een onverwachte fout heeft plaatsgevonden"
+
+msgid "xbian-config.dialog.close"
+msgstr "Sluiten"
+
+msgid "xbian-config.dialog.change"
+msgstr "Wijzigen"
+
+msgid "xbian-config.dialog.exit"
+msgstr "Sluiten"
+
+msgid "xbian-config.dialog.enable"
+msgstr "Inschakelen"
+
+msgid "xbian-config.dialog.disable"
+msgstr "Uitschakelen"
+
+msgid "xbian-config.dialog.password"
+msgstr "Wachtwoord:"
+
+msgid "xbian-config.dialog.confirm"
+msgstr "Bevestig:"
+
+msgid "xbian-config.dialog.retry"
+msgstr "Opnieuw proberen"
+
+msgid "xbian-config.dialog.space_option_select"
+msgstr "Druk [spatie] om een andere optie te selecteren"
+
+msgid "xbian-config.dialog.space_check_select"
+msgstr "Druk [spatie] voor het activeren of de-activeren van een optie"
+
+msgid "xbian-config.dialog.loading_module"
+msgstr "Module wordt geladen. Een ogenblik geduld..."
+
+msgid "xbian-config.dialog.required_packages"
+msgstr "Dit programma vereist de volgende pakketten:"
+
+msgid "xbian-config.dialog.insufficient_arguments"
+msgstr "Onvoldoende aantal argumenten"
+
+msgid "xbian-config.dialog.incorrect_arguments"
+msgstr "Foutief argumententype"
+
+# xbian-config module bootflags
+# 
+msgid "xbian-config.bootflags.name"
+msgstr "Opstart instellingen"
+
+msgid "xbian-config.bootflags.description"
+msgstr "Opstart instellingen aanpassen"
+
+msgid "xbian-config.bootflags.label.bootflags"
+msgstr "Opstart parameters"
+
+msgid "xbian-config.bootflags.update_success"
+msgstr "Opstart parameters succesvol gewijzigd"
+
+msgid "xbian-config.bootflags.splash"
+msgstr "Toon XBian splash tijdens opstarten"
+
+msgid "xbian-config.bootflags.logo"
+msgstr "Schakel kernel opstart logo uit"
+
+msgid "xbian-config.bootflags.quiet"
+msgstr "Kernel output onderdrukken"
+
+msgid "xbian-config.bootflags.loglevel"
+msgstr "Kernel loglevel"
+
+# xbian-config module information
+# 
+msgid "xbian-config.information.name"
+msgstr "Informatie"
+
+msgid "xbian-config.information.description"
+msgstr "Informatie over deze distributie"
+
+msgid "xbian-config.information.text"
+msgstr "XBian is een gratis, open source media center distributie voor de Raspberry Pi, die vanaf http://www.xbian.org gedownload kan worden. Onze slogan is \"XBMC on Raspberry Pi, bleeding edge\" omdat onze belangrijkste focus is het leveren van de snelste mediacenter oplossing voor de Raspberry Pi. Wij geloven dat iedereen kan helpen om XBian beter te maken. Bezoek onze website voor ondersteuning en als u suggesties, wensen of bijdragen heeft, kunt u deze met ons te delen!"
+
+# xbian-config module hostname
+# 
+msgid "xbian-config.hostname.name"
+msgstr "Hostnaam"
+
+msgid "xbian-config.hostname.label.hostname"
+msgstr "Hostnaam:"
+
+msgid "xbian-config.hostname.description"
+msgstr "Wijzig de standaard hostnaam"
+
+msgid "xbian-config.hostname.changed"
+msgstr "Hostnaam succesvol gewijzigd"
+
+# xbian-config module kernel
+# 
+msgid "xbian-config.kernel.name"
+msgstr "Kernel"
+
+msgid "xbian-config.kernel.description"
+msgstr "Wissel tussen geïnstalleerde kernels"
+
+msgid "xbian-config.kernel.label.version"
+msgstr "Versie"
+
+msgid "xbian-config.kernel.switch_success"
+msgstr "Kernel succesvol gewisseld"
+
+msgid "xbian-config.kernel.same_version"
+msgstr "Je maakt al gebruik van deze kernel versie"
+
+msgid "xbian-config.kernel.single_installed"
+msgstr "Er is enkel één kernel geïnstalleerd"
+
+# xbian-config general licenses
+# 
+msgid "xbian-config.license.inserted"
+msgstr "%s succesvol toegevoegd"
+
+msgid "xbian-config.license.deleted"
+msgstr "%s succesvol verwijderd"
+
+msgid "xbian-config.license.updated"
+msgstr "%s succesvol bijgewerkt"
+
+msgid "xbian-config.license.invalid"
+msgstr "Een %s dient 9 of 10 karakters lang te zijn en ziet er uit als 0x00000000. Je kunt maximaal 8 licenties opgeven, gescheiden door een komma."
+
+# xbian-config module licensempg2
+# 
+msgid "xbian-config.licensempg2.name"
+msgstr "MPG2 licentie"
+
+msgid "xbian-config.licensempg2.description"
+msgstr "Beheer je MPG2 licentie"
+
+# xbian-config module licensevc1
+# 
+msgid "xbian-config.licensevc1.name"
+msgstr "VC1 licentie"
+
+msgid "xbian-config.licensevc1.description"
+msgstr "Beheer je VC1 licentie"
+
+# xbian-config module locales
+# 
+msgid "xbian-config.locales.name"
+msgstr "Landinstelling van systeem"
+
+msgid "xbian-config.locales.description"
+msgstr "Taal wijzigen"
+
+msgid "xbian-config.locales.label.letter"
+msgstr "Lettertype"
+
+msgid "xbian-config.locales.label.name"
+msgstr "Naam"
+
+msgid "xbian-config.locales.label.xbmc"
+msgstr "XBMC"
+
+msgid "xbian-config.locales.label.xbian"
+msgstr "XBian"
+
+msgid "xbian-config.locales.updated"
+msgstr "Systeem, Xbian en XBMC taal succesvol gewijzigd"
+
+# xbian-config module network
+# 
+msgid "xbian-config.network.name"
+msgstr "Netwerk"
+
+msgid "xbian-config.network.description"
+msgstr "Configuratie van netwerk interfaces"
+
+msgid "xbian-config.network.label.interfaces"
+msgstr "Interfaces"
+
+msgid "xbian-config.network.interfaces.loading"
+msgstr "Laden van interfaces, een moment geduld ..."
+
+msgid "xbian-config.network.interfaces.unavailable"
+msgstr "Geen netwerk interfaces beschikbaar of verbonden"
+
+msgid "xbian-config.network.interfaces.select"
+msgstr "Selecteer te configureren interface"
+
+msgid "xbian-config.network.label.dhcp"
+msgstr "DHCP"
+
+msgid "xbian-config.network.label.name"
+msgstr "Netwerk"
+
+msgid "xbian-config.network.dhcp_selected"
+msgstr "Interface is nu geconfigureerd met DHCP"
+
+msgid "xbian-config.network.disabled"
+msgstr ""
+
+msgid "xbian-config.network.label.static"
+msgstr "Statisch IP"
+
+msgid "xbian-config.network.label.status"
+msgstr "Status"
+
+msgid "xbian-config.network.label.ipaddress"
+msgstr "IP Adres"
+
+msgid "xbian-config.network.label.netmask"
+msgstr "Netmask"
+
+msgid "xbian-config.network.label.gateway"
+msgstr "Gateway"
+
+msgid "xbian-config.network.label.nameserver"
+msgstr "Nameserver"
+
+msgid "xbian-config.network.label.ssid"
+msgstr "SSID"
+
+msgid "xbian-config.network.label.key"
+msgstr "Key"
+
+msgid "xbian-config.network.label.type"
+msgstr "Type"
+
+msgid "xbian-config.network.label.protection"
+msgstr "Beveiliging"
+
+msgid "xbian-config.network.label.scan"
+msgstr "Scannen"
+
+msgid "xbian-config.network.label.custom"
+msgstr "Custom"
+
+msgid "xbian-config.network.label.wlan"
+msgstr "WLAN"
+
+msgid "xbian-config.network.label.not_connected"
+msgstr "Niet verbonden"
+
+msgid "xbian-config.network.label.reloading_values"
+msgstr "Herladen van de instellingen voor %s"
+
+msgid "xbian-config.network.scanning"
+msgstr "Scannen van beschikbare netwerken ..."
+
+msgid "xbian-config.network.connection.restart"
+msgstr "Herstarten van %s"
+
+msgid "xbian-config.network.connection.updating"
+msgstr "Een moment geduld. Proberen om verbinding te maken met %s"
+
+msgid "xbian-config.network.connection.failed"
+msgstr "Kan geen verbinding maken met %s"
+
+msgid "xbian-config.network.connection.success"
+msgstr "Succesvol verbonden met %s"
+
+msgid "xbian-config.network.credentials.enter"
+msgstr "Voer autorisatie in voor geselecteerde interface"
+
+msgid "xbian-config.network.credentials.wlan.invalid"
+msgstr "Ongeldige WLAN autorisatie, zowel het SSID als de KEY dienen ingevoerd te worden."
+
+msgid "xbian-config.network.credentials.wlan.updated"
+msgstr "WLAN autorisatie succesvol bijgewerkt"
+
+msgid "xbian-config.network.credentials.lan.invalid"
+msgstr "Ongeldige gegevens voor statisch IP ingevoerd, probeer het  opnieuw"
+
+msgid "xbian-config.network.credentials.lan.updated"
+msgstr "Statische IP configuratie bijgewerkt"
+
+msgid "xbian-config.network.label.wpa"
+msgstr "WPA"
+
+msgid "xbian-config.network.label.wep"
+msgstr "WEP"
+
+msgid "xbian-config.network.label.open"
+msgstr "Open"
+
+msgid "xbian-config.network.label.signal"
+msgstr "Signaal"
+
+# xbian-config module overclocking
+# 
+msgid "xbian-config.overclocking.name"
+msgstr "Overklokken"
+
+msgid "xbian-config.overclocking.description"
+msgstr "Overklok configuratie"
+
+msgid "xbian-config.overclocking.warning"
+msgstr "Extreem overklokken kan resulteren is een verkorte levensduur van je Raspberry Pi. Xbian heeft verschillende overklok instellingen getest en creëerde de meest geprefereerde combinatie van instellingen. Turbo overklokken kan het bestandssysteem beschadigen. Dus: overklokken op eigen risico!"
+
+msgid "xbian-config.overclocking.alreadyset"
+msgstr "Deze overclock instellingen zijn al ingesteld"
+
+msgid "xbian-config.overclocking.changed"
+msgstr "De overklok instellingen zijn succesvol gewijzigd"
+
+msgid "xbian-config.overclocking.label.preset"
+msgstr "Vooraf ingesteld"
+
+msgid "xbian-config.overclocking.label.custom"
+msgstr "~"
+
+msgid "xbian-config.overclocking.empty_fields"
+msgstr "Je hebt niet alle velden ingevuld"
+
+# xbian-config module packages
+# 
+msgid "xbian-config.packages.name"
+msgstr "Pakketten"
+
+msgid "xbian-config.packages.description"
+msgstr "Installeren of verwijderen van pakketten"
+
+msgid "xbian-config.packages.apt.update"
+msgstr "Bijwerken van de lokale pakket-database"
+
+msgid "xbian-config.packages.apt.update_failed"
+msgstr "Een foutmelding vond plaats bij het bijwerken van de pakket-database"
+
+msgid "xbian-config.packages.list.download"
+msgstr "Downloaden van de externe pakket-database ..."
+
+msgid "xbian-config.packages.mirrors.download_failed"
+msgstr "Ophalen van download mirrors mislukt, er zal een lokale (wellicht verouderde) lijst gebruikt worden"
+
+msgid "xbian-config.packages.loading"
+msgstr "Laden van pakket-database dialoogvenster ..."
+
+msgid "xbian-config.packages.install.confirm"
+msgstr "Weet u zeker dat u dit pakket wilt installeren of bijwerken?"
+
+msgid "xbian-config.packages.install.success"
+msgstr "Het pakket is succesvol geïnstalleerd"
+
+msgid "xbian-config.packages.install.retry"
+msgstr "Gelieve opnieuw te proberen om dit pakket te installeren"
+
+msgid "xbian-config.packages.remove.confirm"
+msgstr "Weet u zeker dat u dit pakket wilt verwijderen?"
+
+msgid "xbian-config.packages.remove.success"
+msgstr "Het pakket is succesvol verwijderd"
+
+msgid "xbian-config.packages.already_installed"
+msgstr "De laatste versie van dit pakket is al geïnstalleerd"
+
+msgid "xbian-config.packages.unavailable_version"
+msgstr "De pakket versie die u probeert te installeren kan niet worden gevonden"
+
+msgid "xbian-config.packages.not_exists"
+msgstr "Het pakket dat u probeert te installeren kan niet worden gevonden"
+
+msgid "xbian-config.packages.not_installed"
+msgstr "Het pakket is niet geïnstalleerd"
+
+msgid "xbian-config.packages.size_mismatch"
+msgstr "Er is een grootte mismatch voor de externe pakketten"
+
+msgid "xbian-config.packages.essential"
+msgstr "Dit is een essentieel pakket en kan niet worden verwijderd"
+
+msgid "xbian-config.packages.show_log"
+msgstr "Wilt u het installatie log zien?"
+
+msgid "xbian-config.packages.error"
+msgstr "Een ernstige fout is opgetreden tijdens het verwerken van dit pakket"
+
+msgid "xbian-config.packages.downgrade"
+msgstr "U gebruikt al een nieuwere versie van dit pakket, dan degene die officieel beschikbaar is"
+
+msgid "xbian-config.packages.installing"
+msgstr "Installeren / updaten van het pakket, dit kan enkele minuten duren. Een moment geduld aub ..."
+
+msgid "xbian-config.packages.removing"
+msgstr "Verwijderen van het pakket, dit kan enkele minuten duren. Een moment geduld aub ..."
+
+msgid "xbian-config.packages.label.categories"
+msgstr "Categorieën"
+
+msgid "xbian-config.packages.label.name"
+msgstr "Naam"
+
+msgid "xbian-config.packages.label.installed"
+msgstr "Geïnstalleerd"
+
+msgid "xbian-config.packages.label.not_installed"
+msgstr "Niet geïnstalleerd"
+
+msgid "xbian-config.packages.label.information"
+msgstr "Informatie"
+
+msgid "xbian-config.packages.label.install_update"
+msgstr "Installeren / Bijwerken"
+
+msgid "xbian-config.packages.label.install"
+msgstr "Installeren"
+
+msgid "xbian-config.packages.label.remove"
+msgstr "Verwijderen"
+
+msgid "xbian-config.packages.label.get_more"
+msgstr "Meer verkrijgen..."
+
+msgid "xbian-config.packages.info.fullname"
+msgstr "Volledige naam:"
+
+msgid "xbian-config.packages.info.version.available"
+msgstr "Beschikbare versie:"
+
+msgid "xbian-config.packages.info.version.installed"
+msgstr "Geïnstalleerde versie:"
+
+msgid "xbian-config.packages.info.size.installed"
+msgstr "Geïnstalleerde grootte:"
+
+msgid "xbian-config.packages.info.size.download"
+msgstr "Download grootte:"
+
+msgid "xbian-config.packages.info.description"
+msgstr "Beschrijving:"
+
+msgid "xbian-config.packages.info.dependencies"
+msgstr "Afhankelijkheden:"
+
+msgid "xbian-config.packages.label.actions"
+msgstr "Acties"
+
+# xbian-config module resizesd
+# 
+msgid "xbian-config.resizesd.name"
+msgstr "Grootte van de SD kaart wijzigen"
+
+msgid "xbian-config.resizesd.description"
+msgstr "Vergroot root partitie om SD kaart te vullen"
+
+msgid "xbian-config.resizesd.confirm"
+msgstr "Weet u zeker dat u de grootte van de SD kaart wilt wijzigen?"
+
+msgid "xbian-config.resizesd.not_needed"
+msgstr "De grootte van deze SD kaart is al gewijzigd. Afbreken."
+
+msgid "xbian-config.resizesd.on_reboot"
+msgstr "Grootte van root partitie is gewijzigd. Het filesysteem wordt vergroot tijdens de volgende herstart."
+
+msgid "xbian-config.resizesd.error"
+msgstr "Er is een fout opgetreden. Het is mogelijk dat het systeem niet meer kan opstarten. Maak een backup van uw bestanden voordat u opnieuw opstart."
+
+# xbian-config module rootpass
+# 
+msgid "xbian-config.rootpass.name"
+msgstr "Root wachtwoord"
+
+msgid "xbian-config.rootpass.description"
+msgstr "Wijzig wachtwoord van de root gebruiker"
+
+msgid "xbian-config.rootpass.changed"
+msgstr "Het root wachtwoord is succesvol gewijzigd"
+
+msgid "xbian-config.rootpass.label.password"
+msgstr "Wachtwoord:"
+
+msgid "xbian-config.rootpass.empty_fields"
+msgstr "U moet het wachtwoord invoeren en bevestigen"
+
+msgid "xbian-config.rootpass.no_match"
+msgstr "Wachtwoorden zijn niet gelijk"
+
+# xbian-config module services
+# 
+msgid "xbian-config.services.name"
+msgstr "Diensten"
+
+msgid "xbian-config.services.description"
+msgstr "Starten, stoppen en beheren van diensten"
+
+msgid "xbian-config.services.loading"
+msgstr "Status laden van de diensten"
+
+msgid "xbian-config.services.restarting"
+msgstr "Herstarten van de dienst..."
+
+msgid "xbian-config.services.restart_failed"
+msgstr "Mislukt om de dienst opnieuw te starten ..."
+
+msgid "xbian-config.services.starting"
+msgstr "Starten van de dienst..."
+
+msgid "xbian-config.services.start_failed"
+msgstr "Starten van de dienst mislukt ..."
+
+msgid "xbian-config.services.stopping"
+msgstr "Stoppen van de dienst..."
+
+msgid "xbian-config.services.stop_failed"
+msgstr "Stoppen van de dienst mislukt ..."
+
+msgid "xbian-config.services.refresh"
+msgstr "Het vernieuwen van de service is mislukt"
+
+msgid "xbian-config.services.autostart.enabling"
+msgstr "Automatisch starten van de dienst inschakelen ..."
+
+msgid "xbian-config.services.autostart.disabling"
+msgstr "Automatisch starten van de dienst uitschakelen ..."
+
+msgid "xbian-config.services.autostart.enable_failed"
+msgstr "Inschakelen van automatisch starten van de dienst mislukt ..."
+
+msgid "xbian-config.services.autostart.disable_failed"
+msgstr "Uitschakelen van automatisch starten van de dienst mislukt ..."
+
+msgid "xbian-config.services.not_exists"
+msgstr "De dienst bestaat niet ..."
+
+msgid "xbian-config.services.error"
+msgstr "Onbekende foutmelding"
+
+msgid "xbian-config.services.delete.confirm"
+msgstr "Weet u zeker dat u deze service wilt verwijderen uit de lijst?"
+
+msgid "xbian-config.services.delete.success"
+msgstr "De service is verwijderd"
+
+msgid "xbian-config.services.inserted"
+msgstr "De service is toegevoegd"
+
+msgid "xbian-config.services.updated"
+msgstr "De service is bijgewerkt"
+
+msgid "xbian-config.services.label.service"
+msgstr "Service"
+
+msgid "xbian-config.services.label.action"
+msgstr "Actie"
+
+msgid "xbian-config.services.label.autostart"
+msgstr "Automatisch starten"
+
+msgid "xbian-config.services.label.noautostart"
+msgstr "Autostart uitschakelen"
+
+msgid "xbian-config.services.label.running"
+msgstr "Geactiveerd"
+
+msgid "xbian-config.services.label.start_restart"
+msgstr "(Her)starten"
+
+msgid "xbian-config.services.label.start"
+msgstr "Starten"
+
+msgid "xbian-config.services.label.restart"
+msgstr "Herstarten"
+
+msgid "xbian-config.services.label.stop"
+msgstr "Stoppen"
+
+msgid "xbian-config.services.refresh_gui"
+msgstr "Vernieuwen"
+
+msgid "xbian-config.services.label.stopped"
+msgstr "Gestopt"
+
+msgid "xbian-config.services.label.add_custom"
+msgstr "Een custom service toevoegen"
+
+msgid "xbian-config.services.label.edit"
+msgstr "Wijzig"
+
+msgid "xbian-config.services.label.delete"
+msgstr "Verwijder"
+
+msgid "xbian-config.services.label.name"
+msgstr "Naam"
+
+msgid "xbian-config.services.label.confirminsert"
+msgstr "Wilt u %s invoegen"
+
+msgid "xbian-config.services.label.daemons"
+msgstr "Daemon(s)"
+
+msgid "xbian-config.services.label.leave_empty"
+msgstr "Leeg laten, wanneer deze niet gebruikt wordt"
+
+msgid "xbian-config.services.label.separate_space"
+msgstr "Gescheiden door spaties"
+
+# xbian-config module sshroot
+# 
+msgid "xbian-config.sshroot.name"
+msgstr "SSH root login"
+
+msgid "xbian-config.sshroot.description"
+msgstr "Inschakelen / uitschakelen SSH root login"
+
+msgid "xbian-config.sshroot.enable_confirm"
+msgstr "Wilt u SSH root login inschakelen of uitschakelen?"
+
+msgid "xbian-config.sshroot.empty_password"
+msgstr "De gebruiker \"root\" heeft een leeg wachtwoord, zonder wachtwoord is het niet mogelijk in te loggen via SSH, dus geef vooraf een wachtwoord op."
+
+msgid "xbian-config.sshroot.enabled"
+msgstr "SSH root login succesvol ingeschakeld"
+
+msgid "xbian-config.sshroot.disabled"
+msgstr "SSH root login succesvol uitgeschakeld"
+
+# xbian-config module timezone
+# 
+msgid "xbian-config.timezone.name"
+msgstr "Tijdzone"
+
+msgid "xbian-config.timezone.description"
+msgstr "Wijzig de tijdzone van uw RPi"
+
+msgid "xbian-config.timezone.loading.timezone"
+msgstr "Ophalen van de huidige tijdzone ..."
+
+msgid "xbian-config.timezone.loading.location"
+msgstr "Laden van de locaties ..."
+
+msgid "xbian-config.timezone.label.timezone"
+msgstr "Tijdzone"
+
+msgid "xbian-config.timezone.label.location"
+msgstr "Locatie"
+
+msgid "xbian-config.timezone.old"
+msgstr "De oude tijdzone: %s"
+
+msgid "xbian-config.timezone.new"
+msgstr "De nieuwe tijdzone: %s"
+
+msgid "xbian-config.timezone.no_timezone_selected"
+msgstr "U heeft geen tijdzone geselecteerd"
+
+msgid "xbian-config.timezone.no_location_selected"
+msgstr "U heeft geen locatie geselecteerd"
+
+msgid "xbian-config.timezone.notset"
+msgstr "Niet ingesteld"
+
+# xbian-config modules updates
+# 
+msgid "xbian-config.aptupdate.name"
+msgstr "apt-get update"
+
+msgid "xbian-config.aptupdate.description"
+msgstr "apt-get update uitvoeren"
+
+msgid "xbian-config.updates.name"
+msgstr "Controleer deb upgrades"
+
+msgid "xbian-config.updates.description"
+msgstr "apt-get upgrade uitvoeren"
+
+msgid "xbian-config.updatemirrors.name"
+msgstr "Mirrors updaten"
+
+msgid "xbian-config.updatemirrors.description"
+msgstr "Informatie bijwerken over beschikbare mirror servers"
+
+msgid "xbian-config.updatemenu.name"
+msgstr "Updates"
+
+msgid "xbian-config.updatemenu.description"
+msgstr "Controleren op updates van het systeem"
+
+msgid "xbian-config.updates.apt.update"
+msgstr "Bijwerken van de lokale pakket-database ..."
+
+msgid "xbian-config.updates.apt.update_failed"
+msgstr "Er is een fout opgetreden tijdens het bijwerken van de pakket-database"
+
+msgid "xbian-config.updates.list.download"
+msgstr "Ophalen van lijst met upgradeable pakketten"
+
+msgid "xbian-config.updates.mirror.download"
+msgstr "Downloaden van externe pakket-database"
+
+msgid "xbian-config.updates.mirror.download_failed"
+msgstr "Ophalen van download mirrors mislukt. Hierdoor zal een lokale (wellicht verouderde) lijst gebruikt worden."
+
+msgid "xbian-config.updates.upgrade.available"
+msgstr "Een nieuwe XBian versie is beschikbaar, wilt u deze nu installeren? Het systeem zal automatisch herstarten wanneer het update proces voltooid is."
+
+msgid "xbian-config.updates.upgrade.installing"
+msgstr "XBian wordt bijgewerkt naar een nieuwe versie, het systeem niet herstarten of loskoppelen van de stroomvoorziening aangezien dit kan leiden tot een niet goed functionerend systeem. Afhankelijk van uw internet connectie kan dit proces enige tijd duren ..."
+
+msgid "xbian-config.updates.upgrade.reboot"
+msgstr "XBian zal automatisch herstarten wanneer dit scherm wordt gesloten"
+
+msgid "xbian-config.updates.update.confirm"
+msgstr "Wilt u deze pakketten bijwerken?"
+
+msgid "xbian-config.updates.update.running"
+msgstr "Even geduld, tot het update proces is voltooid ..."
+
+msgid "xbian-config.updates.update.success"
+msgstr "De pakketten zijn succesvol bijgewerkt"
+
+msgid "xbian-config.updates.update.already_installed"
+msgstr "De laatste versies van deze pakketten zijn reeds geïnstalleerd"
+
+msgid "xbian-config.updates.update.not_exists"
+msgstr "De pakketten die u wilt installeren kunnen niet gevonden worden"
+
+msgid "xbian-config.updates.update.version_unavailable"
+msgstr "De pakket versies die u wilt installeren kunnen niet gevonden worden"
+
+msgid "xbian-config.updates.update.show_log"
+msgstr "Wilt u het installatie log zien?"
+
+msgid "xbian-config.updates.update.error"
+msgstr "Een ernstige fout is opgetreden tijdens het verwerken van deze pakketten"
+
+msgid "xbian-config.updates.update.size_mismatch"
+msgstr "Grootte komt niet overeen met het externe pakket"
+
+msgid "xbian-config.updates.update.installing"
+msgstr "Bijwerken van de pakketten, dit kan enkele minuten duren dus een moment geduld ..."
+
+msgid "xbian-config.updates.update.downgrade"
+msgstr "U heeft reeds nieuwere versies van dit pakket geïnstalleerd"
+
+msgid "xbian-config.updates.label.updates"
+msgstr "Updates"
+
+msgid "xbian-config.updates.label.update"
+msgstr "Bijwerken"
+
+msgid "xbian-config.updates.label.update_packages"
+msgstr "Pakketten bijwerken"
+
+msgid "xbian-config.updates.label.version"
+msgstr "Versie"
+
+msgid "xbian-config.updates.label.update_all"
+msgstr "Alles bijwerken"
+
+msgid "xbian-config.updates.label.update_to_date"
+msgstr "Up-to-date"
+
+msgid "xbian-config.updates.label.upgrade"
+msgstr "Upgrade"
+
+msgid "xbian-config.updates.label.autoupdates"
+msgstr "Automatische updates"
+
+msgid "xbian-config.updates.label.autoinstallupdates"
+msgstr "Automatisch installeren van beschikbare updates"
+
+msgid "xbian-config.updates.label.aptsnapshot"
+msgstr "Maak een snapshot bij een apt-get actie"
+
+msgid "xbian-config.updates.label.autoupdaterepo"
+msgstr "Automatisch controleren op updates"
+
+msgid "xbian-config.updates.label.autoupdaterepointerval"
+msgstr "Interval (dagen)"
+
+msgid "xbian-config.updates.uptodate"
+msgstr "Uw installatie bevat de laatste versie van de XBian pakketten"
+
+# xbian-config module videoflags
+# 
+msgid "xbian-config.videoflags.name"
+msgstr "Video uitgang"
+
+msgid "xbian-config.videoflags.description"
+msgstr "Wijzig HDMI, CEC en overscan instellingen"
+
+msgid "xbian-config.videoflags.label.videoflags"
+msgstr "Video parameters"
+
+msgid "xbian-config.videoflags.update_success"
+msgstr "Video parameters succesvol bijgewerkt"
+
+msgid "xbian-config.videoflags.hdmi_force_hotplug"
+msgstr "Forceer het HDMI uitgangssignaal wanneer de TV niet is geïdentificeerd"
+
+msgid "xbian-config.videoflags.hdmi_ignore_hotplug"
+msgstr "Negeer het HDMI uitgangssignaal wanneer een TV is verbonden"
+
+msgid "xbian-config.videoflags.hdmi_ignore_cec_init"
+msgstr "Negeer CEC initialisatie; dit voorkomt het aangaan van de TV tijdens een herstart"
+
+msgid "xbian-config.videoflags.hdmi_ignore_cec"
+msgstr "CEC uitschakelen"
+
+msgid "xbian-config.videoflags.disable_overscan"
+msgstr "Overscan uitschakelen"
+
+msgid "xbian-config.videoflags.disable_splash"
+msgstr "Het 'regenboog' scherm tijdens de start van de RPi uitschakelen"
+
+# xbian-config module xbconfig
+# 
+msgid "xbian-config.xbconfig.name"
+msgstr "XBian configuratie"
+
+msgid "xbian-config.xbconfig.description"
+msgstr "XBian configuratie instellingen"
+
+msgid "xbian-config.xbconfig.label.autostart"
+msgstr "Automatisch starten"
+
+msgid "xbian-config.xbconfig.label.actions"
+msgstr "Acties"
+
+msgid "xbian-config.xbconfig.autostart.enable_disable"
+msgstr "Wilt u XBian-Config automatisch starten wanneer u middels SSH inlogt als user xbian?"
+
+msgid "xbian-config.xbconfig.autostart.enabled"
+msgstr "Succesvolle activering van de \"Xbian-config auto-start\""
+
+msgid "xbian-config.xbconfig.autostart.disabled"
+msgstr "Succesvolle deactivering van de \"Xbian-config auto-start\""
+
+# xbian-config module xbianpass
+# 
+msgid "xbian-config.xbianpass.name"
+msgstr "XBian wachtwoord"
+
+msgid "xbian-config.xbianpass.description"
+msgstr "Wijzig wachtwoord voor XBian gebruiker "
+
+msgid "xbian-config.xbianpass.changed"
+msgstr "XBian wachtwoord succesvol gewijzigd"
+
+msgid "xbian-config.xbianpass.label.password"
+msgstr "Wachtwoord:"
+
+msgid "xbian-config.xbianpass.empty_fields"
+msgstr "Je dient een wachtwoord in te voeren en deze te bevestigen"
+
+msgid "xbian-config.xbianpass.no_match"
+msgstr "Wachtwoorden komen niet overeen"
+
+# xbian-config module xbmc
+# 
+msgid "xbian-config.xbmc.name"
+msgstr "XBMC"
+
+msgid "xbian-config.xbmc.description"
+msgstr "Wijzig XBMC instellingen"
+
+msgid "xbian-config.xbmc.webserver.enable_disable"
+msgstr "Wilt u de XBMC webserver in- of uitschakelen?"
+
+msgid "xbian-config.xbmc.webserver.enable.success"
+msgstr "XBMC webserver succesvol ingeschakeld"
+
+msgid "xbian-config.xbmc.webserver.disable.success"
+msgstr "XBMC webserver succesvol uitgeschakeld"
+
+msgid "xbian-config.xbmc.webserver.enable.failed"
+msgstr "Inschakelen van de XBMC webserver mislukt"
+
+msgid "xbian-config.xbmc.webserver.disable.failed"
+msgstr "Uitschakelen van de XBMC webserver mislukt"
+
+msgid "xbian-config.xbmc.label.webserver"
+msgstr "Webserver"
+
+msgid "xbian-config.xbmc.label.actions"
+msgstr "Acties"
+
+msgid "xbian-config.xbmc.label.tvoff_screensaver"
+msgstr "Zet de CEC geschikte tv uit bij schermbeveiliging"
+
+msgid "xbian-config.xbmc.label.tvoff_screensaver_delay"
+msgstr "Vertraging (minuten)"
+
+msgid "xbian-config.xbmc.label.tvon_exit"
+msgstr "Zet CEC geschikte tv aan wanneer XBMC wordt afgesloten"
+
+msgid "xbian-config.xbmc.label.tvoff_shutdown"
+msgstr "Zet CEC geschikte tv uit wanneer de RPi afsluit"
+
+msgid "xbian-config.xbmc.label.usbhotplug"
+msgstr "USB HotPlug"
+
+msgid "xbian-config.xbmc.label.automount"
+msgstr "USB disk automounting inschakelen"
+
+msgid "xbian-config.xbmc.label.share"
+msgstr "Maak automounted schijven beschikbaar via SMB"
+
+msgid "xbian-config.xbmc.label.sharerw"
+msgstr "Schrijftoegang (inclusief anonieme toegang) van netwerkshares"
+
+msgid "xbian-config.xbmc.label.uuid"
+msgstr "Neem partition UUID op in mnt folder naam"
+
+msgid "xbian-config.xbmc.label.dyn_priority"
+msgstr "XBMC Dynamische Prioriteit"
+
+msgid "xbian-config.xbmc.label.lownice"
+msgstr "Lagere \"Nice\" prioriteit"
+
+msgid "xbian-config.xbmc.label.highnice"
+msgstr "Hogere \"Nice\" prioriteit"
+
+msgid "xbian-config.xbmc.label.spindown"
+msgstr "Spin Down HDD"
+
+msgid "xbian-config.xbmc.label.sync"
+msgstr "Mount met sync optie"
+
+# xbian-config module preferences
+# 
+msgid "xbian-config.preferences.name"
+msgstr "Voorkeuren"
+
+msgid "xbian-config.preferences.label.advanced_mode"
+msgstr "Geavanceerde modus"
+
+msgid "xbian-config.preferences.label.advanced"
+msgstr "Geavanceerd"
+
+msgid "xbian-config.preferences.update.error"
+msgstr "Fout tijdens het bijwerken van de instellingen"
+
+msgid "xbian-config.preferences.update.success"
+msgstr "Instellingen succesvol bijgewerkt"
+
+msgid "xbian-config.preferences.label.notify"
+msgstr "Berichtgeving"
+
+msgid "xbian-config.preferences.notify.on_error"
+msgstr "Toon een notificatie bij een fout"
+
+msgid "xbian-config.preferences.notify.on_success"
+msgstr "Toon een notificatie bij succes"
+
+msgid "xbian-config.preferences.ask_confirmation"
+msgstr "Vraag om goedkeuring voorafgaand aan het bijwerken van instellingen"
+
+msgid "xbian-config.preferences.label.notification"
+msgstr "Notificatie"
+
+# 	xbiancopy
+# 
+msgid "xbian-config.xbiancopy.label.source"
+msgstr "Bron schijf / partitie:"
+
+msgid "xbian-config.xbiancopy.label.dest"
+msgstr "Bestemming:"
+
+msgid "xbian-config.xbiancopy.name"
+msgstr "XBian copier"
+
+msgid "xbian-config.xbiancopy.description"
+msgstr "Xbian systeem kopieer tool (naar usb, img bestand ...)"
+
+msgid "xbian-config.xbiancopy.dialog.wrongblkdev"
+msgstr "Verkeerde doel (bestaat niet of is niet een partitie)"
+
+msgid "xbian-config.xbiancopy.dialog.exportwrong"
+msgstr "Export van NFS voldoet niet aan de vereisten"
+
+msgid "xbian-config.xbiancopy.dialog.targetwrong"
+msgstr ""
+
+msgid "xbian-config.xbiancopy.dialog.preperror"
+msgstr "Kan het bestemmings bestandssysteem niet voorbereiden"
+
+msgid "xbian-config.xbiancopy.dialog.config"
+msgstr ""
+
+msgid "xbian-config.xbiancopy.dialog.copyerror"
+msgstr ""
+
+msgid "xbian-config.xbiancopy.dialog.clonedone"
+msgstr ""
+
+msgid "xbian-config.backup.category.snasphot"
+msgstr "Beheer snapshots"
+
+msgid "xbian-config.backup.category.home"
+msgstr "Home backup"
+
+msgid "xbian-config.backup.category.system"
+msgstr "Systeem backup"
+
+msgid "xbian-config.backup.category.snapshot"
+msgstr "Snapshot"
+
+msgid "xbian-config.backup.category.autosnapshot"
+msgstr "Automatisch snapshot"
+
+msgid "xbian-config.backup.daily_snapshot"
+msgstr "Dagelijkse snapshot instellen"
+
+msgid "xbian-config.backup.nbautosnap"
+msgstr "Aantal te bewaren snapshots"
+
+msgid "xbian-config.backup.weekly_snapshot"
+msgstr "Wekelijkse snapshot instellen"
+
+msgid "xbian-config.backup.auto_system_image"
+msgstr "Automatische image"
+
+msgid "xbian-config.backup.destype"
+msgstr "Bestemmingstype"
+
+msgid "xbian-config.backup.blockdev"
+msgstr "Block device"
+
+msgid "xbian-config.backup.filedest"
+msgstr "Bestemming"
+
+msgid "xbian-config.backup.start"
+msgstr "Backup nu starten"
+
+msgid "xbian-config.backup.confirm_write"
+msgstr "Backup wegschrijven naar %s?"
+
+msgid "xbian-config.backup.warning_write"
+msgstr "Deze actie zal ALLE data verwijderen op %s, wilt u doorgaan?"
+
+msgid "xbian-config.backup.selectdevice"
+msgstr "Selecteer device"
+
+#       backuphome
+# 
+msgid "xbian-config.backuphome.name"
+msgstr "Backup van /home naar bestand"
+
+msgid "xbian-config.backuphome.description"
+msgstr "Backup van XBMC instellingen, bibliotheken en gerelateerde bestanden"
+
+msgid "xbian-config.backuphome.running"
+msgstr "Een moment geduld, er wordt een backup gemaakt"
+
+msgid "xbian-config.backuphome.done"
+msgstr "Backup bestand is klaargezet op /xbmc-backup. Gaarne dit bestand kopiëren naar een netwerk- of andere veilige locatie"
+
+msgid "xbian-config.backuphome.failed"
+msgstr "Backup van /home is mislukt"
+
+msgid "xbian-config.backuphome.desc1"
+msgstr "Het kan enkele minuten duren, afhankelijk van de grootte van uw /home/xbian directory"
+
+msgid "xbian-config.backuphome.desc2"
+msgstr "Bestanden worden gecreeerd in de map /xbian-backup, welke tevens toegankelijk zijn via de SMB share"
+
+msgid "xbian-config.backuphome.desc3"
+msgstr "Tijdens de operatie zal er enkel een tijdelijke map gemaakt worden. Eenmaal klaar zal het .img bestand zichtbaar worden"
+
+msgid "xbian-config.backuphome.desc4"
+msgstr "U kunt het bestand kopiëren naar uw computer (tijdens een herstart zal het bestand verwijderd worden!) "
+
+msgid "xbian-config.backuphome.desc5"
+msgstr "Om XBMC te herstellen kopieert u het .img bestand naar de map /xbian-backup/put_to_restore."
+
+msgid "xbian-config.backuphome.restore"
+msgstr "Herstel een backup"
+
+msgid "xbian-config.backuphome.selectimage"
+msgstr "Selecteer een Home Image"
+
+msgid "xbian-config.backuphome.restore_home_confirm"
+msgstr "%s: Wilt u home herstellen van %s?"
+
+msgid "xbian-config.backuphome.restore_home_info"
+msgstr "Het kan enkele minuten duren, afhankelijk van de grootte van uw backup image"
+
+# 	enable auto updates
+# 
+msgid "xbian-config.enableauto.name"
+msgstr "Automatische updates"
+
+msgid "xbian-config.enableauto.description"
+msgstr "Stel het automatische update mechanisme in"
+
+msgid "xbian-config.updates.enableauto.enable_disable"
+msgstr "Wilt u automatische updates activeren?"
+
+msgid "xbian-config.updates.enableauto.disabled"
+msgstr "Automatische updates zijn gedeactiveerd"
+
+msgid "xbian-config.updates.enableauto.enabled"
+msgstr "Automatische updates zijn geactiveerd"
+
+# manage snapshot
+# 
+msgid "xbian-config.snapshot.mountsnap"
+msgstr "Mount een snapshot"
+
+msgid "xbian-config.snapshot.loadingvolume"
+msgstr "Laden van volumes ..."
+
+msgid "xbian-config.snapshot.volume"
+msgstr "Btrfs volume"
+
+msgid "xbian-config.snapshot.rollback"
+msgstr "Terugdraaien van een snapshot"
+
+msgid "xbian-config.snapshot.delete_snasphot"
+msgstr "Verwijder een snapshot"
+
+msgid "xbian-config.snapshot.create_snapshot"
+msgstr "Maak een snapshot"
+
+msgid "xbian-config.snapshot.name_snapshot"
+msgstr "Snapshot naam"
+
+msgid "xbian-config.snapshot.backup"
+msgstr "Backup"
+
+# util
+# 
+msgid "xbian-config.util.valuegreater"
+msgstr "Waarden dienen groter te zijn dan %d"
+
+msgid "xbian-config.util.valuelower"
+msgstr "Waarden dienen lager te zijn dan %d"
+
+#  wizard
+# 
+msgid "xbian-config.wizard.welcome.title"
+msgstr "Welkom bij XBian"
+
+msgid "xbian-config.wizard.welcome.smalltitle"
+msgstr "Welkom"
+
+msgid "xbian-config.wizard.welcome.description"
+msgstr "Bedankt voor het kiezen XBian. [CR] [CR] XBian is een gratis open source media center distributie voor de Raspberry Pi. [CR] Onze slogan is \"XBMC on Raspberry Pi, the Bleeding edge\" waarbij onze belangrijkste focus ligt op het leveren van de snelste media center voor de Raspberry Pi. [CR] [CR] Wij geloven dat iedereen kan bijdragen om XBian beter te maken. [CR] bezoek onze website www.xbian.org voor ondersteuning. Als u vragen, suggesties of bijdragen heeft, kunt u deze met ons te delen!"
+
+msgid "xbian-config.wizard.network.title"
+msgstr "Configureer je netwerk"
+
+msgid "xbian-config.wizard.network.smalltitle"
+msgstr "Netwerk"
+
+msgid "xbian-config.wizard.network.description"
+msgstr "Het configureren van uw vaste of draadloze verbinding in XBian is zeer eenvoudig. XBian werkt ook zonder toegang tot het internet, maar met internettoegang zult u een betere ervaring beleven."
+
+msgid "xbian-config.wizard.license.title"
+msgstr "Voer uw licentie code in"
+
+msgid "xbian-config.wizard.license.smalltitle"
+msgstr "Licentie code"
+
+msgid "xbian-config.wizard.license.description"
+msgstr "De Raspberry Pi kan het merendeel van de video en audio bestanden afspelen, echter om VC1 (wordt gebruikt in sommige BluRay schijven) of MPEG-2 te decoderen , dient u een licentie aan te schaffen.[CR]Deze zijn verkrijgbaar bij http://www.raspberrypi.com/licence-keys/[CR][CR]Wanneer u al beschikt over deze licenties, kunt u ze hier opvoeren."
+
+msgid "xbian-config.wizard.backup.title"
+msgstr "Herstel Home"
+
+msgid "xbian-config.wizard.backup.smalltitle"
+msgstr "Herstel"
+
+msgid "xbian-config.wizard.backup.description"
+msgstr "XBian biedt u een eenvoudige manier om een backup te maken van je systeem. [CR] Als u al een bestaande back-up van uw Home folder heeft [CR] (deze bevat uw XBMC configuratie, add-on, instellingen, bibliotheken ...), [CR] kunt u deze nu herstellen. [CR] [CR] Als u later een back-up wilt maken, kunt u onder andere een snapshot maken, [CR], ga hiervoor naar systeem-> xbian-> backup"
+
+msgid "xbian-config.wizard.update.title"
+msgstr "XBian bijwerken"
+
+msgid "xbian-config.wizard.update.smalltitle"
+msgstr "Bijwerken"
+
+msgid "xbian-config.wizard.update.description"
+msgstr "U kunt nu kiezen hoe XBian zal worden bijgewerkt en hoe vaak het systeem zal controleren op updates. [CR] [CR] Standaard wordt XBian niet automatisch bijgewerkt, echter u wordt geïnformeerd wanneer er een nieuwe update beschikbaar is. [CR] [CR ] Om het systeem te bijwerken gaat u naar Systeem -> XBian -> bijwerken en selecteert u de pakketten die u wilt bijwerken. [CR] [CR] Wilt u dat XBian automatisch wordt bijgewerkt, dan kunt u dat nu instellen.."
+
+msgid "xbian-config.wizard.package.title"
+msgstr "Installeer nieuwe pakketten"
+
+msgid "xbian-config.wizard.package.smalltitle"
+msgstr "Pakket"
+
+msgid "xbian-config.wizard.package.description"
+msgstr "XBian beschikt over alle functionaliteiten die nodig zijn voor het draaien van XBMC, maar u kunt eenvoudig aanvullende vooraf geconfigureerde pakketten (zoals Torrent, Newsbin, CouchPotato en meer) toevoegen. [CR] [CR] Gebruikers kunnen hun eigen pakket samenstellen en delen met anderen gebruikers. Als je het idee hebt dat je iets waardevol kan zijn voor anderen, ga dan naar het XBian forum en post een thread, verdere informatie zal van daaruit worden verstrekt. [CR] [CR] Wees geduldig wanneer de pakketten worden geladen."
+
+msgid "xbian-config.wizard.finish.title"
+msgstr "It's time to play"
+
+msgid "xbian-config.wizard.finish.smalltitle"
+msgstr "Klaar"
+
+msgid "xbian-config.wizard.finish.description"
+msgstr "U beschikt nu over een volledig geconfigureerd XBian systeem [CR] We hopen dat XBian u een geweldige ervaring geeft.[CR] [CR] Wilt u aanvullende zaken binnen XBian instellen, ga dan naar Systeem -> XBian.[CR] Als u deze wizard opnieuw of op een ander tijdstip wilt uitvoeren, selecteer dan het tabblad XBian Wizard onder Systeem"
+
+# extra
+# 
+msgid "xbian-config.extra.name"
+msgstr "Extra"
+
+#   commom
+# 
+msgid "xbian-config.common.pleasewait"
+msgstr "Een moment geduld ..."
+
+msgid "xbian-config.common.initialisation"
+msgstr "Initialiseren ..."
+
+msgid "xbian-config.common.loading"
+msgstr "Laden"
+
+msgid "xbian-config.common.doyouwanto"
+msgstr "Wilt u %s"
+
+msgid "xbian-config.common.error"
+msgstr "Foutmelding: opslaan van instellingen niet gelukt"
+
+msgid "xbian-config.common.ok"
+msgstr "Instellingen zijn opgeslagen"
+
+msgid "xbian-config.common.confirmation"
+msgstr "Weet u zeker dat u de aanpassingen wilt toepassen?"
+
+msgid "xbian-config.common.badentry"
+msgstr "Ingevoerde gegevens zijn incorrect"

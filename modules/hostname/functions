@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#Copyright 2012 CurlyMo <development@xbian.org>
+#Copyright 2012 -2017 CurlyMo & mkreisl <development@xbian.org>
 #
 #This file is part of XBian - XBMC on the Raspberry Pi.
 #
@@ -23,7 +23,6 @@
 #  $HOSTNAME [String]
 function getCurrentHostnameFn() {
 	HOSTNAME=$(cat /etc/hostname);
-	eval "$1=$HOSTNAME";
 }
 
 # Get the current hostname
@@ -35,8 +34,25 @@ function getCurrentHostnameFn() {
 #  - 0: Failed
 function setHostnameFn() {
 	echo "$1" > /etc/hostname
-	hostname $1
-	eval "sed -i 's/$2/$1/g' /etc/hosts";
+	hostname -F /etc/hostname
+	sed -i "s/$2 /$1 /g" /etc/hosts
+	sed -i "s/$2\t/$1\t/g" /etc/hosts
+	sed -i "s/$2\./$1\./g" /etc/hosts
+	sed -i "s/$2\$/$1/g" /etc/hosts
+	mkdir -p /run/xbian-config
+	[ -d /home/xbian/.kodi ] && XBMC_KODI_DIR="/home/xbian/.kodi" || XBMC_KODI_DIR="/home/xbian/.xbmc"
+	for GUISETTINGSXML in $(find $XBMC_KODI_DIR -name guisettings.xml); do
+		echo "sed -i 's%<devicename.*>.*</devicename>%<devicename>$1</devicename>%' $GUISETTINGSXML" >> /run/xbian-config/xbmc-hostname
+	done
+	for PERIPHERALDATA in $(find $XBMC_KODI_DIR -type d -name peripheral_data); do
+		echo "sed -i 's%<setting id=\"device_name\" value=\".*\" />%<setting id=\"device_name\" value=\"$1\" />%' $PERIPHERALDATA/*" >> /run/xbian-config/xbmc-hostname
+	done
+	if pgrep xbmc.bin >/dev/null || pgrep kodi.bin >/dev/null; then
+	    cat /run/xbian-config/xbmc-hostname >> /run/xbian-config/xbmc-changesettings.sh
+	else
+	    sh /run/xbian-config/xbmc-hostname
+	fi
+	rm /run/xbian-config/xbmc-hostname
 	if [ $(hostname) == $1 ]; then
 		return 1;
 	else

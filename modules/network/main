@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#Copyright 2012 - 2013 Hexagon & CurlyMo & mk01 <development@xbian.org>
+#Copyright 2012 - 2018 Hexagon, CurlyMo, mk01 & mkreisl <development@xbian.org>
 #
 #This file is part of XBian - XBMC on the Raspberry Pi.
 #
@@ -33,6 +33,7 @@ if [ $GUIMODE -eq 1 ]; then
 	source $BASEPATH/modules/network/dialogs
 fi
 source $BASEPATH/functions/markup
+[ "$DEBUG" = yes ] && . $BASEPATH/functions/dtrap
 
 #|------------------------------------|
 #|           Main program             |
@@ -79,20 +80,25 @@ function showIPModeConfigGUIFn() {
 			STATUS=$?;
 			#showInterfaceDhcpSuccessDlg
 			MODE="dhcp"
-		else
+
+		elif [ $RETURN -eq 2 ]; then
 			# Static IP Selected
 			showInterfaceStaticGUIFn "$IFACE" "$IFACE_DATA"
 			STATUS=$?;
 			MODE="static"
+		else
+			showInterfaceStaticGUIFn "$IFACE" "$IFACE_DATA" disable
+			STATUS=3
 		fi
 
 		if [ $STATUS -eq 1 ]; then
 			# If needed, ask for wireless credentials
-			ISWLAN=$(echo -e "$IFACE" | grep wlan)
+			ISWLAN=$(echo -e "$IFACE" | grep -E 'wlan|ra')
 			if [ ! -z "$ISWLAN" ]; then
 				showWlanScanGUIFn "$IFACE" "$IFACE_DATA"
 			else
 				# Configuration done
+				showRestartGUIFn "$IFACE" "LAN"
 				showGUIFn
 			fi
 		fi
@@ -108,45 +114,52 @@ function showInterfaceStaticGUIFn() {
 	GATEWAY=$(echo "$2" | grep gateway | cut -f 2 -d" ")
 	NAMESERVER1=$(echo "$2" | grep nameserver1 | cut -f 2 -d" ")
 	NAMESERVER2=$(echo "$2" | grep nameserver2 | cut -f 2 -d" ")
-	
-	showInterfaceStaticDlg "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2"
-	if [ $? -eq 0 ]; then
+
+	if [ "$3" = "disable" ]; then
 		IFS=$'\n';
-		STATICCONF=($(echo -e "$RETURN"))
+		setInterfaceStaticFn "$1" "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2" $3
 		IFS=$ORIGINALIFS;
-		if [ ${#STATICCONF[@]} -gt 2 ]; then
-			IP="${STATICCONF[0]}"
-			NETMASK="${STATICCONF[1]}"
-			GATEWAY="${STATICCONF[2]}"
-			NAMESERVER1=""
-			NAMESERVER2=""
-			if [ ${#STATICCONF[@]} -gt 3 ]; then
-				NAMESERVER1="${STATICCONF[3]}"
-			fi
-			if [ ${#STATICCONF[@]} -gt 4 ]; then
-				NAMESERVER2="${STATICCONF[4]}"
-			fi
-			# Validation of arguments is done inside this function
-			RESULT=$(setInterfaceStaticFn "$1" "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2"; echo $?)
-			if [ $RESULT -eq 1 ]; then
-				showInterfaceStaticSuccessDlg
-				if [[ $1 =~ "wlan" ]]; then
-					showWlanScanGUIFn "$1" "$2"
+		showInterfaceDisableSuccessDlg
+		showGUIFn
+	else
+		showInterfaceStaticDlg "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2"
+		if [ $? -eq 0 ]; then
+			IFS=$'\n';
+			STATICCONF=($(echo -e "$RETURN"))
+			IFS=$ORIGINALIFS;
+			if [ ${#STATICCONF[@]} -gt 1 ]; then
+				IP="${STATICCONF[0]}"
+				NETMASK="${STATICCONF[1]}"
+				GATEWAY="${STATICCONF[2]}"
+				NAMESERVER1=""
+				NAMESERVER2=""
+				if [ ${#STATICCONF[@]} -gt 3 ]; then
+					NAMESERVER1="${STATICCONF[3]}"
+				fi
+				if [ ${#STATICCONF[@]} -gt 4 ]; then
+					NAMESERVER2="${STATICCONF[4]}"
+				fi
+				# Validation of arguments is done inside this function
+				RESULT=$(setInterfaceStaticFn "$1" "$IP" "$NETMASK" "$GATEWAY" "$NAMESERVER1" "$NAMESERVER2"; echo $?)
+				if [ $RESULT -eq 1 ]; then
+					showInterfaceStaticSuccessDlg
+					if [[ $1 =~ "wlan" ]] || [[ $1 =~ "ra" ]]; then
+						showWlanScanGUIFn "$1" "$2"
+					else
+						showRestartGUIFn $1 "LAN"
+						showGUIFn;
+					fi
 				else
-					showRestartAdapterDlg $1
-					restartLANAdapterFn;
-					showGUIFn;
+					showInterfaceStaticErrorDlg
+					showInterfaceStaticGUIFn "$1" "$2"
 				fi
 			else
 				showInterfaceStaticErrorDlg
 				showInterfaceStaticGUIFn "$1" "$2"
 			fi
 		else
-			showInterfaceStaticErrorDlg
-			showInterfaceStaticGUIFn "$1" "$2"
+			showIPModeConfigGUIFn
 		fi
-	else
-		showIPModeConfigGUIFn
 	fi
 }
 
@@ -183,8 +196,8 @@ function showWlanScanGUIFn() {
 					fi
 
 					if [ "$SSID" != "$(echo "${WNETWORK[0]}" | awk '{print substr($0,2,length-2)}')" ]; then
-						WLANKEY="";
 						SSID=$(echo "${WNETWORK[0]}" | awk '{print substr($0,2,length-2)}');
+						fetchWLANCredentialsFn "$PROTECTION" "$SSID"
 					fi
 					showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
 				else
@@ -224,11 +237,11 @@ function showWlanProtectionGUIFn() {
 		showInterfaceCredentialsDlg "$SSID" "$WLANKEY"
 		if [ $? -eq 0 ]; then
 			IFS=$'\n';
-			CREDENTIALS=($(echo -e "$RETURN"))
+			CREDENTIALS=($(echo "$RETURN"))
 			IFS=$ORIGINALIFS;
 			if [ ${#CREDENTIALS[@]} -eq 2 ];then
-				SSID=${CREDENTIALS[0]}
-				WLANKEY=${CREDENTIALS[1]}
+				SSID="${CREDENTIALS[0]}"
+				WLANKEY="${CREDENTIALS[1]}"
 				if [ $NEWPROTECTION -eq 1 ]; then
 					setInterfaceWlanCredentials "$1" "WPA" "$SSID" "$WLANKEY"
 				else
@@ -236,10 +249,10 @@ function showWlanProtectionGUIFn() {
 				fi
 				
 				showInterfaceCredentialsSuccessDlg
-				showWlanRestartGUIFn $1 $SSID
-				if [ $STATUS -eq 3 ]; then
+				showRestartGUIFn $1 $SSID
+				if [ $STATUS -eq 2 ]; then
 					showGUIFn;
-				elif [ $STATUS -eq 2 ]; then
+				elif [ $STATUS -eq 3 ]; then
 					showWlanProtectionGUIFn "$1" "$2" "$PROTECTION" "$CUSTOM"
 				fi
 			else
@@ -257,7 +270,7 @@ function showWlanProtectionGUIFn() {
 			if [ ! -z "$RETURN" ]; then
 				setInterfaceWlanCredentials "$1" "Open" "$RETURN"
 				showInterfaceCredentialsSuccessDlg
-				showWlanRestartGUIFn $1 $SSID
+				showRestartGUIFn $1 $SSID
 				if [ $STATUS -eq 3 ]; then
 					showGUIFn;
 				elif [ $STATUS -eq 2 ]; then
@@ -273,42 +286,25 @@ function showWlanProtectionGUIFn() {
 	fi
 }
 
-function showWlanRestartGUIFn() {
+function showRestartGUIFn() {
 	showRestartAdapterDlg $1
-	restartWLANAdapterFn "$1"
-	LASTSTATUS=-1;
-	while [ $(kill -0 $PROCESSID 2>/dev/null >/dev/null; echo $?) -eq 0 ]; do
-		getWLANConnectStatusFn;
+	restartAdapterFn "$1"
+	setAuto $1
+	for i in $(seq 1 15); do
+		showConnectingDlg "$2 ($1)"
+		STATUS=$(showCMDFn progress $1)
+		[ "$STATUS" -eq 2 ] || break
+		sleep 2
+	done
 
-		if [ $LASTSTATUS -ne $STATUS ]; then
-			LASTSTATUS=$STATUS;
-			if [ $STATUS -eq 1 ]; then
-				showWLANConnectingDlg $2
-			elif [ $STATUS -eq 2 ]; then
-				showWLANConnectionFailedDlg $2
-			elif [ $STATUS -eq 3 ]; then
-				showWLANConnectionSuccessDlg $2
-			fi
-		fi
-		sleep 1;
-	done;
-	
-	getWLANConnectStatusFn;
-	
-	if [ $LASTSTATUS -ne $STATUS ]; then
-		LASTSTATUS=$STATUS;
-		if [ $STATUS -eq 1 ]; then
-			showWLANConnectingDlg $2
-		elif [ $STATUS -eq 2 ]; then
-			showWLANConnectionFailedDlg $2
-		elif [ $STATUS -eq 3 ]; then
-			showWLANConnectionSuccessDlg $2
-		fi
+	if [ $STATUS -eq 1 ]; then
+		showConnectionSuccessDlg "$2 ($1)"
+	else
+		showConnectionFailedDlg "$2 ($1)"
 	fi
-	
-	clearWLANStatusFn;
-	
 	return $STATUS;
+
+
 }
 
 # Executes the command line version of this module
@@ -319,8 +315,8 @@ function showWlanRestartGUIFn() {
 #    $2 Interface [String]
 #  static
 #    $3 IP [String]
-#    $4 Gateway [String]
-#    $5 Netmask [String]
+#    $4 Netmask [String]
+#    $5 Gateway [String]
 #    $6 Nameserver 1 [String] (optional)
 #    $7 Nameserver 2 [String] (optional)
 #  credentials (No arguments return current settings)
@@ -345,13 +341,13 @@ function showWlanRestartGUIFn() {
 #  -8: Invalid Gateway
 #  -9: Invalid DNS
 #  -10: Invalid wireless protection
-#  -11: WLAN already restarting
+#  -11: Already restarting
 #  -12: Awaiting progress status
 function showCMDFn() {
 	case $1 in
 		list)
 			IFACES=$(listNetworkInterfacesFn)
-			if [ $? -eq 1 ] && [ ! -z "$IFACES" ]; then
+			if [ -n "$IFACES" ]; then
 				echo -e "$IFACES"
 				return 1;
 			else
@@ -386,10 +382,11 @@ function showCMDFn() {
 		dhcp)
 			# Check that we have 3 arguments ($1=action, $2=interface)
 			if [ $# -eq 2 ]; then
-				isValidInterfaceFn "$2"
+				# No need to check for valid interface here as setInterfaceDhcpFn does it
+				setInterfaceDhcpFn "$2"
 				if [ $? -eq 1 ]; then
-					setInterfaceDhcpFn "$2"
 					echo "1"
+					setAuto "$2"
 					return 1;
 				else
 					# Invalid interface
@@ -404,55 +401,49 @@ function showCMDFn() {
 		;;
 		static)
 			if [ $# -gt 3 ]; then
-				isValidInterfaceFn "$2"
-				if [ $? -eq 1 ]; then
+				# No need to check for valid interface here as setInterfaceStaticFn does it
 
-					# $3 = IP
-					# $4 = Gateway
-					# $5 = Netmask
-					# $6 = Nameserver1
-					# $7 = Nameserver2
+				# $3 = IP
+				# $4 = Netmask
+				# $5 = Gateway
+				# $6 = Nameserver1
+				# $7 = Nameserver2
+				# $8 = Method static/manual/disable
 
-					# Handle optional name servers
-					NAMESERVER1=""
-					NAMESERVER2=""
+				# Handle optional name servers and method
+				[ $# -gt 5 ] && NAMESERVER1="$6" || NAMESERVER1=""
+				[ $# -gt 6 ] && NAMESERVER2="$7" || NAMESERVER2=""
+				[ $# -gt 7 ] && METHOD="$8"      || METHOD=""
 
-					if [ $# -gt 5 ]; then
-						NAMESERVER1="$6"
-					fi
-					if [ $# -gt 6 ]; then
-						NAMESERVER2="$7"
-					fi
-
-					# Validation of arguments is done inside this function
-					RESULT=$(setInterfaceStaticFn "$2" "$3" "$4" "$5" "$NAMESERVER1" "$NAMESERVER2"; echo $?)
-					case $RETULT in
-						6)
-							echo -6;
-						;;
-						7)
-							echo -7;
-						;;
-						8)
-							echo -8;
-						;;
-						9)
-							echo -9;
-						;;
-						1)
-							echo 1;
-						;;
-						3)
-							echo -3;
-						;;
-					esac;
-					# Return status of setInterfaceModeFn
-					return $RESULT;
-				else
-					# Invalid interface
-					echo "-2"
-					return 0;
-				fi
+				# Validation of arguments is done inside this function
+				RESULT=$(setInterfaceStaticFn "$2" "$3" "$4" "$5" "$NAMESERVER1" "$NAMESERVER2" "$METHOD"; echo $?)
+				case $RESULT in
+					0)
+						# Invalid interface
+						echo -2;
+					;;
+					1)
+						[ "$METHOD" = disable ] || setAuto "$2"
+						echo 1;
+					;;
+					3)
+						echo -3;
+					;;
+					6)
+						echo -6;
+					;;
+					7)
+						echo -7;
+					;;
+					8)
+						echo -8;
+					;;
+					9)
+						echo -9;
+					;;
+				esac;
+				# Return status of setInterfaceStaticFn
+				return $RESULT;
 			else
 				# Wrong number of arguments
 				echo "-1"
@@ -461,38 +452,41 @@ function showCMDFn() {
 		;;
 		credentials)
 			if [ $# -gt 3 ]; then
-				isValidInterfaceFn "$2"
-				if [ $? -eq 1 ]; then
-					# Validation of the data is done inside this function
+				# No need to check for valid interface here as setInterfaceWlanCredentials does it
 
-					# $2 = Interface
-					# $3 = WPA|WEP|Open
-					# $4 = ESSID
-					# $5 = WLANKEY (semi-optional, only needed with WPA or WEP)
+				# $2 = Interface
+				# $3 = WPA|WEP|Open
+				# $4 = ESSID
+				# $5 = WLANKEY (semi-optional, only needed with WPA or WEP)
 
-					WLANKEY=""
-					if [ $# -gt 4 ]; then
-						WLANKEY="$5"
-					fi
-
-					RETURN=$(setInterfaceWlanCredentials "$2" "$3" "$4" "$WLANKEY"; echo $?)
-					case $RETURN in
-						2)
-							echo -10;
-						;;
-						1)
-							echo 1;
-						;;
-						3)
-							echo 3;
+				WLANKEY=""
+				if [ $# -gt 4 ]; then
+					WLANKEY="$5"
+				else
+					case $3 in
+						WPA|WEP)
+							fetchWLANCredentialsFn "$3" "$(echo $4 | base64 -d)"
+							echo "$WLANKEY"
+							return 1
 						;;
 					esac
-					return $?;
-				else
-					# Invalid interface
-					echo "-2"
-					return 0;
 				fi
+
+				RETURN=$(setInterfaceWlanCredentials "$2" "$3" "$(echo $4 | base64 -d)" "$(echo $WLANKEY | base64 -d)"; echo $?)
+				case $RETURN in
+					0)
+						# Invalid interface
+						echo -2;
+					;;
+					1)
+						echo 1;
+						setAuto $2
+					;;
+					2)
+						echo -10;
+					;;
+				esac
+				return $RETURN;
 			else
 				# Wrong number of arguments
 				echo "-1"
@@ -500,35 +494,32 @@ function showCMDFn() {
 			fi
 		;;
 		scan)
-			if [ $# == 2 ] && [[ "$2" =~ "wlan" ]]; then
+			if [ $# == 2 ] && [[ "$2" =~ "wlan" ]] || [[ "$2" =~ "ra" ]]; then
 				isValidInterfaceFn "$2"
 				if [ $? -eq 1 ]; then
 					scanWLANNetworksFn $2;
-					IFS=$ORIGNALIFS;
-					for WNETWORK in ${WNETWORKS[@]}; do
-						echo $WNETWORK;
+					for WNETWORK in "${WNETWORKS[@]}"; do
+						echo "$WNETWORK";
 					done
 				else
+					# Invalid interface
 					echo -2
 				fi
 			else
+				# Wrong (number of) arguments
 				echo -1
 			fi
 		;;
 		restart)
 			if [ $# == 2 ]; then
-				getAdapterTypeFn $2;
+				isValidInterfaceFn "$2"
 				if [ $? -eq 1 ]; then
-					isValidInterfaceFn "$2"
-					if [ $? -eq 1 ]; then
-						restartWLANAdapterFn $2
-						if [ $PROCESSID -gt 0 ]; then
-							echo 1
-						else
-							echo -11
-						fi
+					restartAdapterFn $2
+					if [ "$?" -gt 0 ]; then
+						setAuto $2
+						echo 1
 					else
-						echo -2
+						echo -11
 					fi
 				else
 					echo -2;
@@ -538,22 +529,18 @@ function showCMDFn() {
 			fi
 		;;
 		progress)
-			if [ $(kill -0 $(pgrep ifup) 2>/dev/null >/dev/null; echo $?) -eq 0 ]; then
-				getWLANConnectStatusFn;
-				if [ $STATUS -eq 0 ]; then
-					echo -12;
-				elif [ $STATUS -eq 1 ]; then
-					echo 2;
-				elif [ $STATUS -eq 2 ]; then
-					echo 0;
-					clearWLANStatusFn;
-				elif [ $STATUS -eq 3 ]; then
-					echo 1;
-					clearWLANStatusFn;
-				fi
+			if [ -e /run/ifup.pid ] && kill -0 $(cat /run/ifup.pid) 2>/dev/null; then
+				echo 2
 			else
-				echo 0;
-				clearWLANStatusFn
+				getConnectStatusFn $2;
+				if [ $STATUS -le 1 ]; then
+					echo -12;
+				elif [ $STATUS -eq 2 ]; then
+					echo 1;
+				elif [ $STATUS -eq 3 ]; then
+					echo 0;
+				fi
+
 			fi
 		;;
 		type)

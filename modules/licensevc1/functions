@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#Copyright 2012 CurlyMo <development@xbian.org>
+#Copyright 2012 -  2017 CurlyMo & mkreisl <development@xbian.org>
 #
 #This file is part of XBian - XBMC on the Raspberry Pi.
 #
@@ -22,7 +22,7 @@
 # Returns
 #  $LICENSE [String]
 function getCurrentLicenseVC1Fn() {
-	LICENSE=$(cat /boot/config.txt | grep 'decode_WVC1' | cut -f 2 -d=); 
+	LICENSE=$(sed -ne 's/\(^decode_WVC1=\)\(.*\)/\2/p' /boot/config.txt);
 }
 
 # Insert the current license
@@ -32,17 +32,21 @@ function getCurrentLicenseVC1Fn() {
 #  - 1: Success
 #  - 0: Failed
 function insertLicenseVC1Fn() {
-	NEWLICENSE=$1;
-	if [ "${NEWLICENSE:0:2}" == "0x" ] && [[ "${NEWLICENSE:2:8}" =~ ^[0-9a-f]{1,8}$ ]] && [ ${#NEWLICENSE} -le 10 ] && [ ${#NEWLICENSE} -ge 9 ]; then
-		echo "decode_WVC1=$1" >> /boot/config.txt 
-		if [ $(cat /boot/config.txt | grep $1 | wc -l) -eq 1 ]; then
-			return 1;
+        L=$1; OIFS=$IFS; IFS=$','
+	set -- $1
+	[ $# -le 8 ] && rc=1 || rc=2
+	for NEWLICENSE in $@; do
+		if [ "${NEWLICENSE:0:2}" == "0x" ] && [[ "${NEWLICENSE:2:8}" =~ ^[0-9a-f]{1,8}$ ]] && [ ${#NEWLICENSE} -le 10 ] && [ ${#NEWLICENSE} -ge 9 ]; then
+			:
 		else
-			return 0;
+			rc=2
 		fi
-	else
-		return 2;
-	fi
+	done
+
+	[ $rc == 1 ] && updateConfigVarFn decode_WVC1 "$L"
+
+	IFS=$OIFS
+	return $rc
 }
 
 
@@ -54,17 +58,7 @@ function insertLicenseVC1Fn() {
 #  - 1: Success
 #  - 0: Failed
 function updateLicenseVC1Fn() {
-	NEWLICENSE=$1;
-	if [ "${NEWLICENSE:0:2}" == "0x" ] && [[ "${NEWLICENSE:2:8}" =~ ^[0-9a-f]{1,8}$ ]] && [ ${#NEWLICENSE} -le 10 ] && [ ${#NEWLICENSE} -ge 9 ]; then
-		sed -i "s/decode_WVC1=$2/decode_WVC1=$1/g" /boot/config.txt;
-		if [ $(cat /boot/config.txt | grep $1 | wc -l) -eq 1 ]; then
-			return 1;
-		else
-			return 0;
-		fi
-	else
-		return 2;
-	fi
+	insertLicenseVC1Fn $1
 }
 
 # Delete the current license
@@ -74,8 +68,8 @@ function updateLicenseVC1Fn() {
 #  - 1: Success
 #  - 0: Failed
 function deleteLicenseVC1Fn() {
-	sed -i "/decode_WVC1=$1/d" /boot/config.txt;
-	if [ $(cat /boot/config.txt | grep $1 | wc -l) -eq 0 ]; then
+	grep -q ^"decode_WVC1=.*$1" /boot/config.txt && updateConfigVarFn decode_WVC1 0x00000000
+	if [ $(grep -c $1 /boot/config.txt) -eq 0 ]; then
 		return 1;
 	else
 		return 0;

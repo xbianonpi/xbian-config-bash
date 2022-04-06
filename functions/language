@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#Copyright 2012 - 2013 CurlyMo & mk01 <development@xbian.org>
+#Copyright 2012 - 2017 CurlyMo, mk01 & mkreisl <development@xbian.org>
 #
 #This file is part of XBian - XBMC on the Raspberry Pi.
 #
@@ -18,12 +18,45 @@
 #with XBian. If not, see <http://www.gnu.org/licenses/>
 #
 
-LANGUAGE=$(locale | sed -ne 's/LANG=\([a-z]\{2,3\}_[A-Z]\{2,3\}\).*/\1/p');
+check_locale()
+{
+    locale > /tmp/xbian-config.lang 2>/dev/null
+    . /tmp/xbian-config.lang 2>/dev/null
 
-if [ ! -f "/usr/share/locale/${LANGUAGE//_/ }/LC_MESSAGES/xbian.mo" ]; then
-	LANGUAGE=en_EN
+    if [ -n "$LC_ALL" ]; then
+        lsetting=$LC_ALL
+    elif [ -n "$LC_MESSAGES" ]; then
+        lsetting=$LC_MESSAGES
+    elif [ -n "$LANGUAGE" ]; then
+        lsetting="$LANGUAGE"
+    elif [ -n "$LANG" ]; then
+        lsetting=$LANG
+    fi
+
+    [ -z "$lsetting" ] && return 1
+    ldir="${lsetting##*=}"
+    ldir="${ldir}_."
+    ldir="${ldir%%_*.*}"
+    [ ! -e "/usr/share/locale/$ldir/LC_MESSAGES/xbian.mo" ] && return 1
+
+    echo -e $(env -i LANG=$lsetting locale) > /run/xbian-config.$$
+    return 0
+
+}
+
+if [ ! -e /run/xbian-config.$$ ]; then
+    check_locale || echo -e $(env -i LANG=en_US.UTF-8 locale) > /run/xbian-config.$$
+    XB_LOCALE=$(cat /run/xbian-config.$$)
+    EN_LOCALE=$(env -i LANG="en_US.UTF-8" locale)
 fi
 
 function _() {
-	echo $(gettext -d "xbian" -s "xbian-config."$1);
+    msgid="xbian-config.$1"
+    translation=$(eval $XB_LOCALE gettext xbian $msgid)
+    if [ "$translation" = "$msgid" ]; then
+        # Untranslated string
+        translation=$(eval $EN_LOCALE gettext xbian $msgid)
+    fi
+
+    echo $translation | tr '^' ' '
 }
